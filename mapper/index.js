@@ -2,14 +2,17 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 var path = require('path');
+const vars = require('./vars')
 const port = 3000;
+
+const cdn = "https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js";
 
 app.use(cors());
 
-//static for now, will eventually update to dynamically have coordinate passing
-const WebPage = path.join(__dirname, '/Web');
-app.use("/", express.static(WebPage));
+app.get("/", (req, res) => {
+    res.send(vars.htmlPage(cdn));
+})
 
-module.exports = app.listen(port, () => {
-    console.log(`App running on port ${port}.`)
+app.listen(port, () => {
+  console.log(`App running on port ${port}.`)
 })
