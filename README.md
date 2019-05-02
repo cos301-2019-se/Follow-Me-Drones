@@ -1,10 +1,9 @@
 ## Object Recognition with Darknet
 
-================
-
 ### Steps to setup
 
 https://pjreddie.com/darknet/yolo/
+
 https://pjreddie.com/darknet/install/#cuda
 
 1) Clone the git repository
