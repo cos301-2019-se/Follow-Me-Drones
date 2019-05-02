@@ -75,7 +75,7 @@ int main()
 
     pics.push_back("eagle.jpg");
     expectedDetections.push_back({"bird"});
-/*
+
     pics.push_back("giraffe.jpg");
     expectedDetections.push_back({"giraffe", "zebra"});
 
@@ -87,7 +87,7 @@ int main()
 
     pics.push_back("person.jpg");
     expectedDetections.push_back({"person", "horse", "dog"});
-*/
+
     string output;
     string* objectsIdentified;
 
@@ -97,6 +97,9 @@ int main()
 
         compareResults(getObjectsIdentified(output), expectedDetections[i], pics[i]);
     }
+
+    system("rm predictions.jpg");
+    system("rm exec.txt");
 
     return 0;
 }
