@@ -6,32 +6,16 @@
 
 ================
 
-<a href="https://github.com/cos301-2019-se/Follow-Me-Drones" target="_blank">Project Github Repository</a> <br> 
-
-<a href="https://github.com/5-guys-1-branch/capstone-documentation" target="_blank">Documentation Github Repository</a> <br>
-
-<a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
-
-### The Team
-
-![alt text](https://i.imgur.com/H8qoSik.jpg "Logo Title Text 1")
-
-Devon
-Francois
-Brendon
-Gilad
-Len
-
 # Steps to setup
 
 https://pjreddie.com/darknet/yolo/
 https://pjreddie.com/darknet/install/#cuda
 
-1 ->    git clone https://github.com/pjreddie/darknet
+git clone https://github.com/pjreddie/darknet
 
-2 ->    cd darknet
+cd darknet
 
-3 ->    make
+make
 
 4 -> Download the weights
 
