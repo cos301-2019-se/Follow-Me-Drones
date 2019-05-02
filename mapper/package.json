@@ -1,0 +1,21 @@
+{
+  "name": "mockmap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "author": "5Guys1Branch",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "ol": "^5.3.2",
+    "path": "^0.12.7"
+  },
+  "devDependencies":{
+    "jest": "^24.7.1"
+  }
+}

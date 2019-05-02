@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 data/
 obj/
 yolov3.weights
+=======
+
+mapper/node_modules/
+>>>>>>> 7d867f9412bbc1510ef7f88686e6a5ba822a007e
