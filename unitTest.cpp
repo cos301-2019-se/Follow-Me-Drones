@@ -51,17 +51,24 @@ vector<string> getObjectsIdentified(string str)
 void compareResults(vector<string> detections, vector<string> expectedDetections, string pic)
 {
     cout << "\n=============================" << endl;
-    cout << "Unit test for -> " << pic << endl;
+    cout << "\tUnit test for -> " << pic << endl;
     cout << "=============================" << endl << endl;;
 
     for(int i = 0; i < expectedDetections.size(); i++)
     {
         if(find(detections.begin(), detections.end(), expectedDetections[i]) != detections.end())
-            cout << "Successfully found: " << detections[i] << endl;
+        {
+            cout << "Successfully found: " << expectedDetections[i] << endl;
+            /*
+            if(expectedDetections[i] == "bird")
+                cout << "Successfully found: " << expectedDetections[i] << endl;
+            else
+                cout << "Successfully found: Not bird" << endl;
+            */
+        }
         else
             cout << "Couldn't find: " << expectedDetections[i] << endl;
     }
-    
 }
 
 int main()
