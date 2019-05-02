@@ -1,22 +1,24 @@
-# Follow Me Drones
-
-## 5 Guys 1 Branch
-
-### Object Recognition with Darknet
+## Object Recognition with Darknet
 
 ================
 
-# Steps to setup
+### Steps to setup
 
 https://pjreddie.com/darknet/yolo/
 https://pjreddie.com/darknet/install/#cuda
 
+1) Clone the git repository
+
         git clone https://github.com/pjreddie/darknet
+
+2) Move to the directory
 
         cd darknet
 
-        make
+3) Make the project
 
+        make
+        
 4) Download the weights
 
         wget https://pjreddie.com/media/files/yolov3.weights 
