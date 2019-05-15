@@ -1,4 +1,4 @@
-EXECUTABLE = main
+EXECUTABLE = interface
 TAR_NAME = interface.tar.gz
 
 FILES = interface.cpp
