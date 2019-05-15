@@ -1,3 +1,0 @@
-/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/yolo-mark/CMakeFiles/rebuild_cache.dir
-/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/yolo-mark/CMakeFiles/yolo_mark.dir
-/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/yolo-mark/CMakeFiles/edit_cache.dir
