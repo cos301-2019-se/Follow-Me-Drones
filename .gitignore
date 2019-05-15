@@ -39,7 +39,7 @@ UserInterfaceState.xcuserstate
 # darknet stuff
 
 CMakeCache.txt
-
+darknet
 data/
 *.mp4
 *.jpg
