@@ -40,7 +40,7 @@ UserInterfaceState.xcuserstate
 
 darknet
 interface
-yolo_mark
+./object-recognition/src/yolo-mark/yolo_mark 
 data/
 *.mp4
 *.jpg
