@@ -11,12 +11,12 @@
 ##### Executing dronekit and mavproxy on windows normally doesnt work as expected
 * Option 1 Using Gitbash  
 ```
-	$ cd DroneControls  
+	$ cd drone-controls  
 	$ ./install.sh  
 ```
 * Option 2 Using CMD/Powershell  
 ```
-	$ cd DroneControls  
+	$ cd drone-controls   
 	$ sh install.sh  
 ```
 * Option 3 Using Python Commands  
@@ -28,7 +28,7 @@
 ### Installing on Linux
 * Option 1 Using terminal 
 ```
-	$ cd DroneControls 
+	$ cd drone-controls  
 	$ chmod +x install.sh  
 	$ ./install.sh  
 ```
