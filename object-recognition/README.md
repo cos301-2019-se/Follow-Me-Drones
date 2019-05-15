@@ -2,36 +2,25 @@
 
 Compiling darknet:
 ```
-$ cd darknet_
+$ cd src/darknet_
 $ make
 ```
 Compiling yolo-mark.
 ```
-$ cd yolo-mark
+$ cd src/yolo-mark
 $ make
 ```
 Compile Frame Extractor
 ```
-$ cd frame-extractor
+$ cd src/frame-extractor
 $ make
 ```
 Download Scraped images from drive.
 ```
 TODO:
-$ cd darknet_/data/animal-pictures
+$ cd src/darknet_/data/animal-pictures
 $ wget …
 $ unzip 
-```
-Using yolo-mark.
-```
-$ cd darknet_/training
-$ ./mark-boxes
-```
-
-Train on marked-data.
-```
-$ cd darknet_/training
-$ ./train-model
 ```
 
 Using frame-extractor 
