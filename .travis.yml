@@ -16,4 +16,4 @@ before_script:
   
 
 script:
-  - ng test  --browser=Firefox --watch=false 
+  - ng test --browsers=Firefox --watch=false 
