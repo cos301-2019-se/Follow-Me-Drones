@@ -14,9 +14,11 @@ void printMenu()
 
     cout << "\033[2J"; // Clear screen;
     cout << "\033[0;0H"; // Move cursor to top left
-    cout << "\033[36m";
+    cout << "\033[36m"; // Change color to blue
     printf(logo.c_str());
-    cout << "\033[37m";
+    cout << "\033[31m"; // Change color to red
+    printf("\n\t\t\t\t\tATTENTION: Be sure to run 'make' within src/darknet_/ and src/yolo-mark before using this\n");
+    cout << "\033[37m"; // Change color to white
 
     cout << "\n1. Test image\n" << "2. Test demo video\n" << "3. Mark images\n" << "4. Train on marked images\n" << "5. Quit\n" << "---------------------------------\nChoice: ";
     cout.flush();
