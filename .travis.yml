@@ -1,7 +1,7 @@
-sudo: false
-
+sudo: required
+dist: trusty
 addons:
-  chrome: stable
+  firefox: "60.0"
       
 language: node_js
 node_js:
@@ -11,8 +11,8 @@ before_install:
   - cd './user-application'
 
 before_script:
-  - npm install
   - npm install -g ionic cordova
+  - npm install
 
 script:
   - ng test
