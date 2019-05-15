@@ -1,7 +1,7 @@
 sudo: required
 dist: trusty
 addons:
-  firefox: "60.0"
+  - chrome:stable
       
 language: node_js
 node_js:
@@ -11,8 +11,11 @@ before_install:
   - cd './user-application'
 
 before_script:
+  - ln -s /var/lib/dbus/machine-id /etc/machine-id
+  - export CHROME_BIN=/usr/bin/google-chrome
   - npm install -g ionic cordova
   - npm install
+  
 
 script:
   - ng test
