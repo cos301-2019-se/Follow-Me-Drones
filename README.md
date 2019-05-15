@@ -11,7 +11,7 @@
 | Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
 |  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
 |  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
-|   Francois Venter [<img src="https://drive.google.com//uc?id=1442TcEMk1RIObzox1DRP43tJb8_fcMcp" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
+|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
 
 ---
 
@@ -169,7 +169,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 #### Francois Venter (u14177553) [<img src="https://i.imgur.com/VkNBW2q.jpg" alt="Top" width="15">](#team-overview)
 ##### BSc Information Technology
 
-<img src="https://i.imgur.com/7UYivDc.jpg" alt="Francois Photo" width="250">
+<img src="https://drive.google.com//uc?id=1442TcEMk1RIObzox1DRP43tJb8_fcMcp" alt="Francois Photo" width="250">
 
 ##### Interests
 * Artificial Intelligence
