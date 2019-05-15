@@ -8,7 +8,6 @@ vid2frames
 *.mp4
 *.list
 *.jpg
-cifar/
 yolo-mark
 *.o
 train.txt
@@ -56,6 +55,3 @@ $RECYCLE.BIN/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
-CMakeCache.txt
-*.zip
-darknet19_448.conv.23
