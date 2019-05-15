@@ -7,6 +7,7 @@
 * Python3 +
 * PIP
 
+# Install
 ### Installing on Windowns
 ##### Executing dronekit and mavproxy on windows normally doesnt work as expected
 * Option 1 Using Gitbash  
@@ -36,4 +37,14 @@
 ```
 	$ pip install dronekit-sitl  
 	$ pip install mavproxy  
+```
+
+# Running
+```
+	[//]: # (This launches the drone simulator)
+	$ dronekit-sitl copter --home=-25.882593,28.263991,584,353
+	[//]: # (This adds the command interface)
+	mavproxy.py --master tcp:127.0.0.1:5760 --out udp:127.0.0.1:14551 --out udp:10.1.2.100:1455
+	[//]: # (This is the custom interface that translates the users command to the mavcomands)
+	$ python interface.py
 ```
