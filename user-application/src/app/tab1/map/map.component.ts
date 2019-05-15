@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterContentInit } from '@angular/core';
 import OlMap from 'ol/Map';
-import OlXYZ from 'ol/source/XYZ';
 import OlTileLayer from 'ol/layer/Tile';
 import OlView from 'ol/View';
 import OlOSM from 'ol/source/OSM';
@@ -12,23 +11,22 @@ import {fromLonLat} from 'ol/proj';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements AfterContentInit  {
 
   map: OlMap;
-  source: OlXYZ;
+  source: OlOSM;
   layer: OlTileLayer;
   view: OlView;
-  constructor() {
-    this.source = new OlXYZ({
-      url: 'http://tile.osm.org/{z}/{x}/{y}.png'
-    });
+  Olproj: OlProj;
+
+  ngAfterContentInit(){
 
     this.layer = new OlTileLayer({
-      source: this.source
+      source: new OlOSM()
     });
 
     this.view = new OlView({
-      center: fromLonLat([28.232592, -25.755710]),
+      center: fromLonLat([0, 0]),
       zoom: 18
     });
 
@@ -37,26 +35,8 @@ export class MapComponent implements OnInit {
       layers: [this.layer],
       view: this.view
     });
-  }
 
-  ngOnInit() {
-    this.source = new OlXYZ({
-      url: 'http://tile.osm.org/{z}/{x}/{y}.png'
-    });
+    this.view.setCenter(fromLonLat([28.232592, -25.755710]));
 
-    this.layer = new OlTileLayer({
-      source: this.source
-    });
-
-    this.view = new OlView({
-      center: fromLonLat([28.232592, -25.755710]),
-      zoom: 18
-    });
-
-    this.map = new OlMap({
-      target: 'map',
-      layers: [this.layer],
-      view: this.view
-    });
-  }
+  } 
 }
