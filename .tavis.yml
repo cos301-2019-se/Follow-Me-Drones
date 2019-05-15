@@ -1,0 +1,14 @@
+sudo: false
+language: node_js
+node_js:
+  - 10
+
+before_install:
+  - d './user-application'
+
+before_script:
+  - npm install
+  - npm install -g ionic cordova
+
+script:
+  - ng test
