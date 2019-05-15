@@ -4,7 +4,7 @@ node_js:
   - 10
 
 before_install:
-  - d './user-application'
+  - cd './user-application'
 
 before_script:
   - npm install
