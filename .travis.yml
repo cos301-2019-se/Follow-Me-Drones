@@ -11,9 +11,11 @@ before_install:
   - cd './user-application'
 
 before_script:
+  - npm install -g phantomjs-prebuilt
+  - export PHANTOMJS_BIN=/usr/bin/phantomjs
   - npm install -g ionic cordova
   - npm install
   
 
 script:
-  - ng test --browsers=Firefox --watch=false 
+  - ng test --browsers=PhantomJS --watch=false 
