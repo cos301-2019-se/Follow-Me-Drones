@@ -7,6 +7,10 @@ language: node_js
 node_js:
   - 10
 
+cache:
+  directories:
+    - ''./user-application/node_modules'
+
 before_install:
   - cd './user-application'
 
