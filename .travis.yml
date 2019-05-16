@@ -9,7 +9,7 @@ node_js:
 
 cache:
   directories:
-    - ''./user-application/node_modules'
+    - './user-application/node_modules'
 
 before_install:
   - cd './user-application'
