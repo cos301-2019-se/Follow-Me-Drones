@@ -42,6 +42,7 @@ darknet
 interface
 ./object-recognition/src/yolo-mark/yolo_mark 
 data/
+custom/
 *.mp4
 *.jpg
 *.png
