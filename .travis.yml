@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: xenial
 addons:
   firefox: latest-esr
       
@@ -10,9 +10,14 @@ node_js:
 before_install:
   - cd './user-application'
 
+services:
+  - xvfb
+
 before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
   - sudo ln -s /var/lib/dbus/machine-id /etc/machine-id
-  - export DISPLAY=:0.0
   - npm install -g ionic cordova
   - npm install
   
