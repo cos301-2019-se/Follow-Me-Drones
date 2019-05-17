@@ -14,9 +14,6 @@ services:
   - xvfb
 
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
   - sudo ln -s /var/lib/dbus/machine-id /etc/machine-id
   - npm install -g ionic cordova
   - npm install
