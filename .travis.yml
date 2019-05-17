@@ -1,7 +1,7 @@
 sudo: required
 dist: trusty
 addons:
-  chrome: stable
+  firefox: latest-esr
       
 language: node_js
 node_js:
