@@ -12,9 +12,10 @@ before_install:
 
 before_script:
   - sudo ln -s /var/lib/dbus/machine-id /etc/machine-id
+  - export DISPLAY=:0.0
   - npm install -g ionic cordova
   - npm install
   
 
 script:
-  - sudo ng test --watch=false
+  - ng test --watch=false
