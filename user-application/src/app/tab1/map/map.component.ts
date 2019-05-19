@@ -62,16 +62,14 @@ export class MapComponent implements AfterContentInit  {
       geometry: new Point(transform(coord2, 'EPSG:4326', 'EPSG:3857')) //this creates a dot at coordinates given
     });
 
-    /*
     var pointStyle = new Style({
       image: new Icon(({
-        crossOrigin: 'anonymous',
-        src: './dot.png' //unable to find
+          crossOrigin: 'anonymous',
+		  src: 'assets/color-pins/red-pin.png' //unable to find
       }))
     });
 
     point.setStyle(pointStyle); //once dot.png is found can apply
-    */
 
     vectorSource.addFeature(point);
     vectorSource.addFeature(point2);
