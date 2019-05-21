@@ -1,0 +1,6 @@
+echo "Writing all image names into data/train.txt..."
+cd ..
+find data/animal-images -name \*.jpg > data/train.txt
+./darknet classifier train cfg/animals.data cfg/animals.cfg darknet19_448.conv.23
+cd training
+
