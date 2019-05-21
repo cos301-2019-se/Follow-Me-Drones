@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
+#include <string>
+
 using std::cerr;
 using std::endl;
 
@@ -274,10 +276,18 @@ void delete_json_sender()
 void send_json_custom(char const* send_buf, int port, int timeout)
 {
     try {
-        std::lock_guard<std::mutex> lock(mtx);
-        if(!js_ptr) js_ptr.reset(new JSON_sender(port, timeout));
+        //std::lock_guard<std::mutex> lock(mtx);
+        //if(!js_ptr) js_ptr.reset(new JSON_sender(port, timeout));
 
-        js_ptr->write(send_buf);
+        std::string content(send_buf);
+        content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
+
+        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:8080/detection";
+        //std::cout << to_send << std::endl;
+
+        system(to_send.c_str());
+
+        //js_ptr->write(send_buf);
     }
     catch (...) {
         cerr << " Error in send_json_custom() function \n";
@@ -286,11 +296,24 @@ void send_json_custom(char const* send_buf, int port, int timeout)
 
 void send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
 {
-    try {
+    try 
+    {
         char *send_buf = detection_to_json(dets, nboxes, classes, names, frame_id, NULL);
 
-        send_json_custom(send_buf, port, timeout);
-        std::cout << " JSON-stream sent. \n";
+        const char *ptr = strchr(send_buf, '[');
+
+        int index = ptr - send_buf;
+
+        if(send_buf[index+5] != ']') // Make sure that an object was detected before sending any json
+        {
+            send_json_custom(send_buf, port, timeout);
+            std::cout << "JSON data:" << std::endl;
+            std::cout << send_buf << std::endl;
+            std::cout << " JSON-stream sent. \n";
+        }
+        else
+            std::cout << "No objects found" << std::endl;
+
 
         free(send_buf);
     }
