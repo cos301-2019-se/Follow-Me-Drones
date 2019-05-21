@@ -1,16 +1,19 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>
-      Drone List
-    </ion-title>
-  </ion-toolbar>
+	<ion-toolbar>
+		<ion-title>
+			Paired Drones
+		</ion-title>
+	</ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-	<app-drone-list>
-
-	</app-drone-list>
+	<app-drone-list></app-drone-list>
+	<ion-fab (click)="addNewDrone()" vertical="bottom" horizontal="end" slot="fixed">
+		<ion-fab-button>
+			<ion-icon name="add"></ion-icon>
+		</ion-fab-button>
+	</ion-fab>
 
 </ion-content>
 
