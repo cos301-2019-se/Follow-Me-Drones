@@ -3,6 +3,9 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddNewDronePage } from './add-new-drone.page';
 
+import { ModalController } from '@ionic/angular';
+import { AngularDelegate } from '@ionic/angular';
+
 describe('AddNewDronePage', () => {
   let component: AddNewDronePage;
   let fixture: ComponentFixture<AddNewDronePage>;
@@ -11,6 +14,7 @@ describe('AddNewDronePage', () => {
     TestBed.configureTestingModule({
       declarations: [ AddNewDronePage ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [ModalController, AngularDelegate],
     })
     .compileComponents();
   }));
