@@ -19,8 +19,8 @@ home: "global"
 def connect_to_drone(args):
   global drone
   try:
-    udp_port = args[1]
-    #udp_port = "14551"
+    #udp_port = args[1]
+    udp_port = "14551"
     print('Connecting to drone on UDP port: %s' % udp_port)
     drone = connect('udp:127.0.0.1:' + udp_port, wait_ready=True)
     print('CONNECT_UDP: SUCCESS')
