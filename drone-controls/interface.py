@@ -1,15 +1,12 @@
 from __future__ import print_function
 from dronekit import connect, VehicleMode, Vehicle, LocationGlobalRelative, mavlink
-import time
-import sys
-import math
+import time, sys, math
 
 # definitions
-CONNECT = 'CONNECT'
-DISCONNECT = 'DISCONNECT'
-CANCEL = 'CANCEL'
-GO_TO_POINT = 'GO_TO'
-ARM = 'ARM'
+CONNECT_UDP = 'CONNECT_UDP'
+DISCONNECT_UDP = 'DISCONNECT_UDP'
+GO_TO_POINT = 'GO_TO_POINT'
+CANCEL_FLIGHT = 'CANCEL_FLIGHT'
 
 drone: Vehicle
 home: "global"
@@ -19,15 +16,15 @@ home: "global"
 def connect_to_drone(args):
   global drone
   try:
-    #udp_port = args[1]
-    udp_port = "14551"
+    udp_port = args[1]
+    #udp_port = "14551"
     print('Connecting to drone on UDP port: %s' % udp_port)
     drone = connect('udp:127.0.0.1:' + udp_port, wait_ready=True)
-    print('CONNECT_UDP: SUCCESS')
+    print('SUCCESS')
     sys.stdout.flush()
   except Exception as e:
     print('Error connecting to drone via UDP', e)
-    print('CONNECT_UDP: FAILURE')
+    print('FAILURE')
   return
 
 #error function
@@ -51,57 +48,59 @@ def return_to_base(args):
   sys.stdout.flush()
 
 #arms the drone and makes it takeoff with a default height of 10m
-def arm(args):
+def arm(alt):
   global drone
   global home
 
   home = drone.location.global_relative_frame
-  if(len(args) < 1):
-    target_altitude = 10
-  else:
-    target_altitude = args[1]
 
-  #wait for autopilot
-  print('Drone initializing')
+  print('Performing pre-arm checks...')
   sys.stdout.flush()
+
+  # Don't try to arm until autopilot is ready
   while not drone.is_armable:
+    print('Drone initializing')
+    sys.stdout.flush()
     time.sleep(1)
-  
-  print('Drone is arming')
+
+  print('Arming drone')
   sys.stdout.flush()
 
+  # Copter should arm in GUIDED mode
   drone.mode = VehicleMode('GUIDED')
   drone.armed = True
 
+  # Confirm vehicle armed before attempting to take off
   while not drone.armed:
+    print('Arming still in progress')
+    sys.stdout.flush()
     time.sleep(1)
 
-  print('Drone is armed')
+  # Take off to target altitude
+  print('Drone launching...')
   sys.stdout.flush()
-  print('Drone is taking off')
-  sys.stdout.flush()
-  drone.simple_takeoff(target_altitude)
-  
+  drone.simple_takeoff(alt)
+
   while True:
     print('Current Altitude:', drone.location.global_relative_frame.alt)
     sys.stdout.flush()
-    # Break and return from function just below target altitude.
-    if drone.location.global_relative_frame.alt >= target_altitude * 0.95:
+  # Break and return from function just below target altitude.
+    if drone.location.global_relative_frame.alt >= alt * 0.95:
       print('Target altitude reached')
       sys.stdout.flush()
       break
     time.sleep(1)
 
 #creates a position and tells the drone to fly to those coords
-def go_to(args):
+def go_to_waypoint(args):
   global drone
   lat = float(args[1])
   long = float(args[2])
 
   if(len(args) < 4):
-    drone.airspeed = 10
+    arm(10)
   else:
-    drone.airspeed = args[3]
+    arm(args[3])
 
   print('Going to destination...')
   point1 = LocationGlobalRelative(lat, long, 13)
@@ -110,11 +109,11 @@ def go_to(args):
 
 # get input from user 
 print("Commands (Arguments are comma seperated):")
-print("Connect: `CONNECT,<UDP PORT>` - connects to the drone")
-print("Disconnect: `DISCONNECT` - disconnects the drone")
-print("Cancel: `CANCEL` - cancels the drones flight")
+print("Connect: `CONNECT_UDP,<UDP PORT>` - connects to the drone")
+print("Disconnect: `DISCONNECT_UDP` - disconnects the drone")
+print("Cancel: `CANCEL_FLIGHT` - cancels the drones flight")
 print("Go to point: `GO_TO_POINT,<latitude>, <longitude>` - cancels the drones flight")
-print("Arm the drone: `ARM` - Arms the drone and lets it takeoff to a height of 10m")
+#print("Arm the drone: `ARM` - Arms the drone and lets it takeoff to a height of 10m")
 line = sys.stdin.readline()
 
 while line != "-1\n":
@@ -122,11 +121,10 @@ while line != "-1\n":
   parsedLine[len(parsedLine) - 1] = parsedLine[len(parsedLine) - 1].rstrip()
 
   switch = {
-    CONNECT: connect_to_drone,
-    DISCONNECT: disconnect_drone,
-    CANCEL: return_to_base,
-    GO_TO_POINT: go_to,
-    ARM: arm
+    CONNECT_UDP: connect_to_drone,
+    DISCONNECT_UDP: disconnect_drone,
+    GO_TO_POINT: go_to_waypoint,
+    CANCEL_FLIGHT: cancel_flight
   }
 
   execute = switch.get(parsedLine[0], invalid)
