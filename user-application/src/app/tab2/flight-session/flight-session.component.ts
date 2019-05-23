@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class FlightSessionComponent implements OnInit {
   //images = [1, 2, 3].map(() => `https://picsum.photos/900/500?random&t=${Math.random()}`);
 
-  const images = ['assets/mockshots/predictionGiraffe.jpg',
+  images = ['assets/mockshots/predictionGiraffe.jpg',
     'assets/mockshots/predictionLeopard.jpg',
     'assets/mockshots/predictionLion.jpg',
     'assets/mockshots/predictionRhino.jpg'];
