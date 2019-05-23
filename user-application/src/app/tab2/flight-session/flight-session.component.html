@@ -1,3 +1,10 @@
+
+<ion-header>
+  <ion-toolbar>
+	<ion-title>Drone Info</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
 <div *ngIf="images || ImageIndex">
     <ion-list>
         <ion-img class="full-img" (click)="viewPhoto()" [src]="images[ImageIndex]"></ion-img>
@@ -25,3 +32,4 @@
         </ion-slides>
     </ion-footer>
 </div>
+</ion-content>

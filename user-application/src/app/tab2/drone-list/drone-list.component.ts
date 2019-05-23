@@ -2,8 +2,8 @@ import { Component, AfterViewInit } from '@angular/core';
 import { DroneData } from '../../../data-models/drone-data.model';
 import { DroneSocketService } from '../../services/drone-socket/drone-socket.service';
 import { Observable, Subject } from 'rxjs/Rx';
-import { ToastController } from '@ionic/angular';
-
+import { ToastController, ActionSheetController, ModalController } from '@ionic/angular';
+import { FlightSessionComponent } from '../flight-session/flight-session.component';
 @Component({
   selector: 'app-drone-list',
   templateUrl: './drone-list.component.html',
@@ -15,7 +15,10 @@ export class DroneListComponent implements AfterViewInit {
   isValid: boolean;
   messages: Subject<any>;
   count = 0;
-  constructor( private droneSock: DroneSocketService, public toastController: ToastController ) {
+	constructor( private droneSock: DroneSocketService, 
+		public toastController: ToastController, 
+		public actionSheetController: ActionSheetController,
+		public modalController: ModalController) {
     this.generateListDynamically();
     this.isValid = false;
     this.messages = <Subject<any>> this.droneSock
@@ -88,5 +91,38 @@ export class DroneListComponent implements AfterViewInit {
       duration: 2000
     });
     toast.present();
+  }
+
+  async presentActionSheet() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Drone Info',
+      buttons: [ {
+        text: 'View Info',
+        handler: () => {
+          console.log('Delete clicked');
+			this.presentModal();
+        }
+
+      }, {
+        text: 'Disconnect',
+		role: 'destructive',
+        handler: () => {
+          console.log('Share clicked');
+
+        }
+
+      }
+      ]
+
+    });
+    await actionSheet.present();
+
+  }
+	async presentModal() {
+    const modal = await this.modalController.create({
+      component: FlightSessionComponent,
+      componentProps: { value: 123 }
+    });
+    return await modal.present();
   }
 }

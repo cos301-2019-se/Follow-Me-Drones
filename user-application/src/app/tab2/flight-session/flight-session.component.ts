@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./flight-session.component.scss'],
 })
 export class FlightSessionComponent implements OnInit {
-  //images = [1, 2, 3].map(() => `https://picsum.photos/900/500?random&t=${Math.random()}`);
+  // images = [1, 2, 3].map(() => `https://picsum.photos/900/500?random&t=${Math.random()}`);
 
   images = ['assets/mockshots/predictionGiraffe.jpg',
     'assets/mockshots/predictionLeopard.jpg',

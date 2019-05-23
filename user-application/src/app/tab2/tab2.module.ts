@@ -7,6 +7,7 @@ import { Tab2Page } from './tab2.page';
 import { DroneListComponent } from './drone-list/drone-list.component';
 import { AddNewDronePage } from './add-new-drone/add-new-drone.page';
 import { DroneSocketService } from '../services/drone-socket/drone-socket.service';
+import { FlightSessionComponent } from './flight-session/flight-session.component';
 @NgModule({
   imports: [
     IonicModule,
@@ -14,8 +15,8 @@ import { DroneSocketService } from '../services/drone-socket/drone-socket.servic
     FormsModule,
     RouterModule.forChild([{ path: '', component: Tab2Page }])
   ],
-  declarations: [Tab2Page, DroneListComponent, AddNewDronePage],
-  entryComponents: [AddNewDronePage],
+  declarations: [Tab2Page, DroneListComponent, AddNewDronePage, FlightSessionComponent],
+  entryComponents: [AddNewDronePage, FlightSessionComponent],
   providers: [DroneSocketService]
 })
 export class Tab2PageModule {}
