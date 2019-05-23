@@ -20,7 +20,7 @@ def connect_to_drone(args):
     #udp_port = "14551"
     print('Connecting to drone on UDP port: %s' % udp_port)
     drone = connect('udp:127.0.0.1:' + udp_port, wait_ready=True)
-    print('SUCCESS')
+    print('CONNECTED')
     sys.stdout.flush()
   except Exception as e:
     print('Error connecting to drone via UDP', e)
@@ -29,15 +29,18 @@ def connect_to_drone(args):
 
 #error function
 def invalid(args):
-	print("Invalid command")
+	print('Invalid command')
 	sys.stdout.flush()
 
 #disconnect the drone
 def disconnect_drone(args):
   global drone
-  drone.close()
-  print("Disconnected")
-  sys.stdout.flush()
+  try:
+    drone.close()
+    print('Disconnected')
+    sys.stdout.flush()
+  except Exception as e:
+    print('Error disconecting the drone', e)
 
 #cancel the flight
 # RTL = return to launch zone
@@ -59,7 +62,7 @@ def arm(alt):
 
   # Don't try to arm until autopilot is ready
   while not drone.is_armable:
-    print('Drone initializing')
+    print('Initialization in progress')
     sys.stdout.flush()
     time.sleep(1)
 
@@ -103,6 +106,7 @@ def go_to_waypoint(args):
     arm(args[3])
 
   print('Going to destination...')
+  drone.airspeed = 10;
   point1 = LocationGlobalRelative(lat, long, 13)
   drone.simple_goto(point1)
   sys.stdout.flush()
@@ -124,7 +128,7 @@ while line != "-1\n":
     CONNECT_UDP: connect_to_drone,
     DISCONNECT_UDP: disconnect_drone,
     GO_TO_POINT: go_to_waypoint,
-    CANCEL_FLIGHT: cancel_flight
+    CANCEL_FLIGHT: return_to_base
   }
 
   execute = switch.get(parsedLine[0], invalid)
