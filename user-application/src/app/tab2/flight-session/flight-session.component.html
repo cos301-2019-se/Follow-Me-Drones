@@ -1,0 +1,27 @@
+<div *ngIf="images || ImageIndex">
+    <ion-list>
+        <ion-img class="full-img" (click)="viewPhoto()" [src]="images[ImageIndex]"></ion-img>
+        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="liftOff()">Lift Off</ion-button>
+        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="returnHome()">Return Home</ion-button>
+        <ion-item lines="none">ID: BFDrone #27</ion-item>
+        <ion-item lines="none">Battery: 72%</ion-item>
+        <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item>
+    </ion-list>
+
+    <ion-footer>
+        <ion-slides loop slidesPerView="3">
+            <ion-slide ng-init="s = 0">
+                <ion-img (click)="updateIndex(0)" [src]="images[0]"></ion-img>
+            </ion-slide>
+            <ion-slide ng-init="s = 1">
+                <ion-img (click)="updateIndex(1)" [src]="images[1]"></ion-img>
+            </ion-slide>
+            <ion-slide ng-init="s = 2">
+                <ion-img (click)="updateIndex(2)" [src]="images[2]"></ion-img>
+            </ion-slide>
+            <ion-slide ng-init="s = 3">
+                <ion-img (click)="updateIndex(3)" [src]="images[3]"></ion-img>
+            </ion-slide>
+        </ion-slides>
+    </ion-footer>
+</div>
