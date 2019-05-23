@@ -4,12 +4,12 @@ let logo = "\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/      
             + "\t       _/      _/    _/  _/    _/      _/            _/        _/      _/    _/  _/    _/  _/    _/  _/    _/_/  _/        _/    _/      \n"
             + "\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n";
 
-// console.log("\033[2J"); // Clear screen;
-// console.log("\033[0;0H"); // Move cursor to top left
-// console.log("\033[36m"); // Change color to blue
+console.log("\033[2J"); // Clear screen;
+console.log("\033[0;0H"); // Move cursor to top left
+console.log("\033[36m"); // Change color to blue
 console.log(logo);
-// console.log("\033[31m"); // Change color to red
-// console.log("\033[37m"); // Change color to white
+console.log("\033[31m"); // Change color to red
+console.log("\033[37m"); // Change color to white
 
 // ===========================
 //    Get the dependencies
@@ -26,14 +26,13 @@ let io = require('socket.io')(server);
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({extended: false}));
 
-
 // ===========================
 //       Socket for app
 // ===========================
 
 io.on('connection', function (socket) {
 
-    // console.log("App connected");
+    console.log("App connected");
 
     socket.on('disconnect', function () {
         io.emit('App disconnected');
@@ -76,4 +75,20 @@ app.post('/detection', (req, res) => {
     res.status(200).send();
 });
 
-module.exports = app;
+// ===========================
+//           Ports
+// ===========================
+
+let port = process.env.PORT;
+if (port == null || port === "") {
+    port = 8181;
+}
+
+app.listen(port, function () {
+    console.log("Server is running on port -> " + port + "\n");
+});
+
+let socketPort = 2000;
+server.listen(socketPort, function () {
+    console.log("App socket listening on port -> " + socketPort + "\n");
+});
