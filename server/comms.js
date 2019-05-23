@@ -4,7 +4,6 @@ let logo = "\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/      
             + "\t       _/      _/    _/  _/    _/      _/            _/        _/      _/    _/  _/    _/  _/    _/  _/    _/_/  _/        _/    _/      \n"
             + "\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n";
 
-
 // console.log("\033[2J"); // Clear screen;
 // console.log("\033[0;0H"); // Move cursor to top left
 // console.log("\033[36m"); // Change color to blue
@@ -18,12 +17,15 @@ console.log(logo);
 
 // start express application
 const app = require("express")();
+
+const bodyParser = require("body-parser");
+
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
-const bodyParser = require("body-parser");
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({extended: false}));
+
 
 // ===========================
 //       Socket for app
@@ -72,24 +74,6 @@ app.post('/detection', (req, res) => {
     io.emit('detection', { data: detection });
 
     res.status(200).send();
-});
-
-// ===========================
-//           Ports
-// ===========================
-
-let port = process.env.PORT;
-if (port == null || port === "") {
-    port = 8181;
-}
-
-app.listen(port, function () {
-    console.log("Server is running on port -> " + port + "\n");
-});
-
-let socketPort = 2000;
-server.listen(socketPort, function () {
-    console.log("App socket listening on port -> " + socketPort + "\n");
 });
 
 module.exports = app;

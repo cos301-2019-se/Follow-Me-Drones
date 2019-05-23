@@ -15,40 +15,42 @@ describe('Test the /detection endpoint', () => {
         .set('Content-Type',  'application/json')
         .set('Accept', 'application/json')
         .then(response => {
-            expect(response.statusCode).toBe(200)
+            expect(response.statusCode).toBe(200);
         });
     });
 });
 
-/*
 describe('Test the connection to the socket', () => {
-    test('Connect to the server from a WebSocket', () => {
-        /*
+    test('Connect to the server from a WebSocket', async () => {
         let socket = io.connect('http://localhost:2000');
-        
-        return socket.on('connection', () => {
+    
+        await socket.on('connection', () => {
             console.log("Connected");
             socket.disconnect();
+            expect(true).toBe(true);
         });
-        */
-/*
-        expect(true).toBe(true);
     });
 });
-*/
 
+describe('Test the socket connection', () => {
+    let data = {
+        "Test": "123"
+    };
 
-/*
-        describe('Test the notification from the socket', () => {
-    
-    test('Receiving a notification of a detection from server', () => {
-        // Send a mocked 'detection'
-        request(app).post("/detection")
-        .send(JSON.stringify({"Test": "123"}))
-        .set('Content-Type',  'application/json')
-        .set('Accept', 'application/json');
-
+    test('The server should notify the app when something is detected', async () => {
         let socket = io.connect('http://localhost:2000');
+
+        await socket.on('detection', () => {
+            socket.disconnect();
+            expect(true).toBe(true);
+        });
+
+        return request(app).post("/detection")
+        .send(JSON.stringify(data))
+        .set('Content-Type',  'application/json')
+        .set('Accept', 'application/json')
+        .then(response => {
+            expect(response.statusCode).toBe(200);
+        });
     });
 });
-*/
