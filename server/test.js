@@ -29,6 +29,26 @@ describe('/detection endpoint', () => {
             });
 
     });
+
+    it('POST method should contain a body', () => {
+        let port = "8080";
+        let body = {
+            "Test": 123
+        };
+
+        chai
+            .request(host + port)
+            .post(path)
+            .set('Content-Type', 'application/json')
+            .set('Accept', 'application/json')
+            .send(body)
+            .end((err, res) => {
+                res.body.should.be.eql({
+                    //Empty for now since there are no detections coming through
+                });
+            });
+
+    });
 });
     
 describe('Test the connection to the socket', () => {
