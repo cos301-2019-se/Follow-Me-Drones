@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DroneListComponent } from './drone-list.component';
+import { ModalController, AngularDelegate } from '@ionic/angular';
 
 describe('DroneListComponent', () => {
   let component: DroneListComponent;
@@ -11,6 +12,7 @@ describe('DroneListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DroneListComponent ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+		providers: [ModalController, AngularDelegate]
     })
     .compileComponents();
   }));
