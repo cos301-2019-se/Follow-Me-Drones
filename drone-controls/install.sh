@@ -1,2 +1,2 @@
-pip install dronekit-sitl
-pip install mavproxy
+sudo pip install dronekit-sitl
+sudo pip install mavproxy
