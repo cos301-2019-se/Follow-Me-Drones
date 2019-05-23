@@ -64,8 +64,9 @@ export class MapComponent implements AfterContentInit  {
 
     var pointStyle = new Style({
       image: new Icon(({
-          crossOrigin: 'anonymous',
-		  src: 'assets/color-pins/red-pin.png' //unable to find
+        crossOrigin: 'anonymous',
+        src: 'assets/dot.png', //unable to find
+        scale: 0.05
       }))
     });
 
