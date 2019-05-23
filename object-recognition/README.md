@@ -1,13 +1,19 @@
 # Object Recognition
 
-Compiling darknet:
+Compile darknet:
 ```
 $ cd src/darknet_
 $ make
 ```
-Compiling yolo-mark.
+Download the weights
+```
+$ Navigate to the backup folder within darknet_
+$ wget ...
+```
+Compile yolo-mark.
 ```
 $ cd src/yolo-mark
+$ cmake .
 $ make
 ```
 Compile Frame Extractor
@@ -15,14 +21,24 @@ Compile Frame Extractor
 $ cd src/frame-extractor
 $ make
 ```
-Download Scraped images from drive.
+To open the terminal user interface
+```
+$ Navigate into the interface directory
+$ make
+$ make run
+```
+To mark images
 ```
 TODO:
-$ cd src/darknet_/data/animal-pictures
-$ wget …
-$ unzip 
+$ Place images you wish to mark in in darknet_/data/animal-pictures directory
+$ Open the user interface
+$ Selection option 3 to mark the images
 ```
-
+To train the detector
+```
+$ Open the user interface
+$ s
+```
 Using frame-extractor 
 ```
 $ cd frame-extractor
