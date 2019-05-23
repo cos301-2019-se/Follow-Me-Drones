@@ -73,5 +73,7 @@ CTestTestfile.cmake
 _deps
 object-recognition/src/yolo-mark/Makefile
 
-
 package-lock.json
+# Drone control stuff
+
+*.mav
