@@ -7,7 +7,7 @@ chai.should();
 
 const host = "127.0.0.1:";
 //let server = require('http').Server(app);
-//var io = require('socket.io-client');
+var io = require('socket.io');
 
 describe('/detection endpoint', () => {
     const path = '/detection';
@@ -28,5 +28,37 @@ describe('/detection endpoint', () => {
                 res.should.have.status(200);
             });
 
+    });
+});
+    
+describe('Test the connection to the socket', () => {
+    it('Connect to the server from a WebSocket', () => {
+        let port = '6969';
+        let path = '/test';
+        let connectString = 'http://' + host + port + path;
+
+        chai
+            .request(host + port)
+            .get(path)
+            .send()
+            .end((err, res) => {
+                res.should.have.status(200);
+            });
+    });
+
+    it('Connection successfully established', () => {
+        let port = '6969';
+        let path = '/test';
+        let connectString = 'http://' + host + port + path;
+
+        chai
+            .request(host + port)
+            .get(path)
+            .send()
+            .end((err, res) => {
+                res.body.should.be.eql({
+                    status : "connected"
+                });
+            });
     });
 });

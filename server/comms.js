@@ -75,6 +75,14 @@ app.post('/detection', (req, res) => {
     res.status(200).send();
 });
 
+// Endpoint to test socket connection since it cannot really be sent
+app.get('/test', (req, res) => {
+    //res.write("Connection established");
+    res.status(200).json({
+        status : "connected"
+    });
+});
+
 // ===========================
 //           Ports
 // ===========================
