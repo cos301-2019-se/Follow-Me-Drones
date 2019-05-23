@@ -74,3 +74,4 @@ _deps
 object-recognition/src/yolo-mark/Makefile
 
 
+package-lock.json
