@@ -1,23 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { DroneData } from '../../../data-models/drone-data.model';
+import { DroneSocketService } from '../../services/drone-socket/drone-socket.service';
+import { Observable, Subject } from 'rxjs/Rx';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-drone-list',
   templateUrl: './drone-list.component.html',
   styleUrls: ['./drone-list.component.scss'],
 })
-export class DroneListComponent implements OnInit {
+export class DroneListComponent implements AfterViewInit {
 
   private droneList: DroneData[] = [];
   isValid: boolean;
-
-  constructor() {
+  messages: Subject<any>;
+  count = 0;
+  constructor( private droneSock: DroneSocketService, public toastController: ToastController ) {
     this.generateListDynamically();
     this.isValid = false;
+    this.messages = <Subject<any>> this.droneSock
+      .connect()
+      .map((res: any): any => {
+        return res;
+      });
+
+
+    this.messages.subscribe( detection => {
+      this.count++;
+      // if (this.count % 2 === 0) {
+        // console.log(detection);
+      let currentObj = detection.data.objects;
+      let response;
+      // currentObj.forEach((value) => {
+      //   console.log(value);
+      //   response += value.name + ", ";
+      // });
+      this.presentToast(currentObj[0].name);
+    });
+
   }
 
-  ngOnInit() {
-
+  ngAfterViewInit() {
   }
 
   generateListDynamically() {
@@ -34,6 +57,9 @@ export class DroneListComponent implements OnInit {
   }
 
   connectDrone(event) {
+
+	console.log(this.messages);
+
     let currentNode = event.target;
 
     while ((currentNode.getAttribute('data-index') === null)) {
@@ -56,5 +82,11 @@ export class DroneListComponent implements OnInit {
     const index = currentNode.getAttribute('data-index');
     this.droneList[index].setConnected(false);
   }
-
+  async presentToast(animal) {
+    const toast = await this.toastController.create({
+      message: `Animal ${animal} spotted!`,
+      duration: 2000
+    });
+    toast.present();
+  }
 }
