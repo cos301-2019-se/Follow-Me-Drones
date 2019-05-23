@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
 // ===========================
 
 app.post('/detection', (req, res) => {
-    // Test -> curl -X POST -d '{"Test":123}' -H "Content-Type:application/json" http://127.0.0.1:8181
+    // Test -> curl -X POST -d '{"Test":123}' -H "Content-Type:application/json" http://127.0.0.1:8080/detection
 
     console.log("Object detected");
 
@@ -79,16 +79,13 @@ app.post('/detection', (req, res) => {
 //           Ports
 // ===========================
 
-let port = process.env.PORT;
-if (port == null || port === "") {
-    port = 8181;
-}
+let port = (process.env.PORT | 8080);
 
 app.listen(port, function () {
     console.log("Server is running on port -> " + port + "\n");
 });
 
-let socketPort = 2000;
+let socketPort = 6969;
 server.listen(socketPort, function () {
     console.log("App socket listening on port -> " + socketPort + "\n");
 });
