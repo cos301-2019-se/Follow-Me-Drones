@@ -1,60 +1,56 @@
+let logo = "\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n"
+            + "\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n"
+            + "\t  _/_/_/        _/  _/_/  _/    _/      _/        _/_/          _/      _/_/_/    _/_/_/    _/_/_/_/  _/  _/  _/  _/        _/_/_/_/     \n"
+            + "\t       _/      _/    _/  _/    _/      _/            _/        _/      _/    _/  _/    _/  _/    _/  _/    _/_/  _/        _/    _/      \n"
+            + "\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n";
+
+
+// console.log("\033[2J"); // Clear screen;
+// console.log("\033[0;0H"); // Move cursor to top left
+// console.log("\033[36m"); // Change color to blue
+console.log(logo);
+// console.log("\033[31m"); // Change color to red
+// console.log("\033[37m"); // Change color to white
+
 // ===========================
-// Get the dependencies
+//    Get the dependencies
 // ===========================
 
 // start express application
 const app = require("express")();
-
+let server = require('http').Server(app);
+let io = require('socket.io')(server);
 const bodyParser = require("body-parser");
-
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-
-io.on('connection', function (socket) {
-
-    console.log("App connected");
-
-    socket.on('disconnect', function () {
-        io.emit('App disconnected');
-        });
-});
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({extended: false}));
 
 // ===========================
-// Specify the ports to use
+//       Socket for app
 // ===========================
 
-let port = process.env.PORT;
-if (port == null || port === "") {
-    port = 8080;
-}
+io.on('connection', function (socket) {
 
-app.listen(port, function () {
-    console.log("Server is running on port -> " + port);
+    // console.log("App connected");
+
+    socket.on('disconnect', function () {
+        io.emit('App disconnected');
+        });
+
+    socket.on('message', function () {
+        io.emit('Echo response');
+        });
 });
 
-let socketPort = 2000;
-server.listen(socketPort);
-console.log("Socket listening on port -> " + socketPort);
+// ===========================
+//          Detection
+// ===========================
 
-// ---------------------------
-// Enable CORS on ExpressJS
-// ---------------------------
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+app.post('/detection', (req, res) => {
+    // Test -> curl -X POST -d '{"Test":123}' -H "Content-Type:application/json" http://127.0.0.1:8181
 
-// ---------------------------
-// Post authenticate
-// ---------------------------
-app.post('/detection', function(req, response)
-{
-    console.log("POST");
+    console.log("Object detected");
+
     /* Data received in format
     JSON data:
     {
@@ -67,13 +63,33 @@ app.post('/detection', function(req, response)
     {"frame_id":696,"objects": [{"class_id":2, "name":"lion", "relative_coordinates":{"center_x":0.493874, "center_y":0.655773, "width":1.137844, "height":0.575388}, "confidence":0.269735}]}
     */
 
-    var detection = JSON.stringify(req.body);
+    console.log("Content type -> " + req.get('Content-Type'));
+    // console.log(req.body);
+    var detection = req.body;
 
     console.log(detection);
-    // var receivedData = JSON.parse(req.data);
-    // console.log(receivedData);
 
-    socket.emit('detection', { data: detection });
+    io.emit('detection', { data: detection });
 
-    response.send();
+    res.status(200).send();
 });
+
+// ===========================
+//           Ports
+// ===========================
+
+let port = process.env.PORT;
+if (port == null || port === "") {
+    port = 8181;
+}
+
+app.listen(port, function () {
+    console.log("Server is running on port -> " + port + "\n");
+});
+
+let socketPort = 2000;
+server.listen(socketPort, function () {
+    console.log("App socket listening on port -> " + socketPort + "\n");
+});
+
+module.exports = app;
