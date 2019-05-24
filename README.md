@@ -11,7 +11,6 @@
 ### Team Overview
 |    Full Name    	| Student Number 	|                                 Profile                                	|
 |:---------------:	|:--------------:	|:----------------------------------------------------------------------:	|
-
 |  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
 | Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
 |  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
