@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.com/cos301-2019-se/Follow-Me-Drones.svg?branch=master)](https://travis-ci.com/cos301-2019-se/Follow-Me-Drones)
+
+# Landing 
+
 <div align="middle"><img src="https://cs.up.ac.za/static/images/headerUP.jpg" alt="UP Logo" width="500"></div>
 
 # COS 301 Capstone Project
@@ -12,6 +16,7 @@
 |  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
 |  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
 |   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
+
 
 ---
 
@@ -30,7 +35,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 
 <a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
 
-<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a> 
+<a href="https://drive.google.com/file/d/1D4lH4jnReqV0Gh8UsP49InHVWbWZMxUo/view?usp=sharing" target="_blank">SRS Document</a> 
+
+<a href="https://drive.google.com/file/d/1Ze5TNk8cKrYSGbRi9bI8STOP2tsu80x2/view?usp=sharing" target="_blank">User Manual</a> 
 
 ---
 
@@ -169,7 +176,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 #### Francois Venter (u14177553) [<img src="https://i.imgur.com/VkNBW2q.jpg" alt="Top" width="15">](#team-overview)
 ##### BSc Information Technology
 
+
 <img src="https://drive.google.com//uc?id=1442TcEMk1RIObzox1DRP43tJb8_fcMcp" alt="Francois Photo" width="250">
+
 
 ##### Interests
 * Artificial Intelligence

@@ -13,7 +13,7 @@ export class DroneSocketService {
 
     // let down = Len && Brendon;
 
-    this.socket = io.connect('http://192.168.1.10:2000');
+    this.socket = io.connect('http://192.168.1.10:6969');
 	
 
     let observable = new Observable(observer => {
