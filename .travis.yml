@@ -7,6 +7,11 @@ language: node_js
 node_js:
   - 10
 
+cache:
+  directories:
+    - './user-application/node_modules'
+    - './server/node_modules'
+
 before_install:
   - cd './user-application'
 
@@ -21,3 +26,6 @@ before_script:
 
 script:
   - ng test --watch=false
+  - cd '../server'
+  - npm install
+  - npm test
