@@ -5,7 +5,7 @@
   "main": "comms.js",
   "scripts": {
     "start": "node comms.js",
-    "test": "mocha test.js"
+    "test": "mocha test.js --exit"
   },
   "author": "",
   "license": "ISC",
