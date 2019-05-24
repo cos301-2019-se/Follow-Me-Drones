@@ -37,6 +37,8 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 
 <a href="https://drive.google.com/file/d/1D4lH4jnReqV0Gh8UsP49InHVWbWZMxUo/view?usp=sharing" target="_blank">SRS Document</a> 
 
+<a href="https://drive.google.com/file/d/1Ze5TNk8cKrYSGbRi9bI8STOP2tsu80x2/view?usp=sharing" target="_blank">User Manual</a> 
+
 ---
 
 ### Meet The Team
