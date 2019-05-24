@@ -35,7 +35,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 
 <a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
 
-<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a> 
+<a href="https://drive.google.com/file/d/1D4lH4jnReqV0Gh8UsP49InHVWbWZMxUo/view?usp=sharing" target="_blank">SRS Document</a> 
 
 ---
 
