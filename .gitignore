@@ -1,27 +1,7 @@
-obj/
-custom/
-data/
-darknet
-predictions.jpg
-*.weights
-vid2frames
-*.mp4
-*.list
-*.jpg
-yolo-mark
-*.o
-train.txt
-cifar/
-yolo-mark
-*.o
-train.txt
-CMakeCache.txt
-*.zip
-
 **/bower_components or sometimes it is lib/**
 *.swp
 *.swo
-
+exe
 www/
 
 *~
@@ -55,3 +35,45 @@ $RECYCLE.BIN/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+# darknet stuff
+
+darknet
+interface
+./object-recognition/src/yolo-mark/yolo_mark 
+data/
+custom/
+*.mp4
+*.jpg
+*.png
+
+*.weights
+*.list
+
+obj/
+*.o
+
+*.zip
+
+darknet19_448.conv.23
+
+*.log
+
+# Cmake stuff
+
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+object-recognition/src/yolo-mark/Makefile
+
+package-lock.json
+# Drone control stuff
+
+*.mav

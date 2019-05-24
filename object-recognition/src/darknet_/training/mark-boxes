@@ -1,0 +1,1 @@
+./yolo-mark ../data/animal-images ../data/train.txt ../data/animal-classes.names
