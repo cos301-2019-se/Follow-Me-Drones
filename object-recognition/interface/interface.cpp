@@ -79,7 +79,7 @@ int main()
                 getline(cin, data);
 
                 chdir("../src/darknet_");
-                system(("./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -json_port 8080").c_str());
+                system(("./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -thresh 0.7 -json_port 8080").c_str());
                 chdir("../../training");
 
                 break;
