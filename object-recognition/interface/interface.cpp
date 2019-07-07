@@ -32,7 +32,7 @@ int main()
     cin >> choice;
 
     string weights, config;
-    string data, train, classes;
+    string data, train, classes, cmd;
 
     while(choice != 5)
     {
@@ -53,7 +53,7 @@ int main()
             // if(config == "\n")
             //     config = "cfg/animals.cfg";
 
-            cout << "Image to test (path from darknet_ director): ";
+            cout << "Image to test (path from darknet_ directory): ";
             getline(cin, data);
 
             chdir("../src/darknet_");
@@ -78,9 +78,12 @@ int main()
                 cout << "Video to test (path from darknet_ director): ";
                 getline(cin, data);
 
+		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -thresh 0.7 -json_port 8080";
+                cout << cmd << endl;
+
                 chdir("../src/darknet_");
-                system(("./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -thresh 0.7 -json_port 8080").c_str());
-                chdir("../../training");
+                system(cmd.c_str());
+		chdir("../../training");
 
                 break;
 
