@@ -4,22 +4,28 @@ import { DroneSocketService } from '../../services/drone-socket/drone-socket.ser
 import { Observable, Subject } from 'rxjs/Rx';
 import { ToastController, ActionSheetController, ModalController } from '@ionic/angular';
 import { FlightSessionComponent } from '../flight-session/flight-session.component';
+// import { DatabaseService } from '../../services/database/database.service';
+//import { SqliteService } from '../../services/database/sqlite.service';
+
 @Component({
   selector: 'app-drone-list',
   templateUrl: './drone-list.component.html',
   styleUrls: ['./drone-list.component.scss'],
 })
-export class DroneListComponent implements AfterViewInit {
 
+export class DroneListComponent implements AfterViewInit {
   private droneList: DroneData[] = [];
   isValid: boolean;
   messages: Subject<any>;
   count = 0;
+  // db: DatabaseService;
   constructor(private droneSock: DroneSocketService,
               public toastController: ToastController,
               public actionSheetController: ActionSheetController,
               public modalController: ModalController) {
     this.generateListDynamically();
+    // this.db = new DatabaseService( new SqliteService() );
+    // console.log(this.db);
     this.isValid = false;
     this.messages = <Subject<any>> this.droneSock
       .connect()
