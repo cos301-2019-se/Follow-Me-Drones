@@ -81,43 +81,89 @@ app.post('/detection', (req, res) => {
 
         let dX, dY;
         let threshX, threshY;
-        let contains;
-        for(let i = 0; i < detection["objects"].length; ++i)
+        let animalAlreadyDetected;
+
+        // Count how many of each animal are present in the frame
+        let animalCounter = [];
+        for(let detectedAnimal of detection["objects"])
         {
-            // See if the old list of animals contains the ones now detected
-            contains = false;
-            for(let j = 0; j < animals.length; ++j)
+            if(animalCounter[detectedAnimal.name])
+                ++animalCounter[detectedAnimal.name]["count"];
+            else
             {
-                dX = Math.abs(animals[j]["relative_coordinates"]["center_x"] - detection["objects"][i]["relative_coordinates"]["center_x"]);
-                dY = Math.abs(animals[j]["relative_coordinates"]["center_y"] - detection["objects"][i]["relative_coordinates"]["center_y"]);
+                // Initialise the animals details, saving its name as the index, a count for how many of them there are, and its coordinates
+                animalCounter[detectedAnimal.name] = [];
+                animalCounter[detectedAnimal.name]["count"] = 1;
+                animalCounter[detectedAnimal.name]["relative_coordinates"] = detectedAnimal["relative_coordinates"];
+            }
+        }
 
-                threshX = 4*detection["objects"][i]["relative_coordinates"]["width"];
-                threshY = 4*detection["objects"][i]["relative_coordinates"]["height"];
+        for(let detectedAnimal in animalCounter)
+        {
+            // See if the old list of animals animalAlreadyDetected the ones now detected
+            animalAlreadyDetected = false;
 
-                // If names are the same, and their X and Y coords are within a range of the thresholds, then its considered the same animal
-                if(animals[j]["name"] === detection["objects"][i]["name"] && dX < threshX && dY < threshY)
+            // If there is more than 1 of this type of animal, then handle it as a herd. Else check if its the same animal as previously
+            if(animalCounter[detectedAnimal]["count"] > 1)
+            {
+                // If the animals name
+                for(let animal of animals)
                 {
-                    contains = true;
-
-                    // Update the animals center coordinates
-                    animals[j]["relative_coordinates"]["center_x"] = detection["objects"][i]["relative_coordinates"]["center_x"];
-                    animals[j]["relative_coordinates"]["center_y"] = detection["objects"][i]["relative_coordinates"]["center_y"];
-                    break;
+                    if(animal["name"] === detectedAnimal && animal["herd"])
+                    {
+                        animalAlreadyDetected = true;
+                        break;
+                    }
                 }
-            }
 
-            // New detection
-            if(!contains)
+                if(!animalAlreadyDetected)
+                {
+                    console.log("New detection!");
+                    console.log("\tFrame -> " + detection["frame_id"]);
+                    console.log("\tHerd of -> " + detectedAnimal);
+
+                    io.emit('detection', { data: detection });
+                }
+
+                // Create a new list of the currently detected animals
+                animalsNew.push({"name": detectedAnimal, "relative_coordinates": animalCounter[detectedAnimal]["relative_coordinates"], "herd": true});
+            }
+            else
             {
-                console.log("New detection!");
-                console.log("\tFrame -> " + detection["frame_id"]);
-                console.log("\tAnimal -> " + detection["objects"][i]["name"]);
+                // Check if the list of detections animalAlreadyDetected an animal with the same name, and if its position is within the threshold 
+                for(let animal of animals)
+                {
+                    dX = Math.abs(animal["relative_coordinates"]["center_x"] - animalCounter[detectedAnimal]["relative_coordinates"]["center_x"]);
+                    dY = Math.abs(animal["relative_coordinates"]["center_y"] - animalCounter[detectedAnimal]["relative_coordinates"]["center_y"]);
 
-                io.emit('detection', { data: detection });
+                    threshX = 4*animalCounter[detectedAnimal]["relative_coordinates"]["width"];
+                    threshY = 4*animalCounter[detectedAnimal]["relative_coordinates"]["height"];
+
+                    // If names are the same, and their X and Y coords are within a range of the thresholds, then its considered the same animal
+                    if(animal["name"] === detectedAnimal && dX < threshX && dY < threshY)
+                    {
+                        animalAlreadyDetected = true;
+
+                        // Update the animals center coordinates
+                        animal["relative_coordinates"]["center_x"] = animalCounter[detectedAnimal]["relative_coordinates"]["center_x"];
+                        animal["relative_coordinates"]["center_y"] = animalCounter[detectedAnimal]["relative_coordinates"]["center_y"];
+                        break;
+                    }
+                }
+
+                // New detection
+                if(!animalAlreadyDetected)
+                {
+                    console.log("New detection!");
+                    console.log("\tFrame -> " + detection["frame_id"]);
+                    console.log("\tAnimal -> " + detectedAnimal);
+
+                    io.emit('detection', { data: detection });
+                }
+
+                // Create a new list of the currently detected animals
+                animalsNew.push({"name": detectedAnimal, "relative_coordinates": animalCounter[detectedAnimal]["relative_coordinates"], "herd": false});
             }
-
-            // Create a new list of the currently detected animals
-            animalsNew.push({"name": detection["objects"][i]["name"], "relative_coordinates": detection["objects"][i]["relative_coordinates"]});
         }
 
         // Replace the old list with the new list, since the camera is always moving "forward", you can discard any animals that have fallen out of frame

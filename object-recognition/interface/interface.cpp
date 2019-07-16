@@ -74,16 +74,27 @@ int main()
 
                 // if(config == "\n")
                 //     config = "backup/animals_last.weights";
+                cout << "\033[31m"; // Change color to red
+                cout << "\nATTENTION: Output file will be saved in ../src/darknet_/data/videos/outputs" << endl;
+                cout << "\033[37m"; // Change color to white
 
-                cout << "Video to test (path from darknet_ director): ";
+
+                cout << "\nList of videos available:" << endl << "-------------------------" << endl << endl;
+                chdir("../src/darknet_/data/videos");
+
+                system("ls -p | grep -v /");
+
+                chdir("../../../../interface");
+
+                cout << "\nVideo to test (path from darknet_ director): ";
                 getline(cin, data);
 
-		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -thresh 0.7 -json_port 8080";
+		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/" + data + " -thresh 0.7 -json_port 8080 -out_filename data/videos/outputs/res.mkv";
                 cout << cmd << endl;
 
                 chdir("../src/darknet_");
                 system(cmd.c_str());
-		chdir("../../training");
+		        chdir("../../interface");
 
                 break;
 
@@ -133,7 +144,7 @@ int main()
                 chdir("../src/darknet_");
                 system("find data/animal-images -name \\*.jpg > data/train.txt");
                 system("./darknet detector train cfg/animals.data cfg/animals.cfg darknet19_448.conv.23");
-                chdir("../../training");
+                chdir("../../interface");
                 break;
 
             default:
