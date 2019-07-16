@@ -1,0 +1,3 @@
+Private Key Generation: openssl genrsa -out <key-name>.pem 2048
+Generate CSR for Private Key: openssl req -new -sha256 -key <key-name>.pem -out <csr-name>.pem
+Self Sign certificate: openssl x509 -req -in <csr-name>.pem -signkey <key-name>.pem -out <cert-name>.pem

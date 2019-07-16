@@ -18,9 +18,17 @@ console.log("\033[37m"); // Change color to white
 // start express application
 const app = require("express")();
 
+let fs = require("fs");
+const encryption = {
+    key: fs.readFileSync("certs/droneKey.pem"),
+    cert: fs.readFileSync("certs/droneCert.pem")
+  };
+
 const bodyParser = require("body-parser");
 
-let server = require('http').Server(app);
+//Before: let server = require('http').Server(app); 
+let server = require('https').Server(encryption, app); 
+
 let io = require('socket.io')(server);
 
 app.use(bodyParser.json()); // support json encoded bodies

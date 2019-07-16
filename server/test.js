@@ -4,10 +4,11 @@ const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 chai.should();
-
 const host = "127.0.0.1:";
 //let server = require('http').Server(app);
 var io = require('socket.io');
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 describe('/detection endpoint', () => {
     const path = '/detection';
@@ -55,10 +56,10 @@ describe('Test the connection to the socket', () => {
     it('Connect to the server from a WebSocket', () => {
         let port = '6969';
         let path = '/test';
-        let connectString = 'http://' + host + port + path;
+        //let connectString = 'https://' + host + port + path;
 
         chai
-            .request(host + port)
+            .request('https://' + host + port)
             .get(path)
             .send()
             .end((err, res) => {
@@ -69,10 +70,10 @@ describe('Test the connection to the socket', () => {
     it('Connection successfully established', () => {
         let port = '6969';
         let path = '/test';
-        let connectString = 'http://' + host + port + path;
+        //let connectString = 'https://' + host + port + path;
 
         chai
-            .request(host + port)
+            .request('https://' + host + port)
             .get(path)
             .send()
             .end((err, res) => {
