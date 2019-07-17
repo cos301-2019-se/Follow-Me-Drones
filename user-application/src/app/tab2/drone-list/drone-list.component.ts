@@ -4,6 +4,7 @@ import { DroneSocketService } from '../../services/drone-socket/drone-socket.ser
 import { Observable, Subject } from 'rxjs/Rx';
 import { ToastController, ActionSheetController, ModalController } from '@ionic/angular';
 import { FlightSessionComponent } from '../flight-session/flight-session.component';
+import { Drone } from '../../services/drone/drone';
 // import { DatabaseService } from '../../services/database/database.service';
 //import { SqliteService } from '../../services/database/sqlite.service';
 
@@ -15,6 +16,7 @@ import { FlightSessionComponent } from '../flight-session/flight-session.compone
 
 export class DroneListComponent implements AfterViewInit {
   private droneList: DroneData[] = [];
+  private drones: Drone[] = [];
   isValid: boolean;
   messages: Subject<any>;
   count = 0;
@@ -26,26 +28,19 @@ export class DroneListComponent implements AfterViewInit {
     this.generateListDynamically();
     // this.db = new DatabaseService( new SqliteService() );
     // console.log(this.db);
-    this.isValid = false;
-    this.messages = <Subject<any>> this.droneSock
-      .connect()
-      .map((res: any): any => {
-        return res;
-      });
+    // this.messages = <Subject<any>> this.droneSock
+    //   .connect()
+    //   .map((res: any): any => {
+    //     return res;
+    //   });
 
 
-    this.messages.subscribe( detection => {
-      this.count++;
-      // if (this.count % 2 === 0) {
-        // console.log(detection);
-      let currentObj = detection.data.objects;
-      let response;
-      // currentObj.forEach((value) => {
-      //   console.log(value);
-      //   response += value.name + ", ";
-      // });
-      this.presentToast(currentObj[0].name);
-    });
+    // this.messages.subscribe( detection => {
+    //   this.count++;
+    //   let currentObj = detection.data.objects;
+    //   let response;
+    //   this.presentToast(currentObj[0].name);
+    // });
 
   }
 
@@ -53,21 +48,21 @@ export class DroneListComponent implements AfterViewInit {
   }
 
   generateListDynamically() {
-    this.droneList.push( new DroneData('DJI Mavic Pro', 2000, '10.0.0.1', './assets/drone-icons/drone-1.svg', ''));
-    this.droneList.push( new DroneData('DJI Mavic Air', 3000, '10.0.0.2', './assets/drone-icons/drone-2.svg', ''));
-    this.droneList.push( new DroneData('DJI Spark', 4000, '10.0.0.3', './assets/drone-icons/drone-3.svg', ''));
+    // this.drones.push( new Drone( new DroneData('Brendon PC', 6969, '192.168.1.13', './assets/drone-icons/drone-1.svg', '')));// Totolink
+    this.drones.push( new Drone( new DroneData('Brendon PC', 6969, '192.168.1.28', './assets/drone-icons/drone-1.svg', ''))); // Gilad House
+    this.drones.push( new Drone(new DroneData('Jetson Nano 1', 6969, '192.168.1.11', './assets/drone-icons/drone-2.svg', '')));
+    this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
+    // this.drones.push( new Drone(new DroneData('DJI Spark', 6969, '10.0.0.3', './assets/drone-icons/drone-3.svg', '')));
 
-    let tempDrone = new DroneData('DJI Inspire 2', 5000, '10.0.0.4', 'assets/drone-icons/drone-4.svg', '');
-    tempDrone.setConnected(true);
+    // let tempDrone = new Drone(new DroneData('DJI Inspire 2', 6969, '10.0.0.4', 'assets/drone-icons/drone-4.svg', ''));
 
-    this.droneList.push(tempDrone);
+    // this.drones.push(tempDrone);
 
 
   }
 
-  connectDrone(event) {
+  async connectDrone(event) {
 
-    console.log(this.messages);
 
     let currentNode = event.target;
 
@@ -76,9 +71,13 @@ export class DroneListComponent implements AfterViewInit {
     }
 
     const index = currentNode.getAttribute('data-index');
-    if (true) { // TODO: if drone is found
-      this.droneList[index].setConnected(true);
+    console.log(this.drones[index]);
+    await this.drones[index].connect();
+
+    if (this.drones[index].isConnected()) { // TODO: if drone is found
+      console.log('jannie');
     } else {
+      console.log('snne');
       // TODO: Notify user that drone is not availible
 
     }
@@ -86,7 +85,7 @@ export class DroneListComponent implements AfterViewInit {
 
   disconnectDrone(event) {
     // TODO: Add prompt to ask if sure to disconnect
-
+    console.log('disconnect me!');
     let currentNode = event.target;
 
     while ((currentNode.getAttribute('data-index') === null)) {
@@ -94,7 +93,7 @@ export class DroneListComponent implements AfterViewInit {
     }
 
     const index = currentNode.getAttribute('data-index');
-    this.droneList[index].setConnected(false);
+    this.drones[index].disconnect();
   }
   async presentToast(animal) {
     const toast = await this.toastController.create({
