@@ -44,6 +44,7 @@ interface
 data/
 custom/
 *.mp4
+*.mkv
 *.jpg
 *.png
 

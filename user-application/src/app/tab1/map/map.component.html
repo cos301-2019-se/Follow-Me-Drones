@@ -1,1 +1,22 @@
 <div id="map" class="map"></div>
+<button (click)="refresh()">refresh</button>
+<div id="info" style="display: none;"></div>
+<label for="track">
+	track position
+	<input id="track" type="checkbox"/>
+</label>
+<p>
+position accuracy : <code id="accuracy"></code>&nbsp;&nbsp;
+<br>
+altitude : <code id="altitude"></code>&nbsp;&nbsp;
+<br>
+altitude accuracy : <code id="altitudeAccuracy"></code>&nbsp;&nbsp;
+<br>
+heading : <code id="heading"></code>&nbsp;&nbsp;
+<br>
+speed : <code id="speed"></code>
+<br>
+lat : <code id="lat"></code>
+<br>
+lon : <code id="lon"></code>
+</p>

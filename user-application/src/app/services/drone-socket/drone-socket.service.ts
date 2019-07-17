@@ -8,13 +8,32 @@ import * as Rx from 'rxjs/Rx';
 })
 export class DroneSocketService {
   private socket;
-  constructor() { }
-  connect(): Rx.Subject<MessageEvent> {
+  private connected: boolean;
+  constructor() { 
+    this.connected = false;
+  }
+  isConnected() {
+    return this.socket.connected;
+  }
+
+  disconnect() {
+    this.socket.disconnect();
+  }
+
+  emitDisconnect() {
+    this.socket.emit('disconnect', () => {
+      console.log('emitted');
+
+    });
+  }
+
+  connect(ip, port): Rx.Subject<MessageEvent> {
 
     // let down = Len && Brendon;
 
-    this.socket = io.connect('http://127.0.0.1:6969');
-	
+    this.socket = io.connect(`http://${ip}:${port}`);
+    // this.socket = io.connect('http://127.0.0.1:6969');
+    const thisSocket = this;
 
     let observable = new Observable(observer => {
       this.socket.on('message', (data) => {
@@ -26,6 +45,19 @@ export class DroneSocketService {
         // console.log('Detection bitch')
         // console.log(data);
         observer.next(data);
+      })
+      this.socket.on('disconnect', (data) => {
+        this.connected = false;
+        console.log('disconnect!!!');
+        observer.next(data);
+      })
+      this.socket.on('reconnect_attempt', () => {
+        console.log('reconnect_attempt!!!');
+        observer.next();
+      })
+      this.socket.on('connect', () => {
+        thisSocket.connected = true;
+        console.log('Connected!')
       })
       return () => {
         this.socket.disconnect();

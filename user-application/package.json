@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^7.2.2",
     "@angular/router": "^7.2.2",
     "@ionic-native/core": "^5.8.0",
+    "@ionic-native/geolocation": "^5.10.0",
     "@ionic-native/splash-screen": "^5.0.0",
     "@ionic-native/sqlite": "^5.8.0",
     "@ionic-native/sqlite-porter": "^5.8.0",
@@ -31,6 +32,7 @@
     "braces": "^2.3.2",
     "cordova-android": "8.0.0",
     "cordova-browser": "^6.0.0",
+    "cordova-plugin-geolocation": "^4.0.2",
     "cordova-sqlite-storage": "^3.2.0",
     "core-js": "^2.5.4",
     "karma-firefox-launcher": "^1.1.0",
@@ -87,7 +89,8 @@
         "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
       },
       "cordova-plugin-ionic-keyboard": {},
-      "cordova-sqlite-storage": {}
+      "cordova-sqlite-storage": {},
+      "cordova-plugin-geolocation": {}
     },
     "platforms": [
       "android",
