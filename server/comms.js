@@ -70,7 +70,7 @@ io.on('connection', function (socket) {
 		++currentConnections;
 		console.log('App connected with id ' + socket.id);
 		console.log('Current connections -> ' + currentConnections + '\n');
-		console.log(io.sockets.connected);
+		// console.log(io.sockets.connected);
 	}
 
 	/* Event: disconnect
