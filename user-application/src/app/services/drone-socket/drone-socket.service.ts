@@ -9,8 +9,13 @@ import * as Rx from 'rxjs/Rx';
 export class DroneSocketService {
   private socket;
   private connected: boolean;
-  constructor() { 
+  constructor() {
     this.connected = false;
+  }
+  armDrone() {
+    this.socket.emit('arm', () => {
+      alert('drone armed');
+    });
   }
   isConnected() {
     return this.socket.connected;
