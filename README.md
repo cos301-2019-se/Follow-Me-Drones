@@ -1,7 +1,3 @@
-[![Build Status](https://travis-ci.com/cos301-2019-se/Follow-Me-Drones.svg?branch=master)](https://travis-ci.com/cos301-2019-se/Follow-Me-Drones)
-
-# Landing 
-
 <div align="middle"><img src="https://cs.up.ac.za/static/images/headerUP.jpg" alt="UP Logo" width="500"></div>
 
 # COS 301 Capstone Project
@@ -11,12 +7,11 @@
 ### Team Overview
 |    Full Name    	| Student Number 	|                                 Profile                                	|
 |:---------------:	|:--------------:	|:----------------------------------------------------------------------:	|
-|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
-| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
-|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
-|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
-|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
-
+|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
+| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
+|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
+|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
+|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
 
 ---
 
@@ -35,9 +30,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 
 <a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
 
-<a href="https://drive.google.com/file/d/1D4lH4jnReqV0Gh8UsP49InHVWbWZMxUo/view?usp=sharing" target="_blank">SRS Document</a> 
-
-<a href="https://drive.google.com/file/d/1Ze5TNk8cKrYSGbRi9bI8STOP2tsu80x2/view?usp=sharing" target="_blank">User Manual</a> 
+<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a> 
 
 ---
 
@@ -72,7 +65,6 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 ##### Current Modules:
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
-|   COS 212   	| Data Structures & Algorithms 	|
 |   COS 301   	|     Software Engineering     	|
 
 ##### Profiles:
@@ -103,10 +95,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
 |   COS 301   	|     Software Engineering     	|
-|   COS 314   	|    Artificial Intelligence   	|
-|   COS 332   	|       Computer Networks      	|
-|   COS 341     |     Compiler Construction     |
-|   COS 344   	|       Computer Graphics      	|
+|   COS 326   	|       Database Systems   	    |
+|   COS 330   	|     Programming Languages  	|
+|   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
 <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a>
@@ -132,12 +123,12 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 ##### Current Modules:
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
-|   COS 210   	| Theoretical Computer Science 	|
-|   COS 221   	|   Intro to Database Systems  	|
+|   WTW 285   	|     Discrete Structures     	|
+|   COS 226   	|     Concurrent Systems     	|
 |   COS 301   	|     Software Engineering     	|
-|   COS 314   	|    Artificial Intelligence   	|
-|   COS 332   	|       Computer Networks      	|
-|   COS 344   	|       Computer Graphics      	|
+|   COS 326   	|       Database Systems   	    |
+|   COS 330   	|     Programming Languages  	|
+|   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
 <a href="https://github.com/gtabul" target="_blank">GitHub</a>
@@ -164,9 +155,10 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 ##### Current Modules:
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
-|   COS 210   	| Theoretical Computer Science 	|
 |   COS 301   	|     Software Engineering     	|
-|   COS 332   	|       Computer Networks      	|
+|   COS 326   	|       Database Systems   	    |
+|   COS 330   	|     Programming Languages  	|
+|   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
 <a href="https://github.com/Brendon127" target="_blank">GitHub</a>
@@ -176,9 +168,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 #### Francois Venter (u14177553) [<img src="https://i.imgur.com/VkNBW2q.jpg" alt="Top" width="15">](#team-overview)
 ##### BSc Information Technology
 
-
-<img src="https://drive.google.com//uc?id=1442TcEMk1RIObzox1DRP43tJb8_fcMcp" alt="Francois Photo" width="250">
-
+<img src="https://i.imgur.com/7UYivDc.jpg" alt="Francois Photo" width="250">
 
 ##### Interests
 * Artificial Intelligence
@@ -193,9 +183,8 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 ##### Current Modules:
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
-|   COS 212   	| Data Structures & Algorithms 	|
 |   COS 301   	|     Software Engineering     	|
-|   COS 332   	|       Computer Networks      	|
+|   COS 326   	|       Database Systems   	    |
 
 ##### Profiles:
 <a href="https://github.com/u14177553" target="_blank">GitHub</a>
