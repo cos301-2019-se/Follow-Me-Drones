@@ -91,13 +91,19 @@ export class DroneListComponent implements AfterViewInit {
   async connectDrone(event) {
     const index = this.getClickedDrone(event);
     await this.drones[index].connect();
+    const currentDrone = this.drones[index];
+    this.drones[index].messages.subscribe( detection => {
+      const currentObj = detection.data.objects;
+      this.presentToast(`${currentDrone.dronedata.name} spotted ${currentObj[0].name}`);
+      console.log(currentObj[0].name);
+    });
 
     if (this.drones[index].isConnected()) { // TODO: if drone is found
-      console.log('jannie');
+      console.log('Drone successfully connected');
     } else {
       console.log('snne');
       alert('nee');
-      // TODO: Notify user that drone is not availible
+      // TODO: Notify user that drone is not available
 
     }
   }
@@ -110,22 +116,26 @@ export class DroneListComponent implements AfterViewInit {
     this.drones[index].disconnect();
   }
 
-  async presentToast(animal) {
+  async presentToast(message) {
     const toast = await this.toastController.create({
-      message: `Animal ${animal} spotted!`,
+      message,
       duration: 2000
     });
     toast.present();
   }
 
-  async presentActionSheet() {
+  async presentActionSheet(event) {
+
+    const index = this.getClickedDrone(event);
+    const clickedDrone = this.drones[index];
+
     const actionSheet = await this.actionSheetController.create({
       header: 'Drone Info',
       buttons: [ {
         text: 'View Info',
         handler: () => {
           console.log('Delete clicked');
-          this.presentModal();
+          this.presentModal(clickedDrone);
         }
 
       }, {
@@ -143,10 +153,14 @@ export class DroneListComponent implements AfterViewInit {
     await actionSheet.present();
 
   }
-  async presentModal() {
+  async presentModal(event) {
+
+    const index = this.getClickedDrone(event);
+    const clickedDrone = this.drones[index];
+
     const modal = await this.modalController.create({
       component: FlightSessionComponent,
-      componentProps: { value: 123 }
+      componentProps: { drone: clickedDrone }
     });
     return await modal.present();
   }

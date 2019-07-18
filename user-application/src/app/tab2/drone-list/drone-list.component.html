@@ -3,7 +3,7 @@
 
     <ion-item>
 
-      <ion-label (click)="armDrone($event)">{{ drone.getName() }}</ion-label>
+      <ion-label (click)="presentModal($event)">{{ drone.getName() }}</ion-label>
 
     <!-- Drone Disconnected -->
       <ion-chip (click)="connectDrone($event)" *ngIf="!drone.connected">
@@ -17,7 +17,7 @@
       </ion-chip>
 
     <!-- ========================================== -->
-      <ion-thumbnail (click)="armDrone($event)" slot="end">
+      <ion-thumbnail (click)="presentModal($event)" slot="end">
         <img src={{drone.getIcon()}}>
       </ion-thumbnail>
 
