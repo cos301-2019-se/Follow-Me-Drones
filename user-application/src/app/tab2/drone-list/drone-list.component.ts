@@ -48,22 +48,28 @@ export class DroneListComponent implements AfterViewInit {
   }
 
   generateListDynamically() {
-    // this.drones.push( new Drone( new DroneData('Brendon PC', 6969, '192.168.1.13', './assets/drone-icons/drone-1.svg', '')));// Totolink
-    this.drones.push( new Drone( new DroneData('Brendon PC', 6969, '192.168.1.28', './assets/drone-icons/drone-1.svg', ''))); // Gilad House
-    this.drones.push( new Drone(new DroneData('Jetson Nano 1', 6969, '192.168.1.11', './assets/drone-icons/drone-2.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
-    // this.drones.push( new Drone(new DroneData('DJI Spark', 6969, '10.0.0.3', './assets/drone-icons/drone-3.svg', '')));
+    /* ========================================================================================================================
+     *  Totolink
+     *======================================================================================================================
+     */
+    // this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.10', './assets/drone-icons/drone-1.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.11', './assets/drone-icons/drone-2.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-2.svg', '')));
+    /* ======================================================================================================================== */
 
-    // let tempDrone = new Drone(new DroneData('DJI Inspire 2', 6969, '10.0.0.4', 'assets/drone-icons/drone-4.svg', ''));
 
-    // this.drones.push(tempDrone);
-
+    /* ========================================================================================================================
+     *  Gilad Home
+     *======================================================================================================================
+     */
+    this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.32', './assets/drone-icons/drone-1.svg', '')));
+    this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.17', './assets/drone-icons/drone-2.svg', '')));
+    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
+    this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
+    /* ======================================================================================================================== */
 
   }
-
-  async connectDrone(event) {
-
-
+  getClickedDrone(event) {
     let currentNode = event.target;
 
     while ((currentNode.getAttribute('data-index') === null)) {
@@ -71,13 +77,26 @@ export class DroneListComponent implements AfterViewInit {
     }
 
     const index = currentNode.getAttribute('data-index');
-    console.log(this.drones[index]);
+    return index;
+
+  }
+
+  armDrone(event) {
+    const  index = this.getClickedDrone(event);
+    console.log(`selected -> ${index}`);
+    this.drones[index].armDrone();
+  }
+
+
+  async connectDrone(event) {
+    const index = this.getClickedDrone(event);
     await this.drones[index].connect();
 
     if (this.drones[index].isConnected()) { // TODO: if drone is found
       console.log('jannie');
     } else {
       console.log('snne');
+      alert('nee');
       // TODO: Notify user that drone is not availible
 
     }
@@ -85,16 +104,12 @@ export class DroneListComponent implements AfterViewInit {
 
   disconnectDrone(event) {
     // TODO: Add prompt to ask if sure to disconnect
-    console.log('disconnect me!');
-    let currentNode = event.target;
 
-    while ((currentNode.getAttribute('data-index') === null)) {
-      currentNode = currentNode.parentNode;
-    }
+    const index = this.getClickedDrone(event);
 
-    const index = currentNode.getAttribute('data-index');
     this.drones[index].disconnect();
   }
+
   async presentToast(animal) {
     const toast = await this.toastController.create({
       message: `Animal ${animal} spotted!`,

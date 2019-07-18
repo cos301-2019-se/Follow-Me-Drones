@@ -26,6 +26,7 @@ export class Drone {
     if (this.connected) {
       this.messages.subscribe( detection => {
         const currentObj = detection.data.objects;
+        // alert(currentObj[0].name);
         console.log(currentObj[0].name);
       });
     }
@@ -37,6 +38,9 @@ export class Drone {
     this.socket.emitDisconnect();
     // this.socket.disconnect();
     this.connected = false;
+  }
+  armDrone() {
+    this.socket.armDrone();
   }
   timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
