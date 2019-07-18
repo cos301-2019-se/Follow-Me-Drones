@@ -7,11 +7,11 @@
 ### Team Overview
 |    Full Name    	| Student Number 	|                                 Profile                                	|
 |:---------------:	|:--------------:	|:----------------------------------------------------------------------:	|
-|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
-| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
-|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
-|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
-|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-img-srchttpsiimgurcomvknbw2qjpg-alttop-width15)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
+|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
+| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
+|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
+|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
+|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
 
 ---
 
