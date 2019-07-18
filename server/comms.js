@@ -35,68 +35,98 @@ app.use(bodyParser.urlencoded({extended: false}));
 //       Socket for app
 // ===========================
 
-/* Event: connection
-
-	socket.io connection event.
-	Increments a counter for the number of connections, if more than one app connects then it'll disconnect them.
-
-	Parameters:
-
-	socket - Parameter containing all the data about the socket connection.
-
-	Returns:
-
-	Nada
-
-	See Also:
-
-	<disconnect>
-*/
-
 // Global variable to keep a counter of the current socket connections
 let currentConnections = 0;
+
+// To execute system commands
+let commandLine = require('child_process');
+let runningCommand = null;
+
+/* 	Event: connection
+*
+*	socket.io connection event.
+*	Increments a counter for the number of connections, if more than one app connects then it'll disconnect them.
+*
+*	Parameters:
+*
+*	socket - Parameter containing all the data about the socket connection.
+*
+*	Returns:
+*
+*	Nada
+*
+*	See Also:
+*
+*	<disconnect>
+*/
 io.on('connection', function (socket) {
 
 	if(currentConnections >= 1)
 	{
 		console.log('Too many apps attempted to connect, kicked ' + socket.id);
 		console.log('Current connections -> ' + currentConnections + '\n');
-		// console.log(io.sockets.connected);
 		io.sockets.connected[socket.id].disconnect();
-		// console.log(io.sockets.connected);
 	}
 	else
 	{
 		++currentConnections;
 		console.log('App connected with id ' + socket.id);
 		console.log('Current connections -> ' + currentConnections + '\n');
-		// console.log(io.sockets.connected);
 	}
 
-	/* Event: disconnect
-
-		socket.io disconnect event.
-		Decrements the counter for number of connections, keeping track of the current connections.
-
-		Returns:
-
-		Nada
-
-		See Also:
-
-		<connection>
+	/*  Event: disconnect
+	*
+	*	socket.io disconnect event.
+	*	Decrements the counter for number of connections, keeping track of the current connections.
+	*
+	*	Returns:
+	*
+	*	Nada
+	*
+	*	See Also:
+	*
+	*	<connection>
 	*/
 	socket.on('disconnect', function () {
 		--currentConnections;
 		console.log('App disconnected with id ' + socket.id);
 		console.log('Current connections -> ' + currentConnections + '\n');
-		// console.log(io.sockets.connected);
-		io.emit('App disconnected');
+		
+		if(runningCommand)
+		{
+			console.log('Killing process with pid -> ' + (runningCommand.pid+1));
+			process.kill(runningCommand.pid+1, 'SIGTERM');
+		}
 		});
 
 	socket.on('message', function () {
 		io.emit('Echo response');
 		});
+
+	socket.on('arm', async function() {
+		console.log('arming...');
+
+		try 
+		{
+			console.log('starting object recognition');
+
+			process.chdir('../object-recognition/src/darknet_/');
+			runningCommand = commandLine.exec('./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights -c 2 -thresh 0.7 -json_port 8080 -out_filename data/videos/outputs/res.mkv > /dev/null');
+			process.chdir('../../../server/');
+
+			console.log('started object recognition with PID -> ' + runningCommand.pid);
+		}
+		catch (err)
+		{
+			console.error(err);
+		};
+	});
+
+	socket.on('kill', function() {
+		console.log('Killing process with pid -> ' + (runningCommand.pid+1));
+		
+		process.kill(runningCommand.pid+1, 'SIGTERM');
+	});
 });
 
 // ===========================
@@ -107,40 +137,40 @@ let lastDetectedFrame = 0;
 let previousDetections = [];
 let newDetections = [];
 
-/* Endpoint: detection
-
-	Endpoint to alert the server of an object detection.
-	The object detection will send a POST request to the server notifying it of a detection.
-
-	Parameters:
-
-	req - Parameter containing all the data about the request being sent.
-	res - Parameter containing all the response data that will be sent back to the request sender.
-
-	Returns:
-
-	Success code of 200 if the function completes.
-
-	See Also:
-
-	<test>
+/*  Endpoint: detection
+*
+*	Endpoint to alert the server of an object detection.
+*	The object detection will send a POST request to the server notifying it of a detection.
+*
+*	Parameters:
+*
+*	req - Parameter containing all the data about the request being sent.
+*	res - Parameter containing all the response data that will be sent back to the request sender.
+*
+*	Returns:
+*
+*	Success code of 200 if the function completes.
+*
+*	See Also:
+*
+*	<test>
 */
 app.post('/detection', (req, res) => {
 	// Test -> curl -X POST -d '{'Test':123}' -H 'Content-Type:application/json' http://127.0.0.1:8080/detection
 	// ./darknet detector demo cfg/previousDetections.data cfg/previousDetections.cfg backup/previousDetections_last.weights data/videos/rhino-drone.mp4 -thresh 0.7 -json_port 8080
 
-	/* Data received in format
-	JSON data:
-	{
-		frame_id: 39,
-		objects:
-		[{
-			class_id: 2,
-			name: 'rhino',
-			relative_coordinates: [Object],
-			confidence: 0.854001
-		}]
-	}
+	/* 	Data received in format
+	* 	JSON data:
+	* 	{
+	*		frame_id: 39,
+	*		objects:
+	*		[{
+	*			class_id: 2,
+	*			name: 'rhino',
+	*			relative_coordinates: [Object],
+	*			confidence: 0.854001
+	*		}]
+	* 	}
 	*/
 
 	var detection = req.body;
@@ -252,24 +282,24 @@ app.post('/detection', (req, res) => {
 	res.status(200).send();
 });
 
-/* Endpoint: test
-
-	Endpoint for unit testing
-	Endpoint to test socket connection since it cannot really be sent
-
-	Parameters:
-
-	req - Parameter containing all the data about the request being sent.
-	res - Parameter containing all the response data that will be sent back to the request sender.
-
-	Returns:
-
-	Success code of 200 if the function completes
-	JSON array with a key-value pair of [status : 'connected']
-
-	See Also:
-
-	<detection>
+/* 	Endpoint: test
+*
+*	Endpoint for unit testing
+*	Endpoint to test socket connection since it cannot really be sent
+*
+*	Parameters:
+*
+*	req - Parameter containing all the data about the request being sent.
+*	res - Parameter containing all the response data that will be sent back to the request sender.
+*
+*	Returns:
+*
+*	Success code of 200 if the function completes
+*	JSON array with a key-value pair of [status : 'connected']
+*
+*	See Also:
+*
+*	<detection>
 */
 app.get('/test', (req, res) => {
 	//res.write('Connection established');
