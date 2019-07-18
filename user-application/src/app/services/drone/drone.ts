@@ -1,6 +1,7 @@
 import { Observable, Subject } from 'rxjs/Rx';
 import { DroneData } from '../../../data-models/drone-data.model';
 import { DroneSocketService } from '../drone-socket/drone-socket.service';
+
 export class Drone {
   dronedata: DroneData;
   socket: DroneSocketService;
@@ -23,12 +24,6 @@ export class Drone {
 
     await this.timeout(2000); // hackerman
     this.connected = this.socket.isConnected();
-    if (this.connected) {
-      this.messages.subscribe( detection => {
-        const currentObj = detection.data.objects;
-        console.log(currentObj[0].name);
-      });
-    }
 
   }
   async disconnect() {
@@ -37,6 +32,9 @@ export class Drone {
     this.socket.emitDisconnect();
     // this.socket.disconnect();
     this.connected = false;
+  }
+  armDrone() {
+    this.socket.armDrone();
   }
   timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
