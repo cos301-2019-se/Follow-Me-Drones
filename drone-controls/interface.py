@@ -14,10 +14,7 @@ home: 'global'
 
 # functions
 # Connect to drone using UDP
-
-
 def connect_to_drone(args):
-    global drone
     try:
         udp_port = args[1]
         #udp_port = '14551'
@@ -25,49 +22,33 @@ def connect_to_drone(args):
         drone = connect('udp:127.0.0.1:' + udp_port, wait_ready=True)
         print('CONNECTED')
         sys.stdout.flush()
-    except Exception as e:
-        print('Error connecting to drone via UDP', e)
+    except Exception as error_from_connection:
+        print('Error connecting to drone via UDP', error_from_connection)
         print('FAILURE')
-    return
 
 # error function
-
-
-def invalid(args):
+def invalid():
     print('Invalid command')
     sys.stdout.flush()
 
 # disconnect the drone
-
-
-def disconnect_drone(args):
-    global drone
+def disconnect_drone():
     try:
         drone.close()
         print('Disconnected')
         sys.stdout.flush()
-    except Exception as e:
-        print('Error disconecting the drone', e)
+    except Exception as error_from_disconnect:
+        print('Error disconecting the drone', error_from_disconnect)
 
 # cancel the flight
 # RTL = return to launch zone
-
-
-def return_to_base(args):
-    global drone
+def return_to_base():
     print('Returning to base')
     drone.mode = VehicleMode('RTL')
     sys.stdout.flush()
 
 # arms the drone and makes it takeoff with a default height of 10m
-
-
 def arm(alt):
-    global drone
-    global home
-
-    home = drone.location.global_relative_frame
-
     print('Performing pre-arm checks...')
     sys.stdout.flush()
 
@@ -106,13 +87,11 @@ def arm(alt):
         time.sleep(1)
 
 # creates a position and tells the drone to fly to those coords
-
-
 def go_to_waypoint(args):
     lat = float(args[1])
     long = float(args[2])
 
-    if(len(args) < 4):
+    if len(args) < 4:
         arm(10)
     else:
         arm(args[3])
