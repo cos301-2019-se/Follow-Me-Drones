@@ -4,6 +4,10 @@
 
 using namespace std;
 
+/*  Function: printMenu
+*
+*   Function to clear the screen, print the 5 guys 1 branch logo and output the menu for the user
+*/
 void printMenu()
 {
     string logo = "\n\t\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n"
@@ -34,12 +38,15 @@ int main()
     string weights, config;
     string data, train, classes, cmd;
 
+    // While the user input is not 5 (quit option), continue to display the menu
     while(choice != 5)
     {
         getline(cin, data); // get rid of data in buffer
 
+        // Switch statement to execute the correct code statements based on user input from the menu prompt
         switch(choice)
         {
+            // Run a detection on an image
             case 1:
             // cout << "Weights (default = backup/animals_last.weights): " << endl;
             // getline(cin, weights);
@@ -62,6 +69,7 @@ int main()
 
             break;
 
+            // Run detection on a video
             case 2:
                 // cout << "Weights (default = backup/animals_last.weights): " << endl;
                 // getline(cin, weights);
@@ -78,7 +86,7 @@ int main()
                 cout << "\nATTENTION: Output file will be saved in ../src/darknet_/data/videos/outputs" << endl;
                 cout << "\033[37m"; // Change color to white
 
-
+                // List the videos available to run
                 cout << "\nList of videos available:" << endl << "-------------------------" << endl << endl;
                 chdir("../src/darknet_/data/videos");
 
@@ -98,6 +106,7 @@ int main()
 
                 break;
 
+            // Run yolo_mark on all the images in the data/animal-images folder
             case 3:
                 // cout << "Images directory (default = ../darkent/data/animal-images): " << endl;
                 // getline(cin, data);
@@ -120,6 +129,7 @@ int main()
                 system("./yolo_mark ../src/darknet_/data/animal-images ../src/darknet_/data/train.txt ../src/darknet_/data/animal-classes.names");
                 break;
 
+            // Train the darknet model
             case 4:
                 // cout << "Data directory (default = ../darkent/data/animal-images): " << endl;
                 // getline(cin, data);
@@ -152,6 +162,7 @@ int main()
                 break;
         }
 
+        // Print the menu and wait for the users choice
         printMenu();
         cin >> choice;
     }
