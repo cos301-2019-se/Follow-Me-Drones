@@ -4,6 +4,10 @@
 
 using namespace std;
 
+/*  Function: printMenu
+*
+*   Function to clear the screen, print the 5 guys 1 branch logo and output the menu for the user
+*/
 void printMenu()
 {
     string logo = "\n\t\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n"
@@ -32,14 +36,17 @@ int main()
     cin >> choice;
 
     string weights, config;
-    string data, train, classes;
+    string data, train, classes, cmd;
 
+    // While the user input is not 5 (quit option), continue to display the menu
     while(choice != 5)
     {
         getline(cin, data); // get rid of data in buffer
 
+        // Switch statement to execute the correct code statements based on user input from the menu prompt
         switch(choice)
         {
+            // Run a detection on an image
             case 1:
             // cout << "Weights (default = backup/animals_last.weights): " << endl;
             // getline(cin, weights);
@@ -53,7 +60,7 @@ int main()
             // if(config == "\n")
             //     config = "cfg/animals.cfg";
 
-            cout << "Image to test (path from darknet_ director): ";
+            cout << "Image to test (path from darknet_ directory): ";
             getline(cin, data);
 
             chdir("../src/darknet_");
@@ -62,6 +69,7 @@ int main()
 
             break;
 
+            // Run detection on a video
             case 2:
                 // cout << "Weights (default = backup/animals_last.weights): " << endl;
                 // getline(cin, weights);
@@ -74,16 +82,31 @@ int main()
 
                 // if(config == "\n")
                 //     config = "backup/animals_last.weights";
+                cout << "\033[31m"; // Change color to red
+                cout << "\nATTENTION: Output file will be saved in ../src/darknet_/data/videos/outputs" << endl;
+                cout << "\033[37m"; // Change color to white
 
-                cout << "Video to test (path from darknet_ director): ";
+                // List the videos available to run
+                cout << "\nList of videos available:" << endl << "-------------------------" << endl << endl;
+                chdir("../src/darknet_/data/videos");
+
+                system("ls -p | grep -v /");
+
+                chdir("../../../../interface");
+
+                cout << "\nVideo to test (path from darknet_ director): ";
                 getline(cin, data);
 
+		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/" + data + " -thresh 0.7 -json_port 8080 -out_filename data/videos/outputs/res.mkv";
+                cout << cmd << endl;
+
                 chdir("../src/darknet_");
-                system(("./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights " + data + " -thresh 0.7 -json_port 8080").c_str());
-                chdir("../../training");
+                system(cmd.c_str());
+		        chdir("../../interface");
 
                 break;
 
+            // Run yolo_mark on all the images in the data/animal-images folder
             case 3:
                 // cout << "Images directory (default = ../darkent/data/animal-images): " << endl;
                 // getline(cin, data);
@@ -106,6 +129,7 @@ int main()
                 system("./yolo_mark ../src/darknet_/data/animal-images ../src/darknet_/data/train.txt ../src/darknet_/data/animal-classes.names");
                 break;
 
+            // Train the darknet model
             case 4:
                 // cout << "Data directory (default = ../darkent/data/animal-images): " << endl;
                 // getline(cin, data);
@@ -130,7 +154,7 @@ int main()
                 chdir("../src/darknet_");
                 system("find data/animal-images -name \\*.jpg > data/train.txt");
                 system("./darknet detector train cfg/animals.data cfg/animals.cfg darknet19_448.conv.23");
-                chdir("../../training");
+                chdir("../../interface");
                 break;
 
             default:
@@ -138,6 +162,7 @@ int main()
                 break;
         }
 
+        // Print the menu and wait for the users choice
         printMenu();
         cin >> choice;
     }

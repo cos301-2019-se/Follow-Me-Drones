@@ -15,7 +15,14 @@ describe('/detection endpoint', () => {
     it('POST method should respond with code 200 OK', () => {
         let port = "8080";
         let body = {
-            "Test": 123
+            frame_id: 420,
+            objects:
+            [{
+                class_id: 2,
+                name: 'rhino',
+                relative_coordinates: [Object],
+                confidence: 0.854001
+            }]
         };
 
         chai

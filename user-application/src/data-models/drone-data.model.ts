@@ -1,10 +1,10 @@
 export class DroneData {
-  private name: string;
-  private port: number;
-  private ipAddress: string;
-  private comments: string;
-  private icon: string;
-  private connected: boolean;
+  name: string;
+  port: number;
+  ipAddress: string;
+  comments: string;
+  icon: string;
+  connected: boolean;
   constructor(name, port, ipAddress, icon, comments) {
     this.name = name;
     this.port = port;

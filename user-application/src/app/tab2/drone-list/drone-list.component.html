@@ -1,25 +1,9 @@
 <ion-list>
-  <ion-item-sliding (click)="presentActionSheet()" *ngFor="let drone of droneList; let i=index" [attr.data-index]="i">
-
-
-    <!-- Drone Connected -->
-    <ion-item-options *ngIf="drone.connected"side="start">
-      <ion-item-option color="danger" (click)="disconnectDrone($event)">Disconnect</ion-item-option>
-    </ion-item-options>
-    <!-- ========================================== -->
-
-    <!-- Drone Disconnected -->
-
-    <ion-item-options *ngIf="!drone.connected"side="start">
-      <ion-item-option color="success" (click)="connectDrone($event)">Connect</ion-item-option>
-    </ion-item-options>
-    <!-- ========================================== -->
-
-
+  <ion-item-sliding *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
 
     <ion-item>
 
-      <ion-label>{{ drone.name }}</ion-label>
+      <ion-label (click)="presentModal($event)">{{ drone.getName() }}</ion-label>
 
     <!-- Drone Disconnected -->
       <ion-chip (click)="connectDrone($event)" *ngIf="!drone.connected">
@@ -33,8 +17,8 @@
       </ion-chip>
 
     <!-- ========================================== -->
-      <ion-thumbnail slot="end">
-        <img src={{drone.icon}}>
+      <ion-thumbnail (click)="presentModal($event)" slot="end">
+        <img src={{drone.getIcon()}}>
       </ion-thumbnail>
 
     </ion-item>
