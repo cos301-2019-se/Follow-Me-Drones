@@ -111,7 +111,7 @@ io.on('connection', function (socket) {
 			console.log('starting object recognition');
 
 			process.chdir('../object-recognition/src/darknet_/');
-			runningCommand = commandLine.exec('./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights -c 2 -thresh 0.7 -json_port 8080 -out_filename data/videos/outputs/res.mkv > /dev/null');
+			runningCommand = commandLine.exec('./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights -c 0 -thresh 0.7 -json_port 8080 -out_filename data/videos/output/res.mkv > /dev/null');
 			process.chdir('../../../server/');
 
 			console.log('started object recognition with PID -> ' + runningCommand.pid);
