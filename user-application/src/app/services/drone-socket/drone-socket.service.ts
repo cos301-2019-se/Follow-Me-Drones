@@ -39,13 +39,16 @@ export class DroneSocketService {
 
   }
 
-  connect(ip, port): Rx.Subject<MessageEvent> {
+  connect(ip, port, done): Rx.Subject<MessageEvent> {
 
     // let down = Len && Brendon;
 
     this.socket = io.connect(`http://${ip}:${port}`);
+
+
     // this.socket = io.connect('http://127.0.0.1:6969');
     const thisSocket = this;
+    const connectedCallback = done;
 
     let observable = new Observable(observer => {
       this.socket.on('detection', (data) => {
@@ -68,13 +71,14 @@ export class DroneSocketService {
         console.log('Connected! | in drone-socket service');
         let obj = this.constructSocketEventObject('connect', data);
         thisSocket.connected = true;
-        console.log('Connected! | in drone-socket service');
+        connectedCallback(this.socket.connected);
         observer.next(obj);
       })
       return () => {
         this.socket.disconnect();
       }
     });
+
 
     // let messageTest = new Observable(observer => {
     //   this.socket.on('message', () => {

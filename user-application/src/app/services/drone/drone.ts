@@ -22,20 +22,20 @@ export class Drone {
     return  this.connected;
   }
   async reconnect() {
-    await this.timeout(1000); // hackerman
     this.connected = this.socket.isConnected();
   }
-  async connect() {
-    console.log('connect!');
+  async connect(done) {
     this.socket = new DroneSocketService();
-
-    this.messages = <Subject<any>> this.socket.connect( this.dronedata.ipAddress, this.dronedata.port)
-      .map( (res: any): any => {
-        return res;
-      });
-
-    await this.timeout(1000); // hackerman
-    this.connected = this.socket.isConnected();
+    
+    this.messages = <Subject<any>> this.socket.connect( this.dronedata.ipAddress, this.dronedata.port, 
+      () => {
+      this.connected = this.socket.isConnected();
+      done(this.connected);
+    })
+    .map( (res: any): any => {
+      return res;
+    });
+    // await this.timeout(1000); // hackerman
 
   }
   async disconnect() {

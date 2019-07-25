@@ -12,9 +12,14 @@
     <!-- ========================================== -->
 
     <!-- Drone Connected -->
-      <ion-chip  (click)="disconnectDrone($event)" *ngIf="drone.connected">
-        <ion-label color="success">Connected</ion-label>
+      <ion-chip  *ngIf="drone.connected">
+        <ion-label color="danger">Arm</ion-label>
       </ion-chip>
+
+      <ion-chip  (click)="disconnectDrone($event)" *ngIf="drone.connected">
+        <ion-label color="success">C</ion-label>
+      </ion-chip>
+
 
     <!-- ========================================== -->
       <ion-thumbnail (click)="presentModal($event)" slot="end">

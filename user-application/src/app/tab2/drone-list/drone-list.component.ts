@@ -96,10 +96,23 @@ export class DroneListComponent implements AfterViewInit {
   }
 
 
-  async connectDrone(event) {
+  connectDrone(event) {
     const index = this.getClickedDrone(event);
-    await this.drones[index].connect();
     const currentDrone = this.drones[index];
+
+    currentDrone.connect( (droneConnected) => {
+
+      if (droneConnected) { // TODO: if drone is found
+        console.log('Drone successfully connected');
+      } else {
+
+        console.log('snne');
+        alert('nee');
+        // TODO: Notify user that drone is not available
+
+      }
+
+    });
 
     // this.drones[index].messages.subscribe( disconnect => {
     //     console.log('disconnect!!! | in drone-list component');
@@ -111,9 +124,6 @@ export class DroneListComponent implements AfterViewInit {
     let currentClass = this;
     this.drones[index].messages.subscribe( {
       next: (socketEvent)  => {
-        console.log('in next');
-        // console.log(currentDrone);
-        // console.log(socketEvent);
         if (socketEvent.event === 'detection') {
           const currentObj = socketEvent.data.data.objects; // TODO: change when Devon sends different format from the server
           console.log(currentObj);
@@ -146,14 +156,6 @@ export class DroneListComponent implements AfterViewInit {
     //   console.log(currentObj[0].name);
     // });
 
-    if (this.drones[index].isConnected()) { // TODO: if drone is found
-      console.log('Drone successfully connected');
-    } else {
-      console.log('snne');
-      alert('nee');
-      // TODO: Notify user that drone is not available
-
-    }
   }
 
   disconnectDrone(event) {
