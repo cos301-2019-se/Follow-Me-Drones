@@ -4,9 +4,16 @@ import { DroneSocketService } from '../drone-socket/drone-socket.service';
 
 export class Drone {
   dronedata: DroneData;
+
+  name: string;
+  port: number;
+  ipAddress: string;
+  icon: string;
+  connected: boolean;
+
   socket: DroneSocketService;
   messages: Subject<any>;
-  connected: boolean;
+  connectionStatus: Subject<any>;
   constructor( dronedata: DroneData) {
     this.dronedata = dronedata;
     this.connected = false;
@@ -14,24 +21,33 @@ export class Drone {
   isConnected() {
     return  this.connected;
   }
+  async reconnect() {
+    await this.timeout(1000); // hackerman
+    this.connected = this.socket.isConnected();
+  }
   async connect() {
     console.log('connect!');
     this.socket = new DroneSocketService();
+
     this.messages = <Subject<any>> this.socket.connect( this.dronedata.ipAddress, this.dronedata.port)
       .map( (res: any): any => {
         return res;
       });
 
-    await this.timeout(2000); // hackerman
+    await this.timeout(1000); // hackerman
     this.connected = this.socket.isConnected();
 
   }
   async disconnect() {
     console.log('Disconnecting myself!');
     this.messages.unsubscribe();
-    this.socket.emitDisconnect();
-    // this.socket.disconnect();
-    this.connected = false;
+    this.socket.disconnect();
+    // this.socket.emitDisconnect();
+    // this.connected = false;
+  }
+  setConnected(value) {
+    console.log('Setting drone to disconnected');
+    this.connected = value;
   }
   armDrone() {
     this.socket.armDrone();

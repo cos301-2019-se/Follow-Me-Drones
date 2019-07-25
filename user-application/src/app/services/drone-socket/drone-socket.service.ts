@@ -28,8 +28,15 @@ export class DroneSocketService {
   emitDisconnect() {
     this.socket.emit('disconnect', () => {
       console.log('emitted');
-
     });
+  }
+
+  constructSocketEventObject(event, data) {
+    return  {
+      event,
+      data
+    };
+
   }
 
   connect(ip, port): Rx.Subject<MessageEvent> {
@@ -41,38 +48,51 @@ export class DroneSocketService {
     const thisSocket = this;
 
     let observable = new Observable(observer => {
-      this.socket.on('message', (data) => {
-        console.log('Received message from Websocket Server');
-        // console.log(data);
-        observer.next(data);
-      })
       this.socket.on('detection', (data) => {
-        // console.log('Detection bitch')
-        // console.log(data);
-        observer.next(data);
+        console.log('detection | in drone-socket service');
+        const obj = this.constructSocketEventObject('detection', data);
+        observer.next(obj);
       })
       this.socket.on('disconnect', (data) => {
         this.connected = false;
-        console.log('disconnect!!!');
-        observer.next(data);
+        const obj = this.constructSocketEventObject('disconnect', data);
+        console.log('disconnect!!! | in drone-socket service');
+        observer.next(obj);
       })
-      this.socket.on('reconnect_attempt', () => {
-        console.log('reconnect_attempt!!!');
-        observer.next();
+      this.socket.on('reconnect_attempt', (data) => {
+        const obj = this.constructSocketEventObject('reconnect_attempt', data);
+        console.log('reconnect_attempt | in drone-socket service');
+        observer.next(obj);
       })
-      this.socket.on('connect', () => {
+      this.socket.on('connect', (data) => {
+        console.log('Connected! | in drone-socket service');
+        let obj = this.constructSocketEventObject('connect', data);
         thisSocket.connected = true;
-        console.log('Connected!')
+        console.log('Connected! | in drone-socket service');
+        observer.next(obj);
       })
       return () => {
         this.socket.disconnect();
       }
     });
 
+    // let messageTest = new Observable(observer => {
+    //   this.socket.on('message', () => {
+    //     console.log('Received message from Websocket Server');
+    //   })
+    // });
+
     let observer = {
       next: (data: Object) => {
         this.socket.emit('message', JSON.stringify(data));
+        console.log('message from my socket');
       },
+      error: ((error) => {
+        console.log(error);
+      }),
+      complete: () => {
+        console.log('completed');
+      }
     };
 
     return Rx.Subject.create(observer, observable);

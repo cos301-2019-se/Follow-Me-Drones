@@ -49,13 +49,19 @@ export class DroneListComponent implements AfterViewInit {
 
   generateListDynamically() {
     /* ========================================================================================================================
+     *  Localhost
+     *======================================================================================================================
+     */
+    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')));
+
+    /* ========================================================================================================================
      *  Totolink
      *======================================================================================================================
      */
-     this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
-    this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
-    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
 
     /* ======================================================================================================================== */
 
@@ -64,10 +70,10 @@ export class DroneListComponent implements AfterViewInit {
      *  Gilad Home
      *======================================================================================================================
      */
-    //this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.32', './assets/drone-icons/drone-1.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.32', './assets/drone-icons/drone-1.svg', '')));
    // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.17', './assets/drone-icons/drone-2.svg', '')));
-    //this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
-    //this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
     /* ======================================================================================================================== */
 
   }
@@ -94,11 +100,51 @@ export class DroneListComponent implements AfterViewInit {
     const index = this.getClickedDrone(event);
     await this.drones[index].connect();
     const currentDrone = this.drones[index];
-    this.drones[index].messages.subscribe( detection => {
-      const currentObj = detection.data.objects;
-      this.presentToast(`${currentDrone.dronedata.name} spotted ${currentObj[0].name}`);
-      console.log(currentObj[0].name);
+
+    // this.drones[index].messages.subscribe( disconnect => {
+    //     console.log('disconnect!!! | in drone-list component');
+    // });
+
+    // this.drones[index].messages.subscribe( connect => {
+    //     console.log('connected !!! | in drone-list component');
+    // });
+    let currentClass = this;
+    this.drones[index].messages.subscribe( {
+      next: (socketEvent)  => {
+        console.log('in next');
+        // console.log(currentDrone);
+        // console.log(socketEvent);
+        if (socketEvent.event === 'detection') {
+          const currentObj = socketEvent.data.data.objects; // TODO: change when Devon sends different format from the server
+          console.log(currentObj);
+          this.presentToast(`${currentDrone.dronedata.name} spotted ${currentObj[0].name}`);
+          console.log(currentObj[0].name);
+
+        } else if (socketEvent.event === 'disconnect') {
+          currentDrone.setConnected(false);
+          console.log('disconnected in next()');
+
+        } else if ( socketEvent.event === 'connect') {
+          console.log('connected in next()');
+
+        } else if ( socketEvent.event === 'reconnect_attempt') {
+          currentDrone.reconnect();
+          console.log('reconnected in next()');
+        }
+      },
+      error: (error)  => {
+        console.log(error);
+      },
+      complete: () => {
+        console.log('completed');
+      }
     });
+
+    // this.drones[index].messages.subscribe( detection => {
+    //   const currentObj = detection.data.objects;
+    //   this.presentToast(`${currentDrone.dronedata.name} spotted ${currentObj[0].name}`);
+    //   console.log(currentObj[0].name);
+    // });
 
     if (this.drones[index].isConnected()) { // TODO: if drone is found
       console.log('Drone successfully connected');

@@ -11,7 +11,6 @@ export class DroneData {
     this.ipAddress = ipAddress;
     this.icon = icon;
     this.comments = comments;
-    this.connected = false;
   }
   setConnected( value: boolean ) {
     this.connected = value;
