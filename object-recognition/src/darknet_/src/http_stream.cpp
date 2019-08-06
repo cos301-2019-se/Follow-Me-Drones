@@ -294,7 +294,7 @@ void send_json_custom(char const* send_buf, int port, int timeout)
     }
 }
 
-void send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
+bool send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
 {
     try 
     {
@@ -310,6 +310,8 @@ void send_json(detection *dets, int nboxes, int classes, char **names, long long
             std::cout << "JSON data:" << std::endl;
             std::cout << send_buf << std::endl;
             std::cout << " JSON-stream sent. \n";
+
+            return true;
         }
         else
             std::cout << "No objects found" << std::endl;
@@ -320,6 +322,7 @@ void send_json(detection *dets, int nboxes, int classes, char **names, long long
     catch (...) {
         cerr << " Error in send_json() function \n";
     }
+    return false;
 }
 // ----------------------------------------
 
