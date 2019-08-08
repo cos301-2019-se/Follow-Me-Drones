@@ -1,0 +1,22 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button onClick="sendMsg()">Hit Me</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://172.16.0.152:42069');
+        socket.on('connect', function() {
+            // we emit a connected message to let knwo the client that we are connected.
+            socket.emit('client_connected', {data: 'New client!'});
+        });
+    </script>
+  </body>
+</html>

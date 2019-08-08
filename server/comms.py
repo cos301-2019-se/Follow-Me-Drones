@@ -1,34 +1,40 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from flask import Flask, request
+from flask_socketio import SocketIO
+from flask_cors import CORS
+
 import cgi
 import json
-import socketio
 
 # Port for the server
 _port = 42069
+_host = '0.0.0.0'
 
-# System command stuff
-runningCommand = False
+# app name
+app = Flask(__name__)
 
 # ============================================================================
-#                                  Socket
+#                           Socket for the app
 # ============================================================================
-_socketPort = 6969
 _currentConnections = 0
 
-sio = socketio.Server()
+io = SocketIO(app)
 
-@sio.event
-def connect(sid, environ):
-    if _currentConnections >= 1:
-        print('Too many apps attempted to connect, kicked', sid)
-        print('Current connections ->', _currentConnections)
-        sio.sockets.connected[sid].disconnect()
-    else:
-        _currentConnections += 1
-        print('App connected ', sid)
-        print('Current connections ->', _currentConnections)
+@io.on('connect')
+def test_connect():
+    emit('my response', {'data': 'Connected'})
 
-@sio.event
+# @io.on('connect')
+# def connect(sid, environ):
+#     if _currentConnections >= 1:
+#         print('Too many apps attempted to connect, kicked', sid)
+#         print('Current connections ->', _currentConnections)
+#         io.sockets.connected[sid].disconnect()
+#     else:
+#         _currentConnections += 1
+#         print('App connected ', sid)
+#         print('Current connections ->', _currentConnections)
+
+@io.on('disconnect')
 def disconnect(sid, environ):
     _currentConnections -= 1
     print('App disconnected ', sid)
@@ -38,10 +44,13 @@ def disconnect(sid, environ):
         print('Killing command that\'s running...')
         # TODO command stuff
 
-@sio.on('my custom event')
+@io.on('my custom event')
 def another_event(sid, data):
     pass
 
+@app.route('/', methods=["GET"])
+def index():
+    return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>'
 # ============================================================================
 #                           Handling detections
 # ============================================================================
@@ -51,7 +60,8 @@ lastDetectedFrame = 0
 previousDetections = []
 newDetections = []
 
-def handleDetection(self):
+@app.route('/detection', methods=["POST"])
+def detection():
     # Tests:
     # Single animal -> curl -X POST -d '{"frame_id":121, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
     # Herd -> curl -X POST -d '{"frame_id":181, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}, {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
@@ -69,16 +79,12 @@ def handleDetection(self):
     #      }]
     #   }
     #
-    self._set_headers()
 
     global lastDetectedFrame
     global previousDetections
     global newDetections
 
-    content_length = int(self.headers['Content-Length'])
-    body = self.rfile.read(content_length)
-
-    detection = json.loads(str(body, encoding='utf-8'))
+    detection = request.json
 
     # Server will only check first detection and then each 50th frame thereafter
     if abs(detection['frame_id'] - lastDetectedFrame) > 50 or lastDetectedFrame == 0:
@@ -118,9 +124,9 @@ def handleDetection(self):
 
                 # New detection of a herd
                 if not animalAlreadyDetected:
-                    print('New detection!')
-                    print('\tFrame -> ', detection['frame_id'])
-                    print('\tHerd of -> ', detectedAnimal)
+                    print('\n', '\033[36m', 'New detection!', '\033[37m') # Blue writing
+                    print('\tFrame ->', detection['frame_id'])
+                    print('\tHerd of ->', detectedAnimal, '\n')
 
                     #TODO: emit detection on socket
 
@@ -146,9 +152,9 @@ def handleDetection(self):
 
                 # New detection of a single animal
                 if not animalAlreadyDetected:
-                    print('New detection!')
+                    print('\n', '\033[36m', 'New detection!', '\033[37m') # Blue writing
                     print('\tFrame ->', detection['frame_id'])
-                    print('\tAnimal ->', detectedAnimal)
+                    print('\tAnimal ->', detectedAnimal, '\n')
 
                     #TODO: emit detection on socket
 
@@ -158,42 +164,12 @@ def handleDetection(self):
         # Replace the old list with the new list, since the camera is always moving 'forward', you can discard any previousDetections that have fallen out of frame
         previousDetections = newDetections
         newDetections = []
+    return ('', 200)
 
 # ============================================================================
-#        Black magic that handles incoming requests to the server
+#                  Print the logo and run socket/server
 # ============================================================================
-class BlackMagic(BaseHTTPRequestHandler):
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-
-    # If the server receives a GET request... that shouldn't happen
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>')
-
-    # If the server receives a POST request, handle the detection notification
-    def do_POST(self):
-        # Routing based on endpoints
-        if self.path == '/detection':
-            handleDetection(self)
-        elif self.path == '/test':
-            handleDetection(self)
-            #TODO: implement tests
-        else:
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(b'<html><head><title>Try again</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">There\'s nothing here for you</p></body></html>')
-
-# ============================================================================
-#                     Print the logo and run server
-# ============================================================================
-def run(server_class=HTTPServer, handler_class=BlackMagic, port=_port):
-
+def run(p = _port, h = _host):
     l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
     l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
     l3 = '\t  _/_/_/        _/  _/_/  _/    _/      _/        _/_/          _/      _/_/_/    _/_/_/    _/_/_/_/  _/  _/  _/  _/        _/_/_/_/     \n'
@@ -208,12 +184,9 @@ def run(server_class=HTTPServer, handler_class=BlackMagic, port=_port):
     # print('\033[31m') # Change color to red
     print('\033[37m') # Change color to white
 
-    # Http server
-    httpd = server_class(('', port), handler_class)
-    
-    print('Serving http requests on ' + str(_port) + '...')
-
-    httpd = socketio.WSGIApp(sio, httpd)
+    # Run the flask API
+    print('Server running on http://' + h + ':' + str(p))
+    io.run(app, port = p, host= h)
 
 # ============================================================================
 #       Start on default port or on the one passed in as an argument
@@ -222,6 +195,6 @@ if __name__ == "__main__":
     from sys import argv
 
     if len(argv) == 2:
-        run(port = int(argv[1]))
+        run(p = int(argv[1]))
     else:
         run()
