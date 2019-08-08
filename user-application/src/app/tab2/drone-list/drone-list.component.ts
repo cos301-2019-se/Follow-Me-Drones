@@ -56,7 +56,7 @@ export class DroneListComponent implements AfterViewInit {
     this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
     this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
     this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Desktop', 42069, '172.16.0.152', './assets/drone-icons/drone-4.svg', '')));
+    this.drones.push( new Drone(new DroneData('Devon Desktop', 42069, '127.0.0.1', './assets/drone-icons/drone-4.svg', '')));
 
     /* ======================================================================================================================== */
 
