@@ -12,11 +12,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://172.16.0.152:42069');
-        socket.on('connect', function() {
-            // we emit a connected message to let knwo the client that we are connected.
-            socket.emit('client_connected', {data: 'New client!'});
-        });
+          var socket = io.connect('http://127.0.0.1:42069');
+
+          socket.on('my response', function(msg) {
+              $('#log').append('<p>Received: ' + msg.data + '</p>');
+          });
+
     </script>
   </body>
 </html>
