@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 import cgi
@@ -19,10 +19,11 @@ cors = CORS(app,resources={r"/*":{"origins":"*"}})
 # ============================================================================
 _currentConnections = 0
 
-io = SocketIO(app)
+io = SocketIO(app, cors_allowed_origins="*")
 
 @io.on('connect', namespace="/")
 def test_connect():
+    print('App connected!')
     emit('my response', {'data': 'Connected'})
 
 # @io.on('connect')
