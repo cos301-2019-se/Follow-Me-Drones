@@ -1,7 +1,9 @@
 from flask import Flask, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
 
+import subprocess
+import os
 import cgi
 import json
 
@@ -12,45 +14,82 @@ _host = '127.0.0.1'
 # app name
 app = Flask(__name__)
 
-cors = CORS(app,resources={r"/*":{"origins":"*"}})
-
 # ============================================================================
 #                           Socket for the app
 # ============================================================================
 _currentConnections = 0
+_runningCommand = False
 
 io = SocketIO(app, cors_allowed_origins="*")
 
-@io.on('connect', namespace="/")
+# Connection event
+@io.on('connect')
 def test_connect():
-    print('App connected!')
-    emit('my response', {'data': 'Connected'})
+    global _currentConnections
 
-# @io.on('connect')
-# def connect(sid, environ):
-#     if _currentConnections >= 1:
-#         print('Too many apps attempted to connect, kicked', sid)
-#         print('Current connections ->', _currentConnections)
-#         io.sockets.connected[sid].disconnect()
-#     else:
-#         _currentConnections += 1
-#         print('App connected ', sid)
-#         print('Current connections ->', _currentConnections)
+    # Only allow one app to be connected at any given time
+    if _currentConnections >= 1:
+        print('Too many apps attempted to connect, kicked', request.sid)
+        print('Current connections ->', _currentConnections)
+        raise ConnectionRefusedError('Unauthorized!')
+    else:
+        _currentConnections += 1
+        print('App connected with ID', request.sid)
+        print('Current connections ->', _currentConnections)
+        emit('response', {'data': 'Connected'})
 
+# Disconnection event
 @io.on('disconnect')
-def disconnect(sid, environ):
+def disconnect():
+    global _currentConnections
+    global _runningCommand
+
     _currentConnections -= 1
-    print('App disconnected ', sid)
+    print('App disconnected with ID', request.sid)
     print('Current connections ->', _currentConnections)
 
-    if runningCommand:
-        print('Killing command that\'s running...')
-        # TODO command stuff
+    # If the detection is running and the app disconnects, turn it off
+    if _runningCommand:
+        print('Turning off object detection...')
+        _runningCommand.kill()
+        _runningCommand = False
 
-@io.on('my custom event')
-def another_event(sid, data):
+    emit('response', {'data': 'Disconnected'})
+
+# Arming event
+@io.on('arm')
+def arm():
+    global _runningCommand
+
+    print('Starting object recognition...')
+
+    # Move into the darknet directory
+    os.chdir('../object-recognition/src/darknet_/')
+
+    # Video camera
+    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c 2', '-thresh 0.7', '-json_port 8080', '-outfile_name data/videos/output/res.mkv']
+    
+    # Video stream
+    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh 0.7', '-json_port 8080', '-outfile_name data/videos/output/res.mkv']
+    
+    _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+
+    # Move back into the server directory
+    os.chdir('../../../server/')
+
+    # Wait for detection to start, then alert the app
+    for line in iter(_runningCommand.stderr.readline, b''):
+        if b'Done!' in line:
+            print('Drone is armed! Beware poachers')
+            emit('response', {'data': 'Armed'})
+            break
+
+# Return home event
+@io.on('return-home')
+def ETGoHome():
     pass
 
+# Default GET, should never happen
 @app.route('/', methods=["GET"])
 def index():
     return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>'
@@ -201,7 +240,12 @@ def run(p = _port, h = _host):
 
     # Run the flask API
     print('Server running on http://' + h + ':' + str(p))
-    io.run(app, port = p, host = h)
+
+    try:
+        io.run(app, port = p, host = h)
+    except KeyboardInterrupt:
+        print('^C received, shutting down the server...')
+        io.stop()
 
 # ============================================================================
 #       Start on default port or on the one passed in as an argument
