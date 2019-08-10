@@ -2,3 +2,38 @@ ion-item {
 	--min-height: 4rem;
 }
 
+.loading{
+  background: connecting() 50%/ 5em;
+  animation: connecting 1s ease-in-out infinite alternate;
+  //transition: all 400ms cubic-bezier(0.680, -0.550, 0.265, 1.550); 
+}
+
+@function connecting($open: 0) {
+  @return linear-gradient(90deg, #3c83ff $open*100%, #444 0);
+  //@return conic-gradient(colorCircle(4,false));
+}
+
+@keyframes connecting { to { background-image: connecting(1) } }
+
+.endloading{
+  background: connecting() 50%/ 5em;
+  animation: connecting 1s ease-in-out 2s alternate;
+}
+
+.loading2{
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+.loading3{
+	background: connect2();
+	animation: a 0s infinite;
+}
+
+@function connect2($open: 0) {
+  @return conic-gradient(from 90deg, #3c83ff, #444);
+}

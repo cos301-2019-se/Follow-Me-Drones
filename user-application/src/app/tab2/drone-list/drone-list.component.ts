@@ -43,7 +43,6 @@ export class DroneListComponent implements AfterViewInit {
     // });
 
   }
-
   ngAfterViewInit() {
   }
 
@@ -52,6 +51,7 @@ export class DroneListComponent implements AfterViewInit {
      *  Localhost
      *======================================================================================================================
      */
+
     this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')));
 
     /* ========================================================================================================================
@@ -83,7 +83,6 @@ export class DroneListComponent implements AfterViewInit {
     while ((currentNode.getAttribute('data-index') === null)) {
       currentNode = currentNode.parentNode;
     }
-
     const index = currentNode.getAttribute('data-index');
     return index;
 
@@ -95,8 +94,12 @@ export class DroneListComponent implements AfterViewInit {
     this.drones[index].armDrone();
   }
 
-
   connectDrone(event) {
+    event.target.innerHTML = "Connecting";
+    const chip = event.target.parentNode;
+    chip.classList.remove("endloading");
+    chip.classList.add("loading");
+    console.log(event.target.parentNode);
     const index = this.getClickedDrone(event);
     const currentDrone = this.drones[index];
 
@@ -105,13 +108,12 @@ export class DroneListComponent implements AfterViewInit {
       if (droneConnected) { // TODO: if drone is found
         console.log('Drone successfully connected');
       } else {
-
         console.log('snne');
         alert('nee');
         // TODO: Notify user that drone is not available
-
       }
 
+      chip.classList.remove("loading");
     });
 
     // this.drones[index].messages.subscribe( disconnect => {
@@ -156,6 +158,7 @@ export class DroneListComponent implements AfterViewInit {
     //   console.log(currentObj[0].name);
     // });
 
+    //event.target.classList.remove('loading');
   }
 
   disconnectDrone(event) {
