@@ -1,17 +1,15 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, ConnectionRefusedError
-from flask_cors import CORS
 
 import subprocess
 import os
-import cgi
-import json
+import base64
 
 # Port for the server
 _port = 42069
 _host = '127.0.0.1'
 
-# app name
+# Flask app
 app = Flask(__name__)
 
 # ============================================================================
@@ -67,10 +65,17 @@ def arm():
     os.chdir('../object-recognition/src/darknet_/')
 
     # Video camera
-    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c 2', '-thresh 0.7', '-json_port 8080', '-outfile_name data/videos/output/res.mkv']
+    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c 2', '-thresh 0.7', '-json_port 42069', '-out_filename ../../output.mkv', '-prefix ../../detections/img']
     
     # Video stream
-    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh 0.7', '-json_port 8080', '-outfile_name data/videos/output/res.mkv']
+    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
+    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
+
+    _output = ""
+    for opt in _cmd:
+        _output += opt + " "
+
+    print(_output)
     
     _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
@@ -97,11 +102,21 @@ def index():
 #                           Handling detections
 # ============================================================================
 
+# Function to alert the app of a detection
+def alertAppOfDetection(detection):
+    _img = '../object-recognition/detections/img_' + str(detection['frame_id']).zfill(8) + '.jpg'
+
+    with open(_img, 'rb') as img_file:
+        _img_base64 = str(base64.b64encode(img_file.read()))
+
+    io.emit('detection', {'data': detection, 'image': _img_base64})
+
 # Filter global variables
 lastDetectedFrame = 0
 previousDetections = []
 newDetections = []
 
+# Endpoint for POST requests alerting the server of a detection
 @app.route('/detection', methods=["POST"])
 def detection():
     # Tests:
@@ -170,7 +185,7 @@ def detection():
                     print('\tFrame ->', detection['frame_id'])
                     print('\tHerd of ->', detectedAnimal, '\n')
 
-                    #TODO: emit detection on socket
+                    alertAppOfDetection(detection)
 
                 # Create a new list of the currently detected animals, with herd flag set to true
                 newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': True})
@@ -198,7 +213,7 @@ def detection():
                     print('\tFrame ->', detection['frame_id'])
                     print('\tAnimal ->', detectedAnimal, '\n')
 
-                    #TODO: emit detection on socket
+                    alertAppOfDetection(detection)
 
                 # Create a new list of the currently detected animals, with the herd flag set to false
                 newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': False})

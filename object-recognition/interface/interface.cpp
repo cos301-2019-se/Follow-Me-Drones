@@ -97,7 +97,7 @@ int main()
                 cout << "\nVideo to test (path from darknet_ director): ";
                 getline(cin, data);
 
-		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/" + data + " -thresh 0.7 -json_port 42069 -prefix data/detections/img -out_filename data/videos/output/res.mkv";
+		        cmd = "./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/" + data + " -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv";
                 cout << cmd << endl;
 
                 chdir("../src/darknet_");
