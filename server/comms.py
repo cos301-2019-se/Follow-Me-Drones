@@ -3,7 +3,9 @@ from flask_socketio import SocketIO, emit, ConnectionRefusedError
 
 import subprocess
 import os
+import glob
 import base64
+import time
 
 # Port for the server
 _port = 42069
@@ -117,7 +119,7 @@ previousDetections = []
 newDetections = []
 
 # Endpoint for POST requests alerting the server of a detection
-@app.route('/detection', methods=["POST"])
+@app.route('/detection', methods=['POST'])
 def detection():
     # Tests:
     # Single animal -> curl -X POST -d '{"frame_id":121, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
@@ -227,6 +229,39 @@ def detection():
 #                  Print the logo and run socket/server
 # ============================================================================
 
+def zipdir(directory, password):
+    subprocess.call(['7z', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def shutdown_process():
+    print('Beginning shutdown process... \n')
+
+    # Create an encrypted zip file of all the detections
+    print('Encrypting all detection images... ', end='', flush=True)
+
+    os.chdir('../object-recognition/')
+    
+    # Create an encrypted zip of the files
+    zipdir('detections', 'Capstone69')
+
+    print('Done!')
+
+    # Delete all the unencrypted images
+    print('Deleting all unencrypted detection images... ', end='', flush=True)
+
+    os.chdir('detections/')
+
+    files=glob.glob('*.jpg')
+    for filename in files:
+        os.remove(filename)
+
+    print('Done!')
+
+    os.chdir('../../server/')
+
+    # Stop the server
+    io.stop()
+    print('Done... Goodbye!')
+
 def run(p = _port, h = _host):
     # l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
     # l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
@@ -260,7 +295,7 @@ def run(p = _port, h = _host):
         io.run(app, port = p, host = h)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
-        io.stop()
+        shutdown_process()
 
 # ============================================================================
 #       Start on default port or on the one passed in as an argument
