@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_socketio import SocketIO, emit, ConnectionRefusedError
+from flask_socketio import SocketIO, emit, ConnectionRefusedError, disconnect
 
 import subprocess
 import os
@@ -9,7 +9,7 @@ import time
 
 # Port for the server
 _port = 42069
-_host = '127.0.0.1'
+_host = '0.0.0.0'
 
 # Flask app
 app = Flask(__name__)
@@ -20,7 +20,8 @@ app = Flask(__name__)
 _currentConnections = 0
 _runningCommand = False
 
-io = SocketIO(app, cors_allowed_origins="*")
+# Create the socket, with all origins allowed
+io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 # Connection event
 @io.on('connect')
@@ -29,14 +30,19 @@ def test_connect():
 
     # Only allow one app to be connected at any given time
     if _currentConnections >= 1:
-        print('Too many apps attempted to connect, kicked', request.sid)
-        print('Current connections ->', _currentConnections)
+        # print('\nToo many apps attempted to connect to drone, kicked', request.sid)
+        # print('Current connections ->', _currentConnections, '\n')
+        # emit('drone_busy')
         raise ConnectionRefusedError('Unauthorized!')
     else:
         _currentConnections += 1
-        print('App connected with ID', request.sid)
-        print('Current connections ->', _currentConnections)
-        emit('response', {'data': 'Connected'})
+        print('\nApp connected with ID', request.sid)
+        print('Current connections ->', _currentConnections, '\n')
+
+# Connection event
+@io.on('connect_drone')
+def test_connect():
+    emit('connect_success')
 
 # Disconnection event
 @io.on('disconnect')
@@ -54,7 +60,7 @@ def disconnect():
         _runningCommand.kill()
         _runningCommand = False
 
-    emit('response', {'data': 'Disconnected'})
+    emit('disconnected')
 
 # Arming event
 @io.on('arm')
@@ -67,17 +73,17 @@ def arm():
     os.chdir('../object-recognition/src/darknet_/')
 
     # Video camera
-    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c 2', '-thresh 0.7', '-json_port 42069', '-out_filename ../../output.mkv', '-prefix ../../detections/img']
+    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c', '2', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
     
     # Video stream
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
     _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
 
-    _output = ""
-    for opt in _cmd:
-        _output += opt + " "
+    # _output = ""
+    # for opt in _cmd:
+    #     _output += opt + " "
 
-    print(_output)
+    # print(_output)
     
     _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
@@ -88,7 +94,7 @@ def arm():
     for line in iter(_runningCommand.stderr.readline, b''):
         if b'Done!' in line:
             print('Drone is armed! Beware poachers')
-            emit('response', {'data': 'Armed'})
+            emit('drone_armed')
             break
 
 # Return home event
@@ -100,6 +106,7 @@ def ETGoHome():
 @app.route('/', methods=["GET"])
 def index():
     return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>'
+
 # ============================================================================
 #                           Handling detections
 # ============================================================================
@@ -230,7 +237,10 @@ def detection():
 # ============================================================================
 
 def zipdir(directory, password):
-    subprocess.call(['7z', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.call(['7z', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d%h') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def startup_process():
+    pass
 
 def shutdown_process():
     print('Beginning shutdown process... \n')
@@ -259,6 +269,7 @@ def shutdown_process():
     os.chdir('../../server/')
 
     # Stop the server
+    io.emit('disconnect')
     io.stop()
     print('Done... Goodbye!')
 
@@ -270,15 +281,15 @@ def run(p = _port, h = _host):
     # l5 = '\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n'
     # logo = l1 + l2 + l3 + l4 + l5
 
-    l1 = "\n\t   d555555o.   5 555555555555 5 555555555o.`5.`555b          ,5' 5 555555555555 5 555555555o.           .5.          b.            5          .5.   5555555 555555555 ,o555555o.     5 55555555o.\n"
-    l2 = "\t 5.`5555.   Y5 5 5555         5 5555     `55 `5.`555b       ,5'  5 5555         5 5555     `55         :5555.        Y5555o.       5         :555.        5 555    ,5 55       `5b   5 555     `55\n"
-    l3 = "\t `5.`5555.     5 5555         5 5555     ,55  `5.`555b     ,5'   5 5555         5 5555     ,55        . `5555.       .`Y55555o.    5        .`5555.       5 555    55 55        `5b  5 555     ,55\n"
-    l4 = "\t  `5.`5555.    5 555555555555 5 5555.   ,55'   `5.`555b   ,5'    5 555555555555 5 5555.   ,55'       .5. `5555.      5o. `Y55555o. 5       .5.`5555.      5 555    55 55         55  5 555.   ,55'\n"
-    l5 = "\t   `5.`5555.   5 5555         5 555555555P'     `5.`555b ,5'     5 5555         5 555555555P'       .5`5. `5555.     5`Y5o. `Y5555o5      .5`5.`5555.     5 555    55 55         55  5 55555555P'\n"
-    l6 = "\t    `5.`5555.  5 5555         5 5555`5b          `5.`555b5'      5 5555         5 5555`5b          .5' `5. `5555.    5   `Y5o. `Y555     .5' `5.`5555.    5 555    55 55         5P  5 555`5b\n"
-    l7 = "\t5b   `5.`5555. 5 5555         5 5555 `5b.         `5.`555'       5 5555         5 5555 `5b.       .5'   `5. `5555.   5      `Y5o. `Y5   .5'   `5.`5555.   5 555    `5 55        ,5P  5 555 `5b.\n"
-    l8 = "\t`5b.  ;5.`5555 5 5555         5 5555   `5b.        `5.`5'        5 5555         5 5555   `5b.    .555555555. `5555.  5         `Y5o.`  .555555555.`5555.  5 555     ` 555     ,55'   5 555   `5b.\n"
-    l9 = "\t `Y5555P ,55P' 5 555555555555 5 5555     `55.       `5.`         5 555555555555 5 5555     `55. .5'       `5. `5555. 5            `Yo .5'       `5.`5555. 5 555       `5555555P'     5 555     `55.\n"
+    l1 = "\n\t   dvvvvvo.   v vvvvvvvvvv v vvvvvvvo. `v.`vvvb         ,v' v vvvvvvvvvv v vvvvvvvo.    b.             v         .v.   vvvvvvv vvvvvvvv  ,ovvvvvvo.    v vvvvvvvo.\n"
+    l2 = "\t v.`vvv.  Yv  v vvv        v vv     `vv `v.`vvvb       ,v'  v vvv        v vv     `vv   Yvvvvo.        v        :vvv.        v vv     ,v vv      `vb   v vv     `vv\n"
+    l3 = "\t `v.`vvv.     v vvv        v vv     ,vv  `v.`vvvb     ,v'   v vvv        v vv     ,vv   .`Yvvvvvo.     v       .`vvvv.       v vv     vv vv       `vb  v vv     ,vv\n"
+    l4 = "\t  `v.`vvv.    v vvvvvvvvvv v vv.   ,vv'   `v.`vvvb   ,v'    v vvvvvvvvvv v vv.   ,vv'   vo. `Yvvvvvo.  v      .v.`vvvv.      v vv     vv vv        vv  v vv.   ,vv'\n"
+    l5 = "\t   `v.`vvv.   v vvv        v vvvvvvvP'     `v.`vvvb ,v'     v vvv        v vvvvvvvP'    v`Yvo. `Yvvvvoov     .v`v.`vvvv.     v vv     vv vv        vv  v vvvvvvvP'\n"
+    l6 = "\t    `v.`vvv.  v vvv        v vv`vb          `v.`vvvbv'      v vvv        v vv`vb        v   `Yvo. `Yvvvv    .v' `v.`vvvv.    v vv     vv vv        vP  v vv`vb\n"
+    l7 = "\tvb   `v.`vvv. v vvv        v vv `vb.         `v.`vvv'       v vvv        v vv `vb.      v      `Yvo. `Yv   .v'   `v.`vvvv.   v vv     `v vv       ,vP  v vv `vb.\n"
+    l8 = "\t`vb.  ;v.`vvv v vvv        v vv   `vb.        `v.`v'        v vvv        v vv   `vb.    v         `Yvo.`  .vvvvvvvvv.`vvvv.  v vv     `v vv     ,vv'   v vv   `vb.\n"
+    l9 = "\t `YvvvP ,vvP' v vvvvvvvvvv v vv     `vv.       `v.`         v vvvvvvvvvv v vv     `vv.  v            `Yo .v'       `v.`vvvv. v vv       `vvvvvvvP'     v vv     `vv.\n"
     logo = l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8 + l9
 
     print('\033[2J') # Clear screen
@@ -292,6 +303,7 @@ def run(p = _port, h = _host):
     print('Server running on http://' + h + ':' + str(p))
 
     try:
+        startup_process()
         io.run(app, port = p, host = h)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
