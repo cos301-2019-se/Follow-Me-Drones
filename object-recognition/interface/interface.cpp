@@ -36,7 +36,7 @@ int main()
     cin >> choice;
 
     string weights, config;
-    string data, train, classes, cmd;
+    string data, train, classes, cmd, cfg;
 
     // While the user input is not 5 (quit option), continue to display the menu
     while(choice != 5)
@@ -149,11 +149,26 @@ int main()
                 // if(classes == "\n")
                 //     classes = "../data/animal-classes.names";
 
+                cout << "1) Normal config\n2) Tiny config" << endl;
+
+                getline(cin, data);
+                cfg = "";
+
+                if(data == "1")
+                    cfg = "cfg/animals.cfg";
+                else if(data == "2")
+                    cfg = "cfg/animals-tiny.cfg";
+                else
+                {
+                    cout << "Invalid option, aborting..." << endl;
+                    break;
+                }
+
                 cout << "Writing all image names into data/train.txt..." << endl;
 
                 chdir("../src/darknet_");
                 system("find data/animal-images -name \\*.jpg > data/train.txt");
-                system("./darknet detector train cfg/animals.data cfg/animals.cfg darknet19_448.conv.23");
+                system(("./darknet detector train cfg/animals.data " + cfg + "cfg/animals.cfg darknet19_448.conv.23").c_str());
                 chdir("../../interface");
                 break;
 

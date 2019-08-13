@@ -1,5 +1,6 @@
 from flask import Flask, request
-from flask_socketio import SocketIO, emit, ConnectionRefusedError, disconnect
+from flask_socketio import SocketIO, emit, ConnectionRefusedError
+from flask_cors import CORS
 
 import subprocess
 import os
@@ -13,6 +14,7 @@ _host = '0.0.0.0'
 
 # Flask app
 app = Flask(__name__)
+CORS(app)
 
 # ============================================================================
 #                           Socket for the app
@@ -21,6 +23,7 @@ _currentConnections = 0
 _runningCommand = False
 
 # Create the socket, with all origins allowed
+
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 # Connection event
@@ -32,7 +35,7 @@ def test_connect():
     if _currentConnections >= 1:
         # print('\nToo many apps attempted to connect to drone, kicked', request.sid)
         # print('Current connections ->', _currentConnections, '\n')
-        # emit('drone_busy')
+
         raise ConnectionRefusedError('Unauthorized!')
     else:
         _currentConnections += 1
@@ -106,6 +109,11 @@ def ETGoHome():
 @app.route('/', methods=["GET"])
 def index():
     return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>'
+
+# Endpoint to ping server
+@app.route('/ping', methods=["GET"])
+def ping():
+    return '[{"pong"}]'
 
 # ============================================================================
 #                           Handling detections
