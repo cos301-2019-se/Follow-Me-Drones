@@ -63,10 +63,8 @@ def disconnect():
         _runningCommand.kill()
         _runningCommand = False
 
-    emit('disconnected')
-
 # Arming event
-@io.on('arm')
+@io.on('arm_drone')
 def arm():
     global _runningCommand
 
@@ -82,12 +80,6 @@ def arm():
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
     _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
 
-    # _output = ""
-    # for opt in _cmd:
-    #     _output += opt + " "
-
-    # print(_output)
-    
     _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
     # Move back into the server directory
@@ -98,7 +90,22 @@ def arm():
         if b'Done!' in line:
             print('Drone is armed! Beware poachers')
             emit('drone_armed')
+
+            _runningCommand.stderr.close()
             break
+
+# Disarm event
+@io.on('disarm_drone')
+def disarm():
+    global _runningCommand
+
+    # If the detection is running and the app disconnects, turn it off
+    if _runningCommand:
+        print('Turning off object detection...')
+        _runningCommand.kill()
+        _runningCommand = False
+
+    emit('drone_disarmed')
 
 # Return home event
 @io.on('return-home')
@@ -116,17 +123,30 @@ def ping():
     return '[{"pong"}]'
 
 # ============================================================================
+#                             Handling images
+# ============================================================================
+
+# Converts the image in detections/ to base64
+def convertImageToBase64(image_id):
+    _img = '../object-recognition/detections/' + image_id
+
+    with open(_img, 'rb') as img_file:
+        return str(base64.b64encode(img_file.read()))
+
+# Endpoint for the app to request an image based on an image_id
+@app.route('/endpoint_name', method=['POST'])
+    # TODO get image ID, use function to convert to base64 and then return it
+    pass
+
+# ============================================================================
 #                           Handling detections
 # ============================================================================
 
 # Function to alert the app of a detection
-def alertAppOfDetection(detection):
-    _img = '../object-recognition/detections/img_' + str(detection['frame_id']).zfill(8) + '.jpg'
+def alertAppOfDetection(frame_id, detection):
+    _img = 'img_' + str(frame_id).zfill(8) + '.jpg'
 
-    with open(_img, 'rb') as img_file:
-        _img_base64 = str(base64.b64encode(img_file.read()))
-
-    io.emit('detection', {'data': detection, 'image': _img_base64})
+    io.emit('detection', {'detection': detection, 'image': _img})
 
 # Filter global variables
 lastDetectedFrame = 0
@@ -202,7 +222,7 @@ def detection():
                     print('\tFrame ->', detection['frame_id'])
                     print('\tHerd of ->', detectedAnimal, '\n')
 
-                    alertAppOfDetection(detection)
+                    alertAppOfDetection(detection['frame_id'], 'herd of ' + detectedAnimal)
 
                 # Create a new list of the currently detected animals, with herd flag set to true
                 newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': True})
@@ -230,7 +250,7 @@ def detection():
                     print('\tFrame ->', detection['frame_id'])
                     print('\tAnimal ->', detectedAnimal, '\n')
 
-                    alertAppOfDetection(detection)
+                    alertAppOfDetection(detection['frame_id'], detectedAnimal)
 
                 # Create a new list of the currently detected animals, with the herd flag set to false
                 newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': False})
@@ -315,7 +335,8 @@ def run(p = _port, h = _host):
         io.run(app, port = p, host = h)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
-        shutdown_process()
+        
+    shutdown_process()
 
 # ============================================================================
 #       Start on default port or on the one passed in as an argument

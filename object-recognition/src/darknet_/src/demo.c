@@ -213,10 +213,10 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             // if (nms) do_nms_obj(local_dets, local_nboxes, l.classes, nms);    // bad results
             if (nms) do_nms_sort(local_dets, local_nboxes, l.classes, nms);
             
-            // printf("\033[2J");
-            // printf("\033[1;1H");
-            // printf("\nFPS:%.1f\n",fps);
-            // printf("Objects:\n\n");
+            printf("\033[2J");
+            printf("\033[1;1H");
+            printf("\nFPS:%.1f\n",fps);
+            printf("Objects:\n\n");
 
             bool objectDetected = false;
             ++frame_id;
@@ -256,6 +256,23 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                     sprintf(buff, "%s_%08d.jpg", prefix, count);
                     if(show_img)
                         save_cv_jpg(show_img, buff);
+                }
+
+                if (!dont_show)
+                {
+                    show_image_mat(show_img, "Demo");
+                    int c = wait_key_cv(1);
+                    if (c == 10)
+                    {
+                        if (frame_skip == 0) frame_skip = 60;
+                        else if (frame_skip == 4) frame_skip = 0;
+                        else if (frame_skip == 60) frame_skip = 4;
+                        else frame_skip = 0;
+                    }
+                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
+                    {
+                        flag_exit = 1;
+                    }
                 }
             }
 
