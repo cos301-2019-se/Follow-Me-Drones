@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
 
@@ -134,14 +134,16 @@ def convertImageToBase64(image_id):
         return str(base64.b64encode(img_file.read()))
 
 # Endpoint for the app to request an image based on an image_id
-@app.route('/endpoint_name', method=['POST'])
-    # TODO get image ID, use function to convert to base64 and then return it
-    pass
+@app.route('/image', methods=['POST'])
+def return_image():
+    blob = convertImageToBase64(request.get_json()['image'])
+    #blob = convertImageToBase64(request.jsond)
+    return (jsonify(blob), 200)
 
 # ============================================================================
 #                           Handling detections
-# ============================================================================
-
+# ===== =======================================================================
+ 
 # Function to alert the app of a detection
 def alertAppOfDetection(frame_id, detection):
     _img = 'img_' + str(frame_id).zfill(8) + '.jpg'
