@@ -28,7 +28,6 @@ label {
 	justify-content: space-around;
 	flex-direction: row;
 	align-items: center;
-	overflow: scroll;
 }
 .ion-chip-wrapper {
 	display:flex;
@@ -42,6 +41,12 @@ label {
 .ion-chip {
 	align-self: flex-end;
 	text-align: center;
+	width: 80%;
+}
+.ion-chip-medium {
+	align-self: flex-end;
+	text-align: center;
+	width: 90%;
 }
 
 .attempt-active {

@@ -21,7 +21,6 @@ export class FlightSessionController {
   startSession() {
     if (!this.active) {
       this.active = true;
-      console.log('Creating flight session');
       this.numActiveSessions++;
       this.activeSession = new FlightSession();
       this.drone.armDrone();
@@ -32,9 +31,10 @@ export class FlightSessionController {
     }
   }
 
-  endSession() {
+  endFlightSession() {
     this.active = false;
     this.pastSessions.set(this.drone.getName(), this.activeSession);
+    this.drone.disArm();
   }
 
   isActive() {

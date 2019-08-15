@@ -17,18 +17,20 @@
 
 
 				<!-- Drone ATTEMPT_ACTIVE -->
-				<ion-chip class="attempt-active" *ngIf="isAttemptActive(drone)">
-					<ion-label color="danger">Offline</ion-label>
-				</ion-chip>
+				<!-- <ion-chip class="attempt-active" *ngIf="isAttemptActive(drone)"> -->
+				<!-- 	<ion-label color="danger">Offline</ion-label> -->
+				<!-- </ion-chip> -->
 				<!-- ========================================== -->
 
-				<!-- Drone ACTIVE -->
-				<ion-chip class="ion-chip" color="secondary" (click)="disconnectDrone(drone)" *ngIf="isActive(drone)">
-					<ion-label  color="secondary">Active</ion-label>
+				<!-- Drone ONLINE -->
+
+				<ion-chip class="ion-chip" color="success" *ngIf="isOnline(drone)">
+					<ion-label color="success">Online</ion-label>
 				</ion-chip>
-				<!-- <button class="ion-chip" color="secondary" (click)="connectDrone(drone)" *ngIf="isActive(drone)"> -->
-				<!-- 	<label  color="secondary">Active</label> -->
-				<!-- </button> -->
+
+				<ion-chip class="ion-chip" color="primary"  (click)="connectDrone(drone)" *ngIf="isOnline(drone)" >
+					<ion-label color="primary">Connect</ion-label>
+				</ion-chip>
 				<!-- ========================================== -->
 
 				<!-- Drone BUSY -->
@@ -38,11 +40,11 @@
 
 
 				<!-- Drone CONNECTED -->
-				<ion-chip class="ion-chip" color="danger" (click)="disconnectDrone(drone)" *ngIf="isConnected(drone)">
+				<ion-chip class="ion-chip-medium" color="danger" (click)="disconnectDrone(drone)" *ngIf="isConnected(drone)">
 					<ion-label color="danger">Disconnect</ion-label>
 				</ion-chip>
 
-				<ion-chip class="ion-chip" color="warning"  (click)="armDrone(drone)" *ngIf="isConnected(drone)" >
+				<ion-chip class="ion-chip-medium" color="warning"  (click)="startSession(drone)" *ngIf="isConnected(drone)" >
 					<ion-label color="warning">Arm Drone</ion-label>
 				</ion-chip>
 				<!-- ========================================== -->
@@ -62,7 +64,7 @@
 					<ion-label color="success">Connected</ion-label>
 				</ion-chip>
 
-				<ion-chip color="success"(click)="armDrone(drone)" *ngIf="isArmed(drone)" >
+				<ion-chip color="success"(click)="endSession(drone)" *ngIf="isArmed(drone)" >
 					<ion-label color="success">Armed</ion-label>
 				</ion-chip>
 				<!-- ========================================== -->

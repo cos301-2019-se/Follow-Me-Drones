@@ -14,22 +14,29 @@ export class Drone {
   state: DroneState;
   connected: boolean; // TODO: remove
   armed: boolean; // TODO: remove
+  pingServer: any;
   flightController: FlightSessionController;
 
   socket: DroneSocketService;
   messages: Subject<any>;
   connectionStatus: Subject<any>;
   constructor( dronedata: DroneData) {
+
+    this.state = DroneState.OFFLINE;
     this.dronedata = dronedata; // TODO: REMOVE
     this.name = dronedata.name;
     this.port = dronedata.port;
     this.ipAddress = dronedata.ipAddress;
-    this.state = DroneState.ATTEMPT_ACTIVE;
     this.flightController = new FlightSessionController(this);
     this.connected = false; // TODO: REMOVE
+
+    this.socket = new DroneSocketService();
   }
   startFlightSession() {
     this.flightController.startSession();
+  }
+  endFlightSession() {
+    this.flightController.endFlightSession();
   }
 
   getState() {
@@ -39,33 +46,45 @@ export class Drone {
     return  this.connected;
   }
 
-  async reconnect() {
+  reconnect() {
     this.connected = this.socket.isConnected();
   }
 
+  serverOnline(done) {
+    const url = `http://${this.ipAddress}:${this.port}/ping`;
 
-  connectSocket(done) {
-    this.socket = new DroneSocketService();
-    this.messages = <Subject<any>> this.socket.connectSocket( this.dronedata.ipAddress, this.dronedata.port, 
-      () => {
-      this.connected = this.socket.isConnected();
-      this.state = DroneState.ACTIVE;
-      done(this.state);
-    })
+    const socket = this.socket;
+
+    this.pingServer = setInterval( () => {
+      socket.serverOnline((connected) => {
+        if (connected) {
+          clearInterval(this.pingServer);
+          done(true);
+        }
+      }, url);
+    }, 1000);
+
+    return this.socket.serverOnline(done, url);
+  }
+  disArm() {
+    this.socket.disArm();
+  }
+
+
+  connectDrone(done) {
+    console.log('sarie');
+    this.messages = <Subject<any>> this.socket.connectSocket( this.dronedata.ipAddress, this.dronedata.port, done)
     .map( (res: any): any => {
       return res;
     });
 
   }
-  connectDrone(done) {
-    this.socket.connectDrone(); // Emit connect_drone
-  }
+
   disconnectDrone() {
     this.socket.disconnectDrone();
-    this.state = DroneState.ACTIVE;
+    this.state = DroneState.ONLINE;
   }
   disconnect() {
-    // console.log('Disconnecting myself!');
     this.messages.unsubscribe();
   }
 
@@ -74,7 +93,6 @@ export class Drone {
   }
 
   armDrone() {
-    const setArmed = this.armed;
     this.socket.armDrone();
   }
   getName() {

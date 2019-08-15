@@ -1,7 +1,6 @@
 export enum DroneState {
     OFFLINE,
-    ATTEMPT_ACTIVE, //
-    ACTIVE,
+    ONLINE,
     BUSY,
     CONNECTING,
     CONNECTED,
