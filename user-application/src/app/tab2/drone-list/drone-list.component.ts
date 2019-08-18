@@ -45,7 +45,7 @@ export class DroneListComponent implements AfterViewInit {
      *======================================================================================================================
      */
     // this.drones.push( new Drone(new DroneData('Brendon Laptop', 8080, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')));
-    // this.drones.push( new Drone(new DroneData('Brendon Laptop 2', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')));
+    this.drones.push( new Drone(new DroneData('Brendon Laptop 2', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')));
 
     /* ========================================================================================================================
      *  Totolink
@@ -53,8 +53,8 @@ export class DroneListComponent implements AfterViewInit {
      */
     // this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
     // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
-    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Laptop', 42069, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
+    this.drones.push( new Drone(new DroneData('Brendon Laptop', 42069, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Devon Laptop', 42069, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
 
     /* ======================================================================================================================== */
 
@@ -65,7 +65,8 @@ export class DroneListComponent implements AfterViewInit {
      */
     // this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.32', './assets/drone-icons/drone-1.svg', '')));
     // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.17', './assets/drone-icons/drone-2.svg', '')));
-    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Brendon Laptop', 42069, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
+    // this.drones.push( new Drone(new DroneData('Francois Laptop', 42069, '192.168.1.7', './assets/drone-icons/drone-3.svg', '')));
     // this.drones.push( new Drone(new DroneData('Devon Laptop', 42069, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
     // this.drones.push( new Drone(new DroneData('Gilad Laptop', 42069, '192.168.1.19', './assets/drone-icons/drone-4.svg', '')));
     /* ======================================================================================================================== */
@@ -86,6 +87,10 @@ export class DroneListComponent implements AfterViewInit {
   startSession(drone) {
     console.log('arm in list');
     drone.startFlightSession();
+  }
+
+  testPost(drone) {
+    drone.fetchImage('image.jpg');
   }
 
   connectDrone(drone) {
@@ -164,10 +169,13 @@ export class DroneListComponent implements AfterViewInit {
 
       next: (socketEvent)  => {
         if (socketEvent.event === 'detection') {
-          const currentObj = socketEvent.data.data.objects; // TODO: change when Devon sends different format from the server
-          console.log(currentObj);
-          this.presentToast(`${drone.dronedata.name} spotted ${currentObj[0].name}`);
-          console.log(currentObj[0].name);
+          const animal = socketEvent.data.detection;
+          console.log(drone);
+          drone.fetchImage( socketEvent.data.image );
+          console.log(socketEvent.data);
+          let message =  `${drone.dronedata.name} spotted ${animal}`;
+          message = 'An Avengers level threat has been spotted';
+          this.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
           drone.setDroneState(DroneState.ONLINE);
           console.log('disconnected in next() | Set drone to ATTEMPT_ACTIVE');

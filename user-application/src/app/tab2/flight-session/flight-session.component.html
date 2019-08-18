@@ -6,30 +6,30 @@
 </ion-header>
 <ion-content>
 <div *ngIf="images || ImageIndex">
+
+	<ion-avatar class="avatar">
+		<img [src]="getDroneIcon()">
+	</ion-avatar>
+
+        <ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img>
+        <ion-slides loop slidesPerView="3">
+            <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i">
+                <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img>
+            </ion-slide>
+        </ion-slides>
+
+
     <ion-list>
-        <ion-img class="full-img" (click)="viewPhoto()" [src]="images[ImageIndex]"></ion-img>
-        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="armDrone()">Arm Drone</ion-button>
-        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="returnHome()">Return Home</ion-button>
-		<ion-item lines="none">ID: {{ dronedata.name }}</ion-item>
+		<ion-item lines="none">Name: {{ dronedata.name }}</ion-item>
         <ion-item lines="none">Battery: 72%</ion-item>
         <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item>
+		<br>
+
     </ion-list>
 
     <ion-footer>
-        <ion-slides loop slidesPerView="3">
-            <ion-slide ng-init="s = 0">
-                <ion-img (click)="updateIndex(0)" [src]="images[0]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 1">
-                <ion-img (click)="updateIndex(1)" [src]="images[1]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 2">
-                <ion-img (click)="updateIndex(2)" [src]="images[2]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 3">
-                <ion-img (click)="updateIndex(3)" [src]="images[3]"></ion-img>
-            </ion-slide>
-        </ion-slides>
+        <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button>
+        <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button>
     </ion-footer>
 </div>
 </ion-content>

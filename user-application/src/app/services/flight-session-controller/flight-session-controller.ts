@@ -41,6 +41,15 @@ export class FlightSessionController {
     return this.active;
   }
 
+  addImage(image) {
+    this.activeSession.addImage(image);
+  }
+  getImage() {
+    console.log('hey');
+    this.activeSession = new FlightSession();
+    return this.activeSession.getImage(2);
+  }
+
   getCurrentFlightSession() {
     return this.activeSession;
   }

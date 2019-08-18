@@ -10,6 +10,8 @@ ion-button{
 ion-slide {
   width: 40% !important;
   height: 80px;
+  padding-left: 1%;
+  padding-right: 1%;
 }
 
 ion-footer {
@@ -18,10 +20,22 @@ ion-footer {
 }
 
 ion-item{
-  font-weight:bold
+  font-weight: bold;
+  height: 30px;
+  font-size: 16px;
 }
 
 .full-img{
-  height: 220px;
+  height: 190px;
   padding: 0 2% 2% 2%;
+}
+
+.avatar {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	margin: auto;
+	height: 70px;
+	width: 70px;
+	margin-top: 10px;
 }
