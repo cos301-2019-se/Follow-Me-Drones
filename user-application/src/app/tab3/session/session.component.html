@@ -1,0 +1,19 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+		{{ sessionName }}
+	</ion-card-title>
+	<ion-card-subtitle> 
+		{{ droneName }}
+		<ion-chip color="success" *ngIf='isActive'>
+			<ion-label color="success">Active</ion-label>
+		</ion-chip>
+	</ion-card-subtitle>
+  </ion-card-header>
+  <ion-card-content>
+	  <img class='cover-image' [src]='coverImage' alt="">
+	<div class="comments">
+		Amet dolores officia molestiae doloribus similique sunt nesciunt laborum Aperiam vel quod enim explicabo totam libero Rem facilis tempora placeat ex ducimus. Quaerat optio architecto quidem dicta odio distinctio
+	</div>
+  </ion-card-content>
+</ion-card>

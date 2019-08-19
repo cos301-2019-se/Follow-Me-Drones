@@ -1,0 +1,7 @@
+<div class="app-session-wrapper" *ngFor="let session of allSessions">
+	<app-session [sessionName]='session.getSessionName()' [isActive]='session.isActive()' droneName='DJI Mavic Pro' [coverImage]='session.getFirstImage()' ></app-session>
+</div>
+
+
+
+
