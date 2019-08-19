@@ -6,6 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
 import { DroneDataService } from '../../services/drone-data/drone-data.service';
 import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
+import * as $ from 'jquery';
+
 @Component({
   selector: 'app-flight-session',
   templateUrl: './flight-session.component.html',
@@ -87,4 +89,7 @@ export class FlightSessionComponent implements OnInit {
     return this.drone.getState() === DroneState.BUSY ? true : false;
   }
 
+  arrowToggle(element) {
+      $(`#${element.id}`).toggleClass('active');
+  }
 }
