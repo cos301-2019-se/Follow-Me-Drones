@@ -1,7 +1,11 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavParams } from '@ionic/angular';
 import { DroneData } from '../../../data-models/drone-data.model';
-import { Drone } from '../../services/drone/drone';
+import { Drone } from '../../services/drone-data/drone/drone';
+import { ActivatedRoute } from '@angular/router';
+import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
+import { DroneDataService } from '../../services/drone-data/drone-data.service';
+import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
 @Component({
   selector: 'app-flight-session',
   templateUrl: './flight-session.component.html',
@@ -18,14 +22,21 @@ export class FlightSessionComponent implements OnInit {
 
 
   activeImageIndex = 0;
-  dronedata: DroneData;
   drone: Drone;
   imageArray: string [];
-  constructor(public navParam: NavParams) {
-    this.drone = navParam.get('drone');
-    this.dronedata = this.drone.dronedata;
-    this.imageArray = this.drone.flightController.getCurrentFlightSession().getImages();
+  dataLoaded: boolean;
+
+  constructor(
+                private droneData: DroneDataService,
+                private route: ActivatedRoute,
+                private flightSessionController: FlightSessionController) {
+
   }
+
+  ngOnInit() {
+    this.drone = this.droneData.getDrone( this.route.snapshot.paramMap.get('drone'));
+  }
+
   getImageSource(index) {
     return this.imageArray[index];
   }
@@ -45,9 +56,6 @@ export class FlightSessionComponent implements OnInit {
     alert('Return Home');
   }
 
-  ngOnInit() {
-
-  }
 
   updateIndex(s) {
     this.activeImageIndex = s;
@@ -55,6 +63,28 @@ export class FlightSessionComponent implements OnInit {
 
   getDroneIcon() {
     return this.drone.icon;
+  }
+
+  isOffline() {
+    return this.drone.getState() === DroneState.OFFLINE ? true : false;
+  }
+  isOnline() {
+    return this.drone.getState() === DroneState.ONLINE ? true : false;
+  }
+  isConnecting() {
+    return this.drone.getState() === DroneState.CONNECTING ? true : false;
+  }
+  isConnected() {
+    return this.drone.getState() === DroneState.CONNECTED ? true : false;
+  }
+  isArming() {
+    return this.drone.getState() === DroneState.ARMING ? true : false;
+  }
+  isArmed() {
+    return this.drone.getState() === DroneState.ARMED ? true : false;
+  }
+  isBusy() {
+    return this.drone.getState() === DroneState.BUSY ? true : false;
   }
 
 }

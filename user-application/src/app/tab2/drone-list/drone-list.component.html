@@ -1,9 +1,10 @@
 <ion-list>
-  <ion-item-sliding *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
+  <ion-item-sliding #settings *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
 
     <ion-item>
 		<div class="ion-item-wrapper">
-			<div class="click-space" (click)="presentModal($event)">
+			<!-- <div class="click-space" (click)="onSelect(drone)" [routerLink]="['flight-session']"> -->
+			<div class="click-space" (click)="onSelect(drone)">
 				<!-- <ion-label>{{ drone.getName() }}</ion-label> -->
 				<label class="drone-name"> {{ drone.getName() }} </label>
 			</div>
@@ -15,12 +16,6 @@
 				</ion-chip>
 				<!-- ========================================== -->
 
-
-				<!-- Drone ATTEMPT_ACTIVE -->
-				<!-- <ion-chip class="attempt-active" *ngIf="isAttemptActive(drone)"> -->
-				<!-- 	<ion-label color="danger">Offline</ion-label> -->
-				<!-- </ion-chip> -->
-				<!-- ========================================== -->
 
 				<!-- Drone ONLINE -->
 
@@ -71,7 +66,7 @@
 			</div>
 
 
-			<ion-thumbnail (click)="presentModal($event)" slot="end">
+			<ion-thumbnail (click)="presentModal(drone)" slot="end">
 				<img src={{drone.getIcon()}}>
 			</ion-thumbnail>
 		</div>
@@ -79,8 +74,8 @@
     </ion-item>
 
 
-    <ion-item-options side="end">
-      <ion-item-option color= "medium"(click)="unread(item)">Settings</ion-item-option>
+    <ion-item-options side="start">
+      <ion-item-option  color= "medium" (click)="editDrone(drone, settings)">Settings</ion-item-option>
     </ion-item-options>
 
 

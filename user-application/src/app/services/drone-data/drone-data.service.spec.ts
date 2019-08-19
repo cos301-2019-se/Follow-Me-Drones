@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DatabaseService } from './database.service';
+import { DroneDataService } from './drone-data.service';
 
-describe('DatabaseService', () => {
+describe('DroneDataService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: DatabaseService = TestBed.get(DatabaseService);
+    const service: DroneDataService = TestBed.get(DroneDataService);
     expect(service).toBeTruthy();
   });
 });

@@ -1,3 +1,26 @@
+.button-and-icon-wrapper {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	padding: 20px;
+	align-content: center;
+}
+.ion-chip-wrapper {
+	width: 85%;
+	margin-left: 20px;
+}
+.ion-chip-large {
+	display: flex;
+	text-align: center;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	justify-content: center;
+}
+.flight-session-wrapper {
+	padding: 10px;
+	height: 100%;
+}
 ion-list{
   margin-top: 2%;
 }
@@ -29,13 +52,15 @@ ion-item{
   height: 190px;
   padding: 0 2% 2% 2%;
 }
-
+ion-avatar {
+	justify-self: center;
+	margin-top: 35px;
+}
 .avatar {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	margin: auto;
-	height: 70px;
-	width: 70px;
-	margin-top: 10px;
+// 	display: flex;
+// 	flex-direction: row;
+// 	justify-content: center;
+	height: 100%;
+	width: 100%;
+	margin-top: 25px;
 }

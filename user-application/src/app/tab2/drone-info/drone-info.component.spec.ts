@@ -1,26 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddNewDronePage } from './add-new-drone.page';
+import { DroneInfoComponent } from './drone-info.component';
 
-import { ModalController } from '@ionic/angular';
-import { AngularDelegate } from '@ionic/angular';
-
-describe('AddNewDronePage', () => {
-  let component: AddNewDronePage;
-  let fixture: ComponentFixture<AddNewDronePage>;
+describe('DroneInfoComponent', () => {
+  let component: DroneInfoComponent;
+  let fixture: ComponentFixture<DroneInfoComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddNewDronePage ],
+      declarations: [ DroneInfoComponent ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [ModalController, AngularDelegate],
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddNewDronePage);
+    fixture = TestBed.createComponent(DroneInfoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

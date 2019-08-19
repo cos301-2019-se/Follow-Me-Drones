@@ -1,35 +1,63 @@
 
 <ion-header>
   <ion-toolbar>
-	<ion-title>Drone Info</ion-title>
+	  <ion-title> {{ drone.name }}</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-<div *ngIf="images || ImageIndex">
+<!-- <ion-content> -->
 
-	<ion-avatar class="avatar">
-		<img [src]="getDroneIcon()">
-	</ion-avatar>
+	<div class="flight-session-wrapper">
+		<div *ngIf="images || ImageIndex">
 
-        <ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img>
-        <ion-slides loop slidesPerView="3">
-            <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i">
-                <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img>
-            </ion-slide>
-        </ion-slides>
+			<!-- <ion-avatar class="avatar"> -->
+			<!-- 	<img [src]="getDroneIcon()"> -->
+			<!-- </ion-avatar> -->
 
 
-    <ion-list>
-		<ion-item lines="none">Name: {{ dronedata.name }}</ion-item>
-        <ion-item lines="none">Battery: 72%</ion-item>
-        <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item>
-		<br>
+				<!-- Production -->
+		        <!-- <ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img> -->
+		        <!-- <ion-slides loop slidesPerView="3"> -->
+		        <!--     <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i"> -->
+		        <!--         <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img> -->
+		        <!--     </ion-slide> -->
+		        <!-- </ion-slides> -->
+				<!-- ========================================================================================================= -->
+				<!-- ========================================================================================================= -->
 
-    </ion-list>
+				<!-- Testing -->
+		        <ion-img class="full-img" (click)="viewPhoto()" [src]="images[activeImageIndex]"></ion-img>
+		        <ion-slides loop slidesPerView="3">
+		            <ion-slide *ngFor="let image of images; let i=index " ng-init="s = i">
+		                <ion-img  (click)="updateIndex(i)" [src]="image"></ion-img>
+		            </ion-slide>
+		        </ion-slides>
+				<!-- ========================================================================================================= -->
 
-    <ion-footer>
-        <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button>
-        <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button>
-    </ion-footer>
-</div>
-</ion-content>
+		    <!-- <ion-list> -->
+		    <!--     <ion-item lines="none">Battery: 72%</ion-item> -->
+		    <!--     <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item> -->
+		    <!-- </ion-list> -->
+
+			<div class="button-and-icon-wrapper">
+				<ion-thumbnail>
+					<img class="avatar" [src]="getDroneIcon()">
+				</ion-thumbnail>
+
+				<div class="ion-chip-wrapper">
+					<ion-chip class="ion-chip ion-chip-large" color="success" >
+						<ion-label color="success">Online</ion-label>
+					</ion-chip>
+
+					<ion-chip class="ion-chip ion-chip-large" color="primary">
+						<ion-label color="primary">Connect</ion-label>
+					</ion-chip>
+				</div>
+				
+			</div>
+
+		        <!-- <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button> -->
+		        <!-- <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button> -->
+		</div>
+
+	</div>
+<!-- </ion-content> -->

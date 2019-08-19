@@ -29,6 +29,8 @@
     "@ionic/angular": "^4.1.0",
     "@ionic/pro": "2.0.4",
     "@types/socket.io-client": "^1.4.32",
+    "angular2-uuid": "^1.1.1",
+    "bootstrap": "^4.3.1",
     "braces": "^2.3.2",
     "cordova-android": "8.0.0",
     "cordova-browser": "^6.0.0",

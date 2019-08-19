@@ -1,7 +1,5 @@
-import { Drone } from '../drone/drone';
-import { DroneState } from '../drone/drone-state.enum';
+import { DroneState } from '../drone-data/drone/drone-state.enum';
 export class FlightSession {
-  private drone: Drone;
   private detectionImages: string [] = [];
 
   constructor() {
