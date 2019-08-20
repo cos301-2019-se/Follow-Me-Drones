@@ -11,10 +11,11 @@
 	<div class="wrapper center-block">
 		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingOne" #elementIDOne>
+				<div class="panel-heading" role="tab" id="headingOne">
 					<h4 class="panel-title">
 						<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
-							aria-expanded="false" aria-controls="collapseOne" (click)="arrowToggle(elementIDOne);">
+						aria-expanded="false" aria-controls="collapseOne" (click)="arrowToggle(arrowOne);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowOne" #arrowOne></ion-icon>
 							Drone Connectivity
 						</a>
 					</h4>
@@ -42,11 +43,12 @@
 			</div>
 
 			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingTwo" #elementIDTwo>
+				<div class="panel-heading" role="tab" id="headingTwo">
 					<h4 class="panel-title">
 						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
 							href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"
-							(click)="arrowToggle(elementIDTwo);">
+							(click)="arrowToggle(arrowTwo);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowTwo" #arrowTwo></ion-icon>
 							Detection Images
 						</a>
 					</h4>
@@ -97,11 +99,12 @@
 			</div>
 
 			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingThree" #elementIDThree>
+				<div class="panel-heading" role="tab" id="headingThree">
 					<h4 class="panel-title">
 						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
 							href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"
-							(click)="arrowToggle(elementIDThree);">
+							(click)="arrowToggle(arrowThree);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowThree" #arrowThree></ion-icon>
 							Detection List
 						</a>
 					</h4>
@@ -116,11 +119,12 @@
 			</div>
 
 			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingFour" #elementIDFour>
+				<div class="panel-heading" role="tab" id="headingFour">
 					<h4 class="panel-title">
 						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
 							href="#collapseFour" aria-expanded="false" aria-controls="collapseFour"
-							(click)="arrowToggle(elementIDFour);">
+							(click)="arrowToggle(arrowFour);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowFour" #arrowFour></ion-icon>
 							Flight Path
 						</a>
 					</h4>
