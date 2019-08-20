@@ -13,13 +13,17 @@ export class PreviousSessionsComponent implements OnInit {
 
     console.log('hierso');
     console.log(this.flightSessions);
-    const mock1 = new FlightSession();
-    mock1.setSessionName('Sunday Morning');
-    const mock2 = new FlightSession();
-    mock2.setSessionName('Monday Afternoon');
+    this.previousSessions = flightSessions.getAllPastSessions();
+    console.log(this.previousSessions);
 
-    this.previousSessions.push( mock1 );
-    this.previousSessions.push( mock2 );
+    // const mock1 = new FlightSession();
+    // mock1.setSessionName('Sunday Morning');
+    // const mock2 = new FlightSession();
+    // mock2.setSessionName('Monday Afternoon');
+
+    // this.previousSessions.push( mock1 );
+    // this.previousSessions.push( mock2 );
+
   }
   ngOnInit() {}
 

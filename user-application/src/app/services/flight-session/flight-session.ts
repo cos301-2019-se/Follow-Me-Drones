@@ -6,6 +6,7 @@ export class FlightSession {
   constructor() {
     console.log('Arming drone!');
     this.active = false;
+    this.sessionName = 'mock_name';
   }
   setSessionName(sessionName) {
     this.sessionName = sessionName;
@@ -26,6 +27,10 @@ export class FlightSession {
     return this.active;
   }
   getFirstImage() {
-    return './assets/mockshots/predictionRhino.jpg';
+    if (this.detectionImages[0] !== undefined) {
+      return this.detectionImages[this.detectionImages.length - 1];
+    } else {
+      return './assets/mockshots/predictionRhino.jpg';
+    }
   }
 }

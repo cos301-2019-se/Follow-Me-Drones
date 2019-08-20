@@ -8,6 +8,7 @@ import { DroneListComponent } from './drone-list/drone-list.component';
 import { DroneSocketService } from '../services/drone-data/drone-socket/drone-socket.service';
 import { FlightSessionComponent } from './flight-session/flight-session.component';
 import { DroneInfoComponent } from './drone-info/drone-info.component';
+import { Router } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -23,6 +24,6 @@ import { DroneInfoComponent } from './drone-info/drone-info.component';
   ],
   declarations: [Tab2Page, DroneListComponent, FlightSessionComponent, DroneInfoComponent],
   entryComponents: [FlightSessionComponent],
-  providers: [DroneSocketService]
+  providers: [DroneSocketService, Router]
 })
 export class Tab2PageModule {}

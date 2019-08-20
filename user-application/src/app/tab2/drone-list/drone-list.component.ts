@@ -186,7 +186,7 @@ export class DroneListComponent implements AfterViewInit {
   // Drone Settings
   ////////////////////////////////////////////////////////////////////////////////
   editDrone(drone, slidingItem: IonItemSliding) {
-    this.router.navigate(['/tabs/tab2/edit-drone', drone.name]);
+    this.router.navigate(['/tabs/tab2/edit-drone', drone.id]);
     slidingItem.close();
   }
   ////////////////////////////////////////////////////////////////////////////////
