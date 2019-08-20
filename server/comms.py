@@ -10,7 +10,6 @@ import time
 
 # Drone stuff
 from pyparrot.Bebop import Bebop
-from pyparrot.DroneVision import DroneVision
 # import threading
 
 _bebop = Bebop()
@@ -61,6 +60,8 @@ def disconnect():
     global _currentConnections
     global _runningCommand
 
+    _bebop.disconnect()
+    
     _currentConnections -= 1
     print('App disconnected with ID', request.sid)
     print('Current connections ->', _currentConnections)
@@ -122,6 +123,8 @@ def disarm():
         print('Turning off object detection...')
         _runningCommand.kill()
         _runningCommand = False
+
+    _bebop.stop_video_stream()
 
     emit('drone_disarmed')
 
