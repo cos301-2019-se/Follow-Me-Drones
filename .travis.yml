@@ -2,7 +2,11 @@ sudo: required
 dist: xenial
 addons:
   firefox: latest-esr
-      
+
+language: node_js
+node_js:
+  - 10
+  
 language: python
 python:
   - "3.7"  
