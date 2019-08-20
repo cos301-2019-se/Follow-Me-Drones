@@ -8,6 +8,13 @@ import glob
 import base64
 import time
 
+# Drone stuff
+from pyparrot.Bebop import Bebop
+from pyparrot.DroneVision import DroneVision
+# import threading
+
+_bebop = Bebop()
+
 # Port for the server
 _port = 42069
 _host = '0.0.0.0'
@@ -42,6 +49,12 @@ def test_connect():
         print('\nApp connected with ID', request.sid)
         print('Current connections ->', _currentConnections, '\n')
 
+        # Establish connection to drone
+        success = _bebop.connect(5)
+
+        if not success:
+            emit('error')
+
 # Connection event
 @io.on('connect_drone')
 def test_connect():
@@ -68,6 +81,11 @@ def disconnect():
 def arm():
     global _runningCommand
 
+    print('Establishing video stream with drone...', end='')
+    _bebop.start_video_stream()
+
+    print('Done!')
+
     print('Starting object recognition...')
 
     # Move into the darknet directory
@@ -79,11 +97,11 @@ def arm():
     
     # Video stream
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
+    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
     
     # Drone stream
-    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights http://ip-addr:port-thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'http://ip-addr:port', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
+    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/bebop.sdp -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
+    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/bebop.sdp', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
 
     _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
