@@ -3,8 +3,8 @@ dist: xenial
 addons:
   firefox: latest-esr
       
-language: node_js
-node_js:
+language: python
+python:
   - 10
 
 cache:
@@ -27,5 +27,5 @@ before_script:
 script:
   - ng test --watch=false
   - cd '../server'
-  - npm install
-  - npm test
+  - pip install -r requirements.txt
+  - python3 tests.py

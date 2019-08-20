@@ -35,7 +35,7 @@ io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 # Connection event
 @io.on('connect')
-def test_connect():
+def connect():
     global _currentConnections
 
     # Only allow one app to be connected at any given time
@@ -54,11 +54,6 @@ def test_connect():
 
         if not success:
             emit('error')
-
-# Connection event
-@io.on('connect_drone')
-def test_connect():
-    emit('connect_success')
 
 # Disconnection event
 @io.on('disconnect')
@@ -138,12 +133,12 @@ def ETGoHome():
 # Default GET, should never happen
 @app.route('/', methods=["GET"])
 def index():
-    return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>'
+    return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>', 200
 
 # Endpoint to ping server
 @app.route('/ping', methods=["GET"])
 def ping():
-    return '[{"pong"}]'
+    return '[{"pong"}]', 200
 
 # ============================================================================
 #                             Handling images
@@ -283,7 +278,7 @@ def detection():
         # Replace the old list with the new list, since the camera is always moving 'forward', you can discard any previousDetections that have fallen out of frame
         previousDetections = newDetections
         newDetections = []
-    return ('', 200)
+    return '', 200
 
 # ============================================================================
 #                  Print the logo and run socket/server
