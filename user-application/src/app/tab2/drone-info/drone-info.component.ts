@@ -23,6 +23,7 @@ export class DroneInfoComponent implements OnInit {
 
     if ( route.snapshot.routeConfig.path !== 'new-drone' ) {
       this.drone = dronesData.getDrone(route.snapshot.paramMap.get('drone'));
+      console.log(this.drone);
       this.state = DroneInfoState.EDIT;
     } else {
       this.state = DroneInfoState.ADD_NEW;

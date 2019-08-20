@@ -8,14 +8,20 @@
 
 <ion-content> 
 	<ion-segment>
-  <ion-segment-button value="All">
-    <ion-label>All</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="Previous">
-    <ion-label>Previous</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="Active">
-    <ion-label>Active</ion-label>
-  </ion-segment-button>
-</ion-segment>
+		<ion-segment-button checked (click)="setAll()" value="all">
+			<ion-label>All</ion-label>
+		</ion-segment-button>
+		<ion-segment-button (click)="setPrevious()" value="previous">
+			<ion-label>Previous</ion-label>
+		</ion-segment-button>
+		<ion-segment-button (click)="setActive()" value="active">
+			<ion-label>Active</ion-label>
+		</ion-segment-button>
+	</ion-segment>
+
+	<app-all-sessions *ngIf="isAll()"></app-all-sessions>
+	<app-active-sessions *ngIf="isActive()"></app-active-sessions>
+	<app-previous-sessions *ngIf="isPrevious()"></app-previous-sessions>
+
+
 </ion-content>

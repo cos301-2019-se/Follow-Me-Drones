@@ -29,6 +29,14 @@ export class FlightSessionController {
   getPastSessions(droneName) {
     return this.pastSessions.get(droneName);
   }
+  getAllPastSessions() {
+    const allPastSessions = Array() ;
+    this.pastSessions.forEach((sessions: FlightSession[], droneId: string) => {
+      allPastSessions.push(sessions);
+    });
+    return allPastSessions[0];
+
+  }
 
   startFlightSession(drone) {
 
@@ -62,6 +70,7 @@ export class FlightSessionController {
 
   detection(drone, data) {
     // TODO: Maybe Convert to httpsDroneService
+    console.log('Fetch image');
     const endpoint = '/image';
     const obj = {
       image: data.image
