@@ -78,3 +78,6 @@ package-lock.json
 # Drone control stuff
 
 *.mav
+
+# virtualenv stuff
+venv/

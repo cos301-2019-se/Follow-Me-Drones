@@ -64,6 +64,7 @@ export class DroneListComponent implements AfterViewInit {
   }
   ////////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD
   ////////////////////////////////////////////////////////////////////////////////
   // Connection
   ////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,18 @@ export class DroneListComponent implements AfterViewInit {
       if (droneConnected) {
         drone.setDroneState(DroneState.CONNECTED);
       } else {
+=======
+  generateListDynamically() {
+    /* ========================================================================================================================
+     *  Totolink
+     *======================================================================================================================
+     */
+    this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
+    this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
+    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
+    this.drones.push( new Drone(new DroneData('Devon Laptop', 42069, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
+    this.drones.push( new Drone(new DroneData('Devon Desktop', 42069, '127.0.0.1', './assets/drone-icons/drone-4.svg', '')));
+>>>>>>> feature/drone-camera-feed
 
       }
 
