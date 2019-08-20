@@ -281,9 +281,9 @@ void send_json_custom(char const* send_buf, int port, int timeout)
 
         std::string content(send_buf);
         content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
-
-        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:8080/detection";
-        //std::cout << to_send << std::endl;
+        
+        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:" + std::__cxx11::to_string(port) + "/detection";
+        std::cout << to_send << std::endl;
 
         system(to_send.c_str());
 

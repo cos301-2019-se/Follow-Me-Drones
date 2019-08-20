@@ -257,6 +257,23 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                     if(show_img)
                         save_cv_jpg(show_img, buff);
                 }
+
+                if (!dont_show)
+                {
+                    show_image_mat(show_img, "Demo");
+                    int c = wait_key_cv(1);
+                    if (c == 10)
+                    {
+                        if (frame_skip == 0) frame_skip = 60;
+                        else if (frame_skip == 4) frame_skip = 0;
+                        else if (frame_skip == 60) frame_skip = 4;
+                        else frame_skip = 0;
+                    }
+                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
+                    {
+                        flag_exit = 1;
+                    }
+                }
             }
 
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090
