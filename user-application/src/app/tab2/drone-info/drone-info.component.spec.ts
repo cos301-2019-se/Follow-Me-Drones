@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+/*import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DroneInfoComponent } from './drone-info.component';
@@ -24,4 +24,4 @@ describe('DroneInfoComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-});
+});*/
