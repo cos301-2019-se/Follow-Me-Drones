@@ -20,7 +20,9 @@ export class DroneDataService {
      *======================================================================================================================
      */
     // this.drones.push( new Drone('Brendon Laptop', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', ''));
+
     // this.drones.push( new Drone('cf2adaf8-1479-89a1-f726-004361cfaa59', 'Brendon Laptop 2', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', ''));
+
 
     /* ========================================================================================================================
      *  Totolink
