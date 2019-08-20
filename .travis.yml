@@ -13,7 +13,9 @@ cache:
     - './server/node_modules'
 
 before_install:
-  - cd './user-application'
+  - cd './server'
+  - pip install -r requirements.txt
+  - cd '../user-application'
 
 services:
   - xvfb
@@ -21,11 +23,10 @@ services:
 before_script:
 # - sudo ln -s /var/lib/dbus/machine-id /etc/machine-id
   - npm install -g ionic cordova
+  - npm install -g @angular/cli
   - npm install
-  
 
 script:
   - ng test --watch=false
   - cd '../server'
-  - pip install -r requirements.txt
   - python3 tests.py
