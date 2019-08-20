@@ -1,4 +1,87 @@
 ion-item {
-	--min-height: 4rem;
+	--min-height: 5rem;
+}
+ion-chip {
+	text-align: center !important;
+	display: flex;
+	justify-content: center;
+}
+.drone-name {
+}
+
+.click-space {
+	width: 45%;
+	height: 100%;
+	line-height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+label {
+	align-self: center;
+}
+
+.ion-item-wrapper {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+	flex-direction: row;
+	align-items: center;
+}
+.ion-chip-wrapper {
+	display:flex;
+	flex-direction: column;
+	align-content: center;
+	justify-content: space-around;
+	height: 100%;
+	width: 110px;
+}
+
+.ion-chip {
+	align-self: flex-end;
+	text-align: center;
+	width: 80%;
+}
+.ion-chip-medium {
+	align-self: flex-end;
+	text-align: center;
+	width: 90%;
+}
+
+.attempt-active {
+
+	animation-name: pulseActive;
+	animation-duration:  1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	animation-direction: alternate-reverse;
+}
+
+.arming {
+
+	animation-name: pulseArming;
+	animation-duration:  1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	animation-direction: alternate-reverse;
+}
+
+@keyframes pulseArming {
+	0% {
+		--background: rgba(255, 206, 0, 0.15);
+	}
+	100% {
+		--background: rgba(255, 206, 0, 0.4);
+	}
+}
+
+@keyframes pulseActive {
+	0% {
+		--background: rgba(245, 61, 61, 0.15);
+	}
+	100% {
+		--background: rgba(245, 61, 61, 0.4);
+	}
 }
 

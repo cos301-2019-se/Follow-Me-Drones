@@ -1,31 +1,81 @@
 <ion-list>
-  <ion-item-sliding *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
+  <ion-item-sliding #settings *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
 
     <ion-item>
+		<div class="ion-item-wrapper">
+			<!-- <div class="click-space" (click)="onSelect(drone)" [routerLink]="['flight-session']"> -->
+			<div class="click-space" (click)="onSelect(drone)">
+				<!-- <ion-label>{{ drone.getName() }}</ion-label> -->
+				<label class="drone-name"> {{ drone.getName() }} </label>
+			</div>
+			<div class="ion-chip-wrapper">
 
-      <ion-label (click)="presentModal($event)">{{ drone.getName() }}</ion-label>
+				<!--  Drone OFFLINE -->
+				<ion-chip color="danger" (click)="connectOneSocket(drone)" *ngIf="isOffline(drone)">
+					<ion-label  color="danger">Offline</ion-label>
+				</ion-chip>
+				<!-- ========================================== -->
 
-    <!-- Drone Disconnected -->
-      <ion-chip (click)="connectDrone($event)" *ngIf="!drone.connected">
-        <ion-label  color="danger">Connected</ion-label>
-      </ion-chip>
-    <!-- ========================================== -->
 
-    <!-- Drone Connected -->
-      <ion-chip  (click)="disconnectDrone($event)" *ngIf="drone.connected">
-        <ion-label color="success">Connected</ion-label>
-      </ion-chip>
+				<!-- Drone ONLINE -->
 
-    <!-- ========================================== -->
-      <ion-thumbnail (click)="presentModal($event)" slot="end">
-        <img src={{drone.getIcon()}}>
-      </ion-thumbnail>
+				<ion-chip class="ion-chip" color="success" *ngIf="isOnline(drone)">
+					<ion-label color="success">Online</ion-label>
+				</ion-chip>
+
+				<ion-chip class="ion-chip" color="primary"  (click)="connectDrone(drone)" *ngIf="isOnline(drone)" >
+					<ion-label color="primary">Connect</ion-label>
+				</ion-chip>
+				<!-- ========================================== -->
+
+				<!-- Drone BUSY -->
+				<ion-chip class="ion-chip" color="secondary" *ngIf="isBusy(drone)">
+					<ion-label  color="secondary">Busy</ion-label>
+				</ion-chip>
+
+
+				<!-- Drone CONNECTED -->
+				<ion-chip class="ion-chip-medium" color="danger" (click)="disconnectDrone(drone)" *ngIf="isConnected(drone)">
+					<ion-label color="danger">Disconnect</ion-label>
+				</ion-chip>
+
+				<ion-chip class="ion-chip-medium" color="warning"  (click)="startSession(drone)" *ngIf="isConnected(drone)" >
+					<ion-label color="warning">Arm Drone</ion-label>
+				</ion-chip>
+				<!-- ========================================== -->
+
+				<!-- Drone ARMING -->
+				<ion-chip color="success" *ngIf="isArming(drone)">
+					<ion-label color="success">Connected</ion-label>
+				</ion-chip>
+
+				<ion-chip class="arming" *ngIf="isArming(drone)" >
+					<ion-label color="warning">Arming</ion-label>
+				</ion-chip>
+				<!-- ========================================== -->
+
+				<!-- Drone ARMED -->
+				<ion-chip color="success" (click)="disconnectDrone(drone)" *ngIf="isArmed(drone)">
+					<ion-label color="success">Connected</ion-label>
+				</ion-chip>
+
+				<ion-chip color="success"(click)="endSession(drone)" *ngIf="isArmed(drone)" >
+					<ion-label color="success">Armed</ion-label>
+				</ion-chip>
+				<!-- ========================================== -->
+			</div>
+
+
+			<ion-thumbnail (click)="presentModal(drone)" slot="end">
+				<img src={{drone.getIcon()}}>
+			</ion-thumbnail>
+		</div>
 
     </ion-item>
 
 
-    <ion-item-options side="end">
-      <ion-item-option color= "medium"(click)="unread(item)">Settings</ion-item-option>
+    <ion-item-options side="start">
+      <ion-item-option  color= "medium" (click)="editDrone(drone, settings)">Settings</ion-item-option>
     </ion-item-options>
 
 

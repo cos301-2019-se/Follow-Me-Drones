@@ -9,7 +9,8 @@
 <ion-content>
 
 	<app-drone-list></app-drone-list>
-	<ion-fab (click)="addNewDrone()" vertical="bottom" horizontal="end" slot="fixed">
+	<!-- <ion-fab (click) = "openPage('new-drone')" [routerLink]="['./new-drone']" vertical="bottom" horizontal="end" slot="fixed"> -->
+	<ion-fab (click) = "openPage('new-drone')" vertical="bottom" horizontal="end" slot="fixed">
 		<ion-fab-button>
 			<ion-icon name="add"></ion-icon>
 		</ion-fab-button>

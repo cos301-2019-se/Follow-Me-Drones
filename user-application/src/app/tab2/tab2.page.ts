@@ -1,19 +1,17 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AddNewDronePage } from './add-new-drone/add-new-drone.page';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
 export class Tab2Page {
-  constructor(public modalcontroller: ModalController) {
+  constructor(public modalcontroller: ModalController,
+              public router: Router) {
 
   }
-  async addNewDrone() {
-    const modal = await this.modalcontroller.create( {
-      component:  AddNewDronePage
-    });
-    await modal.present();
+  openPage(routename: string) {
+    this.router.navigateByUrl(`/tabs/tab2/${routename}`);
   }
 }

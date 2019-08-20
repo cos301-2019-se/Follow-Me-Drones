@@ -1,0 +1,31 @@
+<ion-content>
+  <ion-item>
+	<ion-label>Drone Icon</ion-label>
+	<ion-avatar slot="end">
+	  <img id='drone-image' src="./assets/drone-icons/drone-2.svg">
+	</ion-avatar>
+  </ion-item>
+
+  <ion-item>
+	<ion-label position="stacked">Drone Name</ion-label>
+	<ion-input id='drone-name' required="true" [ngModel]="getName()"></ion-input>
+  </ion-item>
+
+  <ion-item>
+	<ion-label position="stacked">IP address</ion-label>
+	<ion-input id='drone-ipAddress' value="10.0.0." [ngModel]="getIpAddress()"></ion-input>
+  </ion-item>
+
+  <ion-item>
+	<ion-label position="stacked">Connection Port</ion-label>
+	<ion-input id='drone-port' type="number" [ngModel]="getPort()"></ion-input>
+  </ion-item>
+  <ion-item>
+	<ion-label position="stacked">Comments</ion-label>
+	<ion-textarea id='drone-comments'></ion-textarea>
+  </ion-item>
+
+  <ion-button id='submit' (click)="submitDroneInfo()" color="primary" expand="block">Submit</ion-button>
+  <ion-button id='cancel' (click)="cancel()"color="danger" expand="block">Cancel</ion-button>
+
+</ion-content>
