@@ -99,7 +99,7 @@ ion-avatar {
 
 .panel-heading  a:before {
    font-family: 'Glyphicons Halflings';
-   content: "\e114";
+   //content: "\e114";
    float: right;
    transition: all 0.5s;
 }
@@ -113,6 +113,15 @@ ion-avatar {
 .panel.panel-default {
 	border-style: solid none solid none;
 	border-color: lightgrey;
-	border-width: 1px 0px 1px 0px;
+	border-width: 0px 0px 1px 0px;
 	margin: 1px;
+}
+
+.arrow {
+	float: right;
+	transition: all 0.25s;
+}
+
+.arrow.arrow-rotated {
+	transform: rotate(180deg);
 }

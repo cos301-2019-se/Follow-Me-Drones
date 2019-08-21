@@ -90,6 +90,6 @@ export class FlightSessionComponent implements OnInit {
   }
 
   arrowToggle(element) {
-      $(`#${element.id}`).toggleClass('active');
+      $(`#${element.el.id}`).toggleClass('arrow-rotated');
   }
 }

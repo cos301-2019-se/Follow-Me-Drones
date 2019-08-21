@@ -9,6 +9,7 @@ import { FlightSessionComponent } from '../flight-session/flight-session.compone
 import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
 import { Router } from '@angular/router';
 import { IonItemSliding } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-drone-list',
@@ -18,22 +19,23 @@ import { IonItemSliding } from '@ionic/angular';
 
 
 export class DroneListComponent implements AfterViewInit {
-
+  
   ////////////////////////////////////////////////////////////////////////////////
   // Init
   ////////////////////////////////////////////////////////////////////////////////
   private drones: Drone[] = [];
   messages: Subject<any>;
   constructor(public toastController: ToastController,
-              public actionSheetController: ActionSheetController,
-              public modalController: ModalController,
-              public droneDataService: DroneDataService,
-              public flightSessionController: FlightSessionController,
+    public actionSheetController: ActionSheetController,
+    public modalController: ModalController,
+    public droneDataService: DroneDataService,
+    public flightSessionController: FlightSessionController,
+    public alertController : AlertController,
               public router: Router
-  ) {
-    this.drones = this.droneDataService.getDrones();
+              ) {
+                this.drones = this.droneDataService.getDrones();
   }
-
+  
   ngAfterViewInit() {
     const thisClass = this;
     this.drones.forEach( (drone) => {
@@ -71,22 +73,7 @@ export class DroneListComponent implements AfterViewInit {
     drone.connectDrone(this, (droneConnected) => {
       if (droneConnected) {
         drone.setDroneState(DroneState.CONNECTED);
-      } else {
-=======
-  generateListDynamically() {
-    /* ========================================================================================================================
-     *  Totolink
-     *======================================================================================================================
-     */
-    this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
-    this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
-    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Laptop', 42069, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Desktop', 42069, '127.0.0.1', './assets/drone-icons/drone-4.svg', '')));
->>>>>>> feature/drone-camera-feed
-
       }
-
     });
 
     // this.setupSocketEvents(drone);
@@ -154,7 +141,7 @@ export class DroneListComponent implements AfterViewInit {
       message,
       duration: 2000
     });
-    toast.present();
+    await toast.present(); //This bliksem
   }
 
   async presentActionSheet(drone) {
@@ -184,7 +171,7 @@ export class DroneListComponent implements AfterViewInit {
   }
   async presentModal(drone) {
 
-    const clickedDrone = drone;
+    const clickedDrone = await drone; //This other bliksem
 
     const modal = await this.modalController.create({
       component: FlightSessionComponent,
@@ -192,13 +179,56 @@ export class DroneListComponent implements AfterViewInit {
     });
     return await modal.present();
   }
+
+  /* Function to confirm permanent deletion of an existing drone */
+  async presentDeleteConfirmation(drone, slidingItem: IonItemSliding) {
+    const alert = await this.alertController.create({
+      message: 'Are you sure you want to permanently delete this drone?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            slidingItem.close();
+          }
+        },
+        {
+          cssClass: 'yes-button',
+          text: 'Yes',
+          handler: () => {
+            this.deleteDrone(drone, slidingItem);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
   ////////////////////////////////////////////////////////////////////////////////
 
   ////////////////////////////////////////////////////////////////////////////////
   // Drone Settings
   ////////////////////////////////////////////////////////////////////////////////
+  /* Function to detect which direction user swiped and invokes appropriate function */
+  async swipeEvent(drone, slidingItem : IonItemSliding){
+    await slidingItem.getSlidingRatio()
+    .then((slidingRatio) => {
+      if(slidingRatio.valueOf() < 0) {
+        this.editDrone(drone, slidingItem);
+      } else if(slidingRatio.valueOf() > 0) {
+        this.presentDeleteConfirmation(drone, slidingItem);
+      }
+    });
+  }
+  
+  /* Function to modify existing drone settings */
   editDrone(drone, slidingItem: IonItemSliding) {
     this.router.navigate(['/tabs/tab2/edit-drone', drone.id]);
+    slidingItem.close();
+  }
+  
+  /* Function to permanently delete an existing drone */
+  deleteDrone(drone, slidingItem: IonItemSliding) {
+    alert("Deyeeted!");
     slidingItem.close();
   }
   ////////////////////////////////////////////////////////////////////////////////
