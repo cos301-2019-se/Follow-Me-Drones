@@ -40,23 +40,35 @@ if (success):
                 _rad = 0
                 while(True):
                     try:
-                        # Forward / Back / Left / Right
-                        if keyboard.is_pressed('w'):
+                        # Moving Forward / Back / Left / Right and FLIPS!!!!!! 
+                        if keyboard.is_pressed('shift+w'):
+                            print('forward flip')
+                            # _bebop.flip('front') # front, back, right, left
+                        elif keyboard.is_pressed('w'):
                             print('Moving forward')
                             _dx = 0.1
 
-                        if keyboard.is_pressed('s'):
+                        if keyboard.is_pressed('shift+s'):
+                            print('backward flip')
+                            # _bebop.flip('back')
+                        elif keyboard.is_pressed('s'):
                             print('Moving backward')
                             _dx = -0.1
 
-                        if keyboard.is_pressed('q'):
+                        if keyboard.is_pressed('shift+q'):
+                            print('left flip')
+                            # _bebop.flip('left')
+                        elif keyboard.is_pressed('q'):
                             print('Strafe left')
                             _dy = -0.1
                         
-                        if keyboard.is_pressed('e'):
+                        if keyboard.is_pressed('shift+e'):
+                            print('right flip')
+                            # _bebop.flip('right')
+                        elif keyboard.is_pressed('e'):
                             print('Strafe right')
                             _dy = 0.1
-
+                            
                         # Vertical controls
                         if keyboard.is_pressed('space'):
                             print('Moving up')
@@ -74,28 +86,9 @@ if (success):
                         if keyboard.is_pressed('d'):
                             print('Rotating right')
                             _rad = 15
-
-                        # FLIPS!!!!!!
-                        if keyboard.is_pressed('shift+w'):
-                            print('forward flip')
-                            _bebop.flip('front') # front, back, right, left
-
-                        if keyboard.is_pressed('shift+s'):
-                            print('backward flip')
-                            _bebop.flip('back')
-                        
-                        if keyboard.is_pressed('shift+a'):
-                            print('left flip')
-                            _bebop.flip('left')
-                        
-                        if keyboard.is_pressed('shift+d'):
-                            print('right flip')
-                            _bebop.flip('right')
                         
                         if keyboard.is_pressed('esc'):
                             break
-
-                        bebop.smart_sleep(0.2)
 
                         _dx = 0
                         _dy = 0
