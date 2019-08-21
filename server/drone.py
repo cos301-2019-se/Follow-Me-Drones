@@ -1,6 +1,9 @@
 from pyparrot.Bebop import Bebop
 # import threading
 from pynput import keyboard
+from termios import tcflush, TCIFLUSH
+import math
+import sys
 
 # Movement variables
 _dx = 0
@@ -61,11 +64,11 @@ def on_press(key):
         # Rotating
         if key.char == 'a':
             print('Rotating left')
-            _rad = -330
+            _rad = math.radians(15)
         
         if key.char == 'd':
             print('Rotating right')
-            _rad = 5
+            _rad = math.radians(-15)
 
         # print('Moving:', _dx, _dy, _dz, _rad)
         # _bebop.move_relative(_dx, _dy, _dz, _rad)
@@ -87,6 +90,7 @@ def on_press(key):
         _bebop.move_relative(_dx, _dy, _dz, _rad)
 
 def on_release(key):
+    tcflush(sys.stdin, TCIFLUSH)
     print('{0} released'.format(key))
     if key == keyboard.Key.esc:
         # Stop listener
