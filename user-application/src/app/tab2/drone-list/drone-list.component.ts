@@ -39,6 +39,11 @@ export class DroneListComponent implements AfterViewInit {
   ngAfterViewInit() {
     const thisClass = this;
     this.drones.forEach( (drone) => {
+        thisClass.checkOneDroneStatus(drone);
+    });
+  }
+
+  checkOneDroneStatus(drone) {
       drone.serverOnline( (online) => {
         if (online) {
           drone.setDroneState(DroneState.ONLINE);
@@ -46,7 +51,7 @@ export class DroneListComponent implements AfterViewInit {
           drone.setDroneState(DroneState.OFFLINE);
         }
       });
-    });
+
   }
   ////////////////////////////////////////////////////////////////////////////////
 

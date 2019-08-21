@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DroneDataService} from '../../services/drone-data/drone-data.service';
 import { Router } from '@angular/router';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
-
+import { UUID } from 'angular2-uuid';
 @Component({
   selector: 'app-drone-info',
   templateUrl: './drone-info.component.html',
@@ -37,7 +37,7 @@ export class DroneInfoComponent implements OnInit {
       const port = this.getValue('drone-port');
       const ipAddress = this.getValue('drone-ipAddress');
       const comment = '';
-      this.dronesData.addNewDrone(new Drone('50', name, port, ipAddress, './assets/drone-icons/drone-1.svg', comment  ));
+      this.dronesData.addNewDrone(new Drone( UUID.UUID() , name, port, ipAddress, './assets/drone-icons/drone-1.svg', comment  ));
 
       this.router.navigate(['/tabs/tab2/']);
     } else if ( this.state === DroneInfoState.EDIT) {
@@ -48,6 +48,7 @@ export class DroneInfoComponent implements OnInit {
       const newIpAddress = this.getValue('drone-ipAddress');
       const newComment = '';
       this.drone.updateDrone(newName, newPort, newIpAddress, newComment );
+      this.dronesData.updateDrone(this.drone);
       this.router.navigate(['/tabs/tab2/']);
     }
 

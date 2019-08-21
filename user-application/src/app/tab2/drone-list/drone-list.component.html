@@ -12,7 +12,7 @@
 				<div class="ion-chip-wrapper">
 
 					<!--  Drone OFFLINE -->
-					<ion-chip color="danger" (click)="connectOneSocket(drone)" *ngIf="isOffline(drone)">
+					<ion-chip color="danger" (click)="checkOneDroneStatus(drone)" *ngIf="isOffline(drone)">
 						<ion-label color="danger">Offline</ion-label>
 					</ion-chip>
 					<!-- ========================================== -->
