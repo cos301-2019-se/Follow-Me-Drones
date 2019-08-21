@@ -79,6 +79,7 @@ def arm():
 
     print('Establishing video stream with drone...', end='')
     _bebop.start_video_stream()
+    _bebop.safe_takeoff(5)
 
     print('Done!')
 
@@ -124,6 +125,7 @@ def disarm():
         _runningCommand.kill()
         _runningCommand = False
 
+    _bebop.safe_land(5)
     _bebop.stop_video_stream()
 
     emit('drone_disarmed')

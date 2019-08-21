@@ -25,21 +25,23 @@ def on_press(key):
         # w
         if key.char == 'w':
             print('Moving forward')
-            _bebop.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=0.001)
+            _bebop.fly_direct(roll=0, pitch=75, yaw=0, vertical_movement=0, duration=0.005)
             # _dx = 1
         
         if key.char == 's':
             print('Moving backward')
-            _bebop.fly_direct(roll=0, pitch=-50, yaw=0, vertical_movement=0, duration=0.001)
+            _bebop.fly_direct(roll=0, pitch=-75, yaw=0, vertical_movement=0, duration=0.005)
             # _dx = -1
         
         if key.char == 'q':
             print('Strafe left')
-            _dy = -1
+            _bebop.fly_direct(roll=-75, pitch=-0, yaw=0, vertical_movement=0, duration=0.005)
+            #_dy = -1
         
         if key.char == 'e':
             print('Strafe right')
-            _dy = 1
+            _bebop.fly_direct(roll=75, pitch=-0, yaw=0, vertical_movement=0, duration=0.005)
+            #_dy = 1
 
         # FLIPS!!!!!!
         # shift+w
@@ -64,11 +66,12 @@ def on_press(key):
         # Rotating
         if key.char == 'a':
             print('Rotating left')
-            _rad = math.radians(15)
+            _bebop.fly_direct(roll=0, pitch=0, yaw=-100, vertical_movement=0, duration=0.005)
+            #_rad = math.radians(15)
         
         if key.char == 'd':
             print('Rotating right')
-            _rad = math.radians(-15)
+            _bebop.fly_direct(roll=0, pitch=0, yaw=100, vertical_movement=0, duration=0.005)
 
         # print('Moving:', _dx, _dy, _dz, _rad)
         # _bebop.move_relative(_dx, _dy, _dz, _rad)
@@ -80,14 +83,14 @@ def on_press(key):
         # ctrl
         if key == keyboard.Key.ctrl:
             print('Moving down')
-            _dz = 1
+            _bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-50, duration=0.005)
 
         # space
         if key == keyboard.Key.space:
             print('Moving up')
-            _dz = -1
+            _bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=50, duration=0.005)
 
-        _bebop.move_relative(_dx, _dy, _dz, _rad)
+        # _bebop.move_relative(_dx, _dy, _dz, _rad)
 
 def on_release(key):
     tcflush(sys.stdin, TCIFLUSH)
@@ -123,22 +126,25 @@ if (success):
             # print('Command: ', end='')
             _option = input()
             
-            if _option == 'take-off': # take-off
+            if _option == 'to': # take-off
                 # Create a virtual dome in which the drone must remain
                 _bebop.set_max_altitude(2.5)
                 _bebop.set_max_distance(10)
                 _bebop.enable_geofence(1)
+                _bebop.set_max_tilt_rotation_speed(300)
+                _bebop.set_max_rotation_speed(200)
 
                 print('Taking off...', end='')
                 _bebop.safe_takeoff(5)
-            elif _option == 'land': # land
+            elif _option == 'x': # land
                 print('Landing...', end='')
                 _bebop.safe_land(5)
                 print('Done!')
-            elif _option == 'manual':
+            elif _option == 'm':
                 # Collect events until released
                 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
                     listener.join()
+                tcflush(sys.stdin, TCIFLUSH)
             elif _option == 'quit':
                 print('Bye')
                 break
