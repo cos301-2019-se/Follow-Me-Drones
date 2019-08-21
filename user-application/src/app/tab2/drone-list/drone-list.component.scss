@@ -6,8 +6,6 @@ ion-chip {
 	display: flex;
 	justify-content: center;
 }
-.drone-name {
-}
 
 .click-space {
 	width: 45%;
@@ -31,7 +29,7 @@ label {
 }
 .ion-chip-wrapper {
 	display:flex;
-	flex-direction: row;
+	flex-direction: column;
 	align-content: center;
 	justify-content: space-around;
 	height: 100%;
@@ -40,7 +38,7 @@ label {
 
 .ion-chip {
 	align-self: flex-end;
-	text-align: center;
+	text-align: center!important;
 	width: 80%;
 }
 .ion-chip-medium {
