@@ -1,19 +1,43 @@
 import { Injectable } from '@angular/core';
 import { Drone } from './drone/drone';
+import { Storage } from '@ionic/storage';
+import { UUID } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DroneDataService {
   private drones: Drone [] = [];
-  constructor() {
+  constructor( private storage: Storage) {
+
+    // this.storage.set('cf2adaf8-1479-89a1-f726-004361cfaa59',
+    //   JSON.stringify(
+    //     new Drone('cf2adaf8-1479-89a1-f726-004361cfaa59', 'Laptop 1', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')
+    //   ));
+    // this.storage.set('80f9f955-54d2-f6d3-09f0-23a9eb5df0cd',
+    //   JSON.stringify(
+    //     new Drone('80f9f955-54d2-f6d3-09f0-23a9eb5df0cd', 'Jetson Nano 5', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')
+    //   ));
+    // this.storage.set('9ce62288-c418-11e9-aa8c-2a2ae2dbcce4',
+    //   JSON.stringify(
+    //     new Drone('9ce62288-c418-11e9-aa8c-2a2ae2dbcce4', 'Jetson Nano !5', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')
+    //   ));
+    const currentClass = this;
+    this.storage.forEach( (value, key, index) => {
+      const currentStoredDrone = JSON.parse(value);
+      currentClass.drones.push(
+        new Drone( currentStoredDrone.id, currentStoredDrone.name, currentStoredDrone.port, currentStoredDrone.ipAddress,
+                   currentStoredDrone.icon, currentStoredDrone.comment )
+      );
+    });
+
 
     /* ========================================================================================================================
      *  Parrot
      *======================================================================================================================
      */
     // this.drones.push( new Drone('Brendon Laptop', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', ''));
-    this.drones.push( new Drone('cf2adaf8-1479-89a1-f726-004361cfaa59', 'Devon Laptop', 42069, '192.168.42.97', './assets/drone-icons/drone-3.svg', ''));
+    // this.drones.push( new Drone('cf2adaf8-1479-89a1-f726-004361cfaa59', 'Devon Laptop', 42069, '192.168.42.97', './assets/drone-icons/drone-3.svg', ''));
 
     /* ========================================================================================================================
      *  Localhost
@@ -48,8 +72,14 @@ export class DroneDataService {
     // this.drones.push( new Drone('Gilad Laptop', 42069, '192.168.1.19', './assets/drone-icons/drone-4.svg', ''));
     /* ======================================================================================================================== */
   }
+
   addNewDrone(drone) {
+    this.storage.set( drone.id, JSON.stringify(drone) );
     this.drones.push(drone);
+  }
+  updateDrone(drone) {
+    this.storage.remove(drone.id);
+    this.storage.set(drone.id, JSON.stringify(drone));
   }
 
   getDrones() {

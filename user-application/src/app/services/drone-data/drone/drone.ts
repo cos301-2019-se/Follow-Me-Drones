@@ -1,7 +1,6 @@
 import { Observable, Subject } from 'rxjs/Rx';
 import { DroneSocketService } from '../drone-socket/drone-socket.service';
 import { DroneState } from './drone-state.enum';
-import { UUID } from 'angular2-uuid';
 
 export class Drone {
   id: string;
@@ -129,6 +128,7 @@ export class Drone {
     this.port = port;
     this.ipAddress = ipAddress;
     this.comment = comment;
+    this.serverLocation = `http://${this.ipAddress}:${this.port}`;
   }
 
   disconnectDrone() {
