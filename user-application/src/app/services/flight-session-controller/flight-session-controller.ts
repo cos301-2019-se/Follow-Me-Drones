@@ -3,6 +3,8 @@ import * as $ from 'jquery';
 import { FlightSession } from '../flight-session/flight-session';
 import { Drone } from '../drone-data/drone/drone';
 import { DroneState } from '../drone-data/drone/drone-state.enum';
+import { Storage } from '@ionic/storage';
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,17 +16,34 @@ export class FlightSessionController {
   private activeSessions: Map< string, FlightSession>;
   private numActiveSessions: number;
 
-  constructor() {
+  constructor( private storage: Storage) {
     this.activeSessions = new Map<string, FlightSession>();
     this.pastSessions = new Map<string , FlightSession[]> ();
+    this.storage.forEach( (value, key, index ) => {
+      if ( key.endsWith('_sessions')) {
+        console.log(value);
+        const droneId = key.replace('_sessions', '');
+        const tempSessionsArr = [];
+        value.forEach( (currentSession) => {
+          const tempSession = new FlightSession();
+          tempSession.setSesssion(currentSession);
+          tempSessionsArr.push(tempSession);
+        });
+        this.pastSessions.set(droneId, tempSessionsArr);
+      }
+
+    });
+
+
   }
 
-  getCurrentSession(droneName) {
-    if (this.activeSessions.get(droneName) !== undefined) {
-      return this.activeSessions.get(droneName);
+  getCurrentSession(uuid) {
+    if (this.activeSessions.get(uuid) !== undefined) {
+      return this.activeSessions.get(uuid);
     }
     return null;
   }
+
   getAllActiveSessions() {
     return Array.from( this.activeSessions.values());
   }
@@ -42,8 +61,8 @@ export class FlightSessionController {
     return [];
   }
 
-  getPastSessions(droneName) {
-    return this.pastSessions.get(droneName);
+  getPastSessions(uuid) {
+    return this.pastSessions.get(uuid);
   }
   getAllPastSessions() {
     const allPastSessions = Array() ;
@@ -77,6 +96,9 @@ export class FlightSessionController {
       const firstSession = Array(this.activeSessions.get(drone.id));
       this.pastSessions.set(drone.id, firstSession);
     }
+
+    console.log( this.pastSessions.get( drone.id));
+    this.storage.set(drone.id + '_sessions', this.pastSessions.get(drone.id));
 
     drone.disArm();
     drone.setDroneState( DroneState.CONNECTED);
