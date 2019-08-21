@@ -26,17 +26,23 @@
 							<!-- <ion-thumbnail>
 								<img class="avatar" [src]="getDroneIcon()">
 							</ion-thumbnail> -->
-
-							<div class="ion-chip-wrapper">
-								<ion-chip class="ion-chip ion-chip-large" color="success">
-									<ion-label color="success">Online</ion-label>
-								</ion-chip>
-
-								<ion-chip class="ion-chip ion-chip-large" color="primary">
-									<ion-label color="primary">Connect</ion-label>
-								</ion-chip>
-							</div>
-
+							<ion-grid>
+								<ion-row>
+									<div class="ion-chip-wrapper">
+										<ion-col>
+											<ion-chip class="ion-chip ion-chip-large" color="success">
+												<ion-label color="success">Online</ion-label>
+											</ion-chip>
+										</ion-col>
+										<ion-col>
+											<ion-chip class="ion-chip ion-chip-large" color="primary">
+												<ion-label color="primary">Connect</ion-label>
+											</ion-chip>
+										</ion-col>
+									</div>
+								</ion-row>
+							</ion-grid>
+								
 						</div>
 					</div>
 				</div>

@@ -1,5 +1,5 @@
 <ion-list>
-  <ion-item-sliding #settings *ngFor="let drone of drones; let i=index" [attr.data-index]="i">
+  <ion-item-sliding #settings *ngFor="let drone of drones; let i=index" [attr.data-index]="i" (ionSwipe)="swipeEvent(drone, settings)">
 
     <ion-item>
 		<div class="ion-item-wrapper">
@@ -10,7 +10,7 @@
 			</div>
 			<div class="ion-chip-wrapper">
 
-				<!--  Drone OFFLINE -->
+				<!--  Drone OFFLINE -->	
 				<ion-chip color="danger" (click)="connectOneSocket(drone)" *ngIf="isOffline(drone)">
 					<ion-label  color="danger">Offline</ion-label>
 				</ion-chip>
@@ -76,7 +76,11 @@
 
     <ion-item-options side="start">
       <ion-item-option  color= "medium" (click)="editDrone(drone, settings)">Settings</ion-item-option>
-    </ion-item-options>
+	</ion-item-options>
+	
+	<ion-item-options side="end">
+		<ion-item-option color="danger" (click)="deleteDrone(drone, settings)">Delete</ion-item-option>
+	</ion-item-options>
 
 
   </ion-item-sliding>
