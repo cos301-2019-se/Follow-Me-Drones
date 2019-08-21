@@ -27,7 +27,19 @@ export class FlightSessionController {
   }
   getAllActiveSessions() {
     return Array.from( this.activeSessions.values());
-
+  }
+  getAllSessions() {
+    const activeSessions = this.getAllActiveSessions();
+    const previousSessions  = this.getAllPastSessions();
+    if ( Array.isArray(activeSessions) && activeSessions.length  ) {
+      if (Array.isArray( previousSessions) && previousSessions.length) {
+        return activeSessions.concat(previousSessions);
+      }
+      return activeSessions;
+    } else if ( Array.isArray(previousSessions) && previousSessions.length ) {
+      return previousSessions;
+    }
+    return [];
   }
 
   getPastSessions(droneName) {
