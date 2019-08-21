@@ -25,6 +25,22 @@ export class FlightSessionController {
     }
     return null;
   }
+  getAllActiveSessions() {
+    return Array.from( this.activeSessions.values());
+  }
+  getAllSessions() {
+    const activeSessions = this.getAllActiveSessions();
+    const previousSessions  = this.getAllPastSessions();
+    if ( Array.isArray(activeSessions) && activeSessions.length  ) {
+      if (Array.isArray( previousSessions) && previousSessions.length) {
+        return activeSessions.concat(previousSessions);
+      }
+      return activeSessions;
+    } else if ( Array.isArray(previousSessions) && previousSessions.length ) {
+      return previousSessions;
+    }
+    return [];
+  }
 
   getPastSessions(droneName) {
     return this.pastSessions.get(droneName);
@@ -64,6 +80,7 @@ export class FlightSessionController {
 
     drone.disArm();
     drone.setDroneState( DroneState.CONNECTED);
+    this.activeSessions.get(drone.id).active = false;
     this.activeSessions.delete(drone.id);
   }
 
