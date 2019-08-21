@@ -25,6 +25,10 @@ export class FlightSessionController {
     }
     return null;
   }
+  getAllActiveSessions() {
+    return Array.from( this.activeSessions.values());
+
+  }
 
   getPastSessions(droneName) {
     return this.pastSessions.get(droneName);
@@ -64,6 +68,7 @@ export class FlightSessionController {
 
     drone.disArm();
     drone.setDroneState( DroneState.CONNECTED);
+    this.activeSessions.get(drone.id).active = false;
     this.activeSessions.delete(drone.id);
   }
 
