@@ -1,6 +1,5 @@
 from pyparrot.Bebop import Bebop
 # import threading
-import sys
 from pynput import keyboard
 
 # Movement variables
@@ -17,25 +16,27 @@ def on_press(key):
     global _rad
 
     try:
-        print('alphanumeric key {0} pressed'.format(key.char))
+        # print('alphanumeric key {0} pressed'.format(key.char))
 
         # Moving Forward / Back / Left / Right
         # w
         if key.char == 'w':
             print('Moving forward')
-            _dx = 0.1
+            _bebop.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=0.001)
+            # _dx = 1
         
         if key.char == 's':
             print('Moving backward')
-            _dx = -0.1
+            _bebop.fly_direct(roll=0, pitch=-50, yaw=0, vertical_movement=0, duration=0.001)
+            # _dx = -1
         
         if key.char == 'q':
             print('Strafe left')
-            _dy = -0.1
+            _dy = -1
         
         if key.char == 'e':
             print('Strafe right')
-            _dy = 0.1
+            _dy = 1
 
         # FLIPS!!!!!!
         # shift+w
@@ -60,27 +61,30 @@ def on_press(key):
         # Rotating
         if key.char == 'a':
             print('Rotating left')
-            _rad = -15
+            _rad = -330
         
         if key.char == 'd':
             print('Rotating right')
-            _rad = 15
+            _rad = 5
 
-        _bebop.move_relative(_dx, _dy, _dz, _rad)
+        # print('Moving:', _dx, _dy, _dz, _rad)
+        # _bebop.move_relative(_dx, _dy, _dz, _rad)
         
     except AttributeError:
-        # print('special key {0} pressed'.format(key))
+        print('special key {0} pressed'.format(key))
 
         # Vertical controls
         # ctrl
-        if key == 'Key.ctrl':
+        if key == keyboard.Key.ctrl:
             print('Moving down')
-            _dz = 0.1
+            _dz = 1
 
         # space
-        if key == 'Key.space':
+        if key == keyboard.Key.space:
             print('Moving up')
-            _dz = -0.1
+            _dz = -1
+
+        _bebop.move_relative(_dx, _dy, _dz, _rad)
 
 def on_release(key):
     print('{0} released'.format(key))
@@ -108,7 +112,9 @@ if (success):
 
         while(True):
             _bebop.ask_for_state_update()
-            print('{0}% Command: '.format(_bebop.sensors.battery), end='')
+            print('\033[2J') # Clear screen
+            print('\033[00H') # Move cursor to top left
+            print('{0}% ({1}) Command: '.format(_bebop.sensors.battery, _bebop.sensors.flying_state), end='')
 
             # print('Command: ', end='')
             _option = input()
@@ -129,8 +135,6 @@ if (success):
                 # Collect events until released
                 with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
                     listener.join()
-
-                sys.stdin.flush()
             elif _option == 'quit':
                 print('Bye')
                 break
@@ -138,7 +142,9 @@ if (success):
                 print('Invalid command')
     except KeyboardInterrupt:
         print('Interrupt received... Bye!')
+
     # disconnect nicely so we don't need a reboot
+    _bebop.safe_land(5)
     _bebop.disconnect()
 else:
     print('Error connecting to bebop.  Retry')
