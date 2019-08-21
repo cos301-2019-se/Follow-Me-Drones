@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
+from OpenSSL import SSL, crypto
 
 import subprocess
 import os
@@ -21,6 +22,22 @@ _host = '0.0.0.0'
 # Flask app
 app = Flask(__name__)
 CORS(app)
+
+# I like security
+CERT_FILE = "cert.pem"
+KEY_FILE = "key.pem"
+
+def verify_and_create_ssl(certfile, keyfile):
+    C_F = os.path.join(os.getcwd(), certfile)
+    K_F = os.path.join(os.getcwd(), keyfile)
+
+    if not os.path.exists(C_F) or not os.path.exists(K_F):
+        print('Files don\'t exist, generating ssl certificate...', end='')
+        # openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 1825 -subj "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"
+        _cmd = ['openssl', 'req', '-x509', '-newkey', 'rsa:4096', '-nodes', '-out', 'cert.pem', '-keyout', 'key.pem', '-days', '1825', '-subj', "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"]
+
+        _runningCommand = subprocess.call(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print('Done!')
 
 # ============================================================================
 #                           Socket for the app
@@ -44,15 +61,19 @@ def connect():
 
         raise ConnectionRefusedError('Unauthorized!')
     else:
-        _currentConnections += 1
-        print('\nApp connected with ID', request.sid)
-        print('Current connections ->', _currentConnections, '\n')
-
         # Establish connection to drone
         success = _bebop.connect(5)
 
-        if not success:
-            emit('error')
+        if success:
+            _currentConnections += 1
+            print('\nApp connected with ID', request.sid)
+            print('Current connections ->', _currentConnections, '\n')
+        else:
+            _currentConnections -= 1
+            print('\nApp disconnected with ID', request.sid)
+            print('Current connections ->', _currentConnections, '\n')
+
+            raise ConnectionRefusedError('Failure!')
 
 # Disconnection event
 @io.on('disconnect')
@@ -291,7 +312,9 @@ def zipdir(directory, password):
     subprocess.call(['7z', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d%h') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def startup_process():
-    pass
+    global CERT_FILE
+    global KEY_FILE
+    verify_and_create_ssl(CERT_FILE, KEY_FILE)
 
 def shutdown_process():
     print('Beginning shutdown process... \n')
@@ -325,6 +348,9 @@ def shutdown_process():
     print('Done... Goodbye!')
 
 def run(p = _port, h = _host):
+    global CERT_FILE
+    global KEY_FILE
+
     # l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
     # l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
     # l3 = '\t  _/_/_/        _/  _/_/  _/    _/      _/        _/_/          _/      _/_/_/    _/_/_/    _/_/_/_/  _/  _/  _/  _/        _/_/_/_/     \n'
@@ -355,7 +381,7 @@ def run(p = _port, h = _host):
 
     try:
         startup_process()
-        io.run(app, port = p, host = h)
+        io.run(app, port = p, host = h, certfile=CERT_FILE, keyfile=KEY_FILE)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
         

@@ -8,8 +8,6 @@ BASE_URL = 'http://127.0.0.1:42069'
 class TestFlaskApi(unittest.TestCase):
     def test_connect(self):
         client = comms.io.test_client(comms.app)
-        self.assertTrue(client.is_connected())
-        client.disconnect()
         self.assertFalse(client.is_connected())
 
     def test_get(self):
