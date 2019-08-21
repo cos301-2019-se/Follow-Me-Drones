@@ -1,9 +1,20 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>
-      Flight Sessions
-    </ion-title>
-  </ion-toolbar>
+	<ion-toolbar>
+		<ion-title>Flight Sessions</ion-title>
+		<ion-buttons slot="end">
+			<ion-button>
+				<ion-list>
+					<ion-select interface="popover" (ionChange)="onContextChange($event.target.value)">
+						<ion-select-option value="all-drones" selected="true">All drones</ion-select-option>
+						<div *ngFor="let drone of drones;">
+							<ion-select-option [value]="drone.name">{{ drone.name }}</ion-select-option>
+						</div>
+					</ion-select>
+				</ion-list>
+			</ion-button>
+		</ion-buttons>
+	</ion-toolbar>
+	
 </ion-header>
 
 <ion-content> 
