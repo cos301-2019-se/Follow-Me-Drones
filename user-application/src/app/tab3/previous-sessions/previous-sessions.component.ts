@@ -16,6 +16,10 @@ export class PreviousSessionsComponent implements OnInit {
     this.previousSessions = flightSessions.getAllPastSessions();
     console.log(this.previousSessions);
 
+    this.previousSessions.forEach( (current) => {
+      console.log(current);
+    })
+
     // const mock1 = new FlightSession();
     // mock1.setSessionName('Sunday Morning');
     // const mock2 = new FlightSession();

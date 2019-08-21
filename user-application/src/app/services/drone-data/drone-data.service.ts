@@ -24,11 +24,13 @@ export class DroneDataService {
     //   ));
     const currentClass = this;
     this.storage.forEach( (value, key, index) => {
-      const currentStoredDrone = JSON.parse(value);
-      currentClass.drones.push(
-        new Drone( currentStoredDrone.id, currentStoredDrone.name, currentStoredDrone.port, currentStoredDrone.ipAddress,
-                   currentStoredDrone.icon, currentStoredDrone.comment )
-      );
+      if (!key.endsWith('_sessions')) {
+        const currentStoredDrone = JSON.parse(value);
+        currentClass.drones.push(
+          new Drone( currentStoredDrone.id, currentStoredDrone.name, currentStoredDrone.port, currentStoredDrone.ipAddress,
+            currentStoredDrone.icon, currentStoredDrone.comment )
+        );
+      }
     });
 
 

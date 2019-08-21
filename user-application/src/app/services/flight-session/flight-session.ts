@@ -1,14 +1,20 @@
 import { DroneState } from '../drone-data/drone/drone-state.enum';
 export class FlightSession {
-  private detectionImages: string [] = [];
-  private sessionName: string;
+  public detectionImages: string [] = [];
+  public sessionName: string;
   public active: boolean;
-  private droneName;
+  public droneName: string;
   constructor() {
     console.log('Arming drone!');
     this.active = true;
     this.sessionName = 'mock_name';
     this.droneName = 'mock_drone_name'
+  }
+  setSesssion( obj ) {
+    this.sessionName = obj.sessionName;
+    this.detectionImages = obj.detectionImages;
+    this.active = obj.active;
+    this.droneName = obj.droneName;
   }
   setSessionName(sessionName) {
     this.sessionName = sessionName;
