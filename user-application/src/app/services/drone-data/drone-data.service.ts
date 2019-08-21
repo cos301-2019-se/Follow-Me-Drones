@@ -77,9 +77,15 @@ export class DroneDataService {
     this.storage.set( drone.id, JSON.stringify(drone) );
     this.drones.push(drone);
   }
+
   updateDrone(drone) {
     this.storage.remove(drone.id);
     this.storage.set(drone.id, JSON.stringify(drone));
+  }
+
+  deleteDrone(drone) {
+    this.storage.remove(drone.id);
+    this.drones.splice(this.drones.indexOf(drone), 1);
   }
 
   getDrones() {

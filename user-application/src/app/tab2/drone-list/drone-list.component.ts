@@ -233,7 +233,7 @@ export class DroneListComponent implements AfterViewInit {
   
   /* Function to permanently delete an existing drone */
   deleteDrone(drone, slidingItem: IonItemSliding) {
-    alert("Deyeeted!");
+    this.droneDataService.deleteDrone(drone);
     slidingItem.close();
   }
   ////////////////////////////////////////////////////////////////////////////////
