@@ -29,6 +29,19 @@
 					</ion-chip>
 					<!-- ========================================== -->
 
+					<!-- Drone CONNECTING -->
+
+					<ion-chip class="ion-chip" color="success" *ngIf="isConnecting(drone)">
+						<ion-label color="success">Online</ion-label>
+					</ion-chip>
+
+					<ion-chip class="ion-chip connecting" (click)="connectDrone(drone)" *ngIf="isConnecting(drone)">
+						<ion-label color="primary">Connect</ion-label>
+					</ion-chip>
+
+					<!-- ========================================== -->
+
+
 					<!-- Drone BUSY -->
 					<ion-chip class="ion-chip" color="secondary" *ngIf="isBusy(drone)">
 						<ion-label color="secondary">Busy</ion-label>

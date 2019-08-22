@@ -82,6 +82,7 @@ export class DroneListComponent implements AfterViewInit {
   // Connection
   ////////////////////////////////////////////////////////////////////////////////
   connectDrone(drone) {
+    drone.setDroneState(DroneState.CONNECTING);
     drone.connectDrone(this, (droneConnected) => {
       if (droneConnected) {
         console.log('CHANGE STATE TO: CONNECTED');

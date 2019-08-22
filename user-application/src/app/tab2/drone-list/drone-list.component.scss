@@ -65,6 +65,15 @@ label {
 	animation-direction: alternate-reverse;
 }
 
+.connecting {
+
+	animation-name: pulseConnecting;
+	animation-duration:  1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	animation-direction: alternate-reverse;
+}
+
 @keyframes pulseArming {
 	0% {
 		--background: rgba(255, 206, 0, 0.15);
@@ -74,12 +83,12 @@ label {
 	}
 }
 
-@keyframes pulseActive {
+@keyframes pulseConnecting {
 	0% {
-		--background: rgba(245, 61, 61, 0.15);
+		--background: rgba(56, 128, 255, 0.15);
 	}
 	100% {
-		--background: rgba(245, 61, 61, 0.4);
+		--background: rgba(56, 128, 255, 0.4);
 	}
 }
 
