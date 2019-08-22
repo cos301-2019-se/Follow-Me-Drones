@@ -81,3 +81,6 @@ package-lock.json
 
 # virtualenv stuff
 venv/
+
+# Python
+__pycache__/
