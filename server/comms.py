@@ -32,10 +32,10 @@ def verify_and_create_ssl(certfile, keyfile):
     K_F = os.path.join(os.getcwd(), keyfile)
 
     if not os.path.exists(C_F) or not os.path.exists(K_F):
-        print('Files don\'t exist, generating ssl certificate...', end='')
-        # openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 1825 -subj "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"
-        _cmd = ['openssl', 'req', '-x509', '-newkey', 'rsa:4096', '-nodes', '-out', 'cert.pem', '-keyout', 'key.pem', '-days', '1825', '-subj', "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"]
-
+        print('Certificate don\'t exist, generating ssl certificate...', end='')
+        # openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 1825 -sha256 -subj "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"
+        _cmd = ['openssl', 'req', '-x509', '-newkey', 'rsa:4096', '-nodes', '-out', 'cert.pem', '-keyout', 'key.pem', '-days', '1825', '-sha256', '-subj', "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"]
+        
         _runningCommand = subprocess.call(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print('Done!')
 
