@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
-from OpenSSL import SSL, crypto
+from OpenSSL import SSL
 
 import subprocess
 import os
@@ -69,7 +69,6 @@ def connect():
             print('\nApp connected with ID', request.sid)
             print('Current connections ->', _currentConnections, '\n')
         else:
-            _currentConnections -= 1
             print('\nApp disconnected with ID', request.sid)
             print('Current connections ->', _currentConnections, '\n')
 
@@ -377,7 +376,7 @@ def run(p = _port, h = _host):
     print('\033[37m') # Change color to white
 
     # Run the flask API
-    print('Server running on http://' + h + ':' + str(p))
+    print('Server running on https://' + h + ':' + str(p))
 
     try:
         startup_process()
