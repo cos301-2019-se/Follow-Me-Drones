@@ -9,6 +9,61 @@
 <ion-content>
 
 	<div class="wrapper center-block">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingTwo">
+					<h4 class="panel-title">
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+							href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"
+							(click)="arrowToggle(arrowTwo);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowTwo" #arrowTwo></ion-icon>
+							Detection Images
+						</a>
+					</h4>
+				</div>
+				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+					<div class="panel-body">
+						<div class="flight-session-wrapper">
+							<div *ngIf="images || ImageIndex">
+
+								<!-- <ion-avatar class="avatar"> -->
+								<!-- 	<img [src]="getDroneIcon()"> -->
+								<!-- </ion-avatar> -->
+
+
+								<!-- Production -->
+								<ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img>
+								<ion-slides loop slidesPerView="3">
+								    <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i">
+								        <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img>
+								    </ion-slide>
+								</ion-slides>
+								<!-- ========================================================================================================= -->
+								<!-- ========================================================================================================= -->
+
+								<!-- Testing -->
+								<!-- <ion-img class="full-img" (click)="viewPhoto()" [src]="images[activeImageIndex]"> -->
+								<!-- </ion-img> -->
+								<!-- <ion-slides loop slidesPerView="3"> -->
+								<!-- 	<ion-slide *ngFor="let image of images; let i=index " ng-init="s = i"> -->
+								<!-- 		<ion-img (click)="updateIndex(i)" [src]="image"></ion-img> -->
+								<!-- 	</ion-slide> -->
+								<!-- </ion-slides> -->
+								<!-- ========================================================================================================= -->
+
+								<!-- <ion-list> -->
+								<!--     <ion-item lines="none">Battery: 72%</ion-item> -->
+								<!--     <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item> -->
+								<!-- </ion-list> -->
+
+
+								<!-- <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button> -->
+								<!-- <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button> -->
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
 		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			<div class="panel panel-default">
 				<div class="panel-heading" role="tab" id="headingOne">
@@ -48,61 +103,6 @@
 				</div>
 			</div>
 
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingTwo">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-							href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"
-							(click)="arrowToggle(arrowTwo);">
-							<ion-icon name="ios-arrow-down" class="arrow" id="arrowTwo" #arrowTwo></ion-icon>
-							Detection Images
-						</a>
-					</h4>
-				</div>
-				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-					<div class="panel-body">
-						<div class="flight-session-wrapper">
-							<div *ngIf="images || ImageIndex">
-
-								<!-- <ion-avatar class="avatar"> -->
-								<!-- 	<img [src]="getDroneIcon()"> -->
-								<!-- </ion-avatar> -->
-
-
-								<!-- Production -->
-								<!-- <ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img> -->
-								<!-- <ion-slides loop slidesPerView="3"> -->
-								<!--     <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i"> -->
-								<!--         <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img> -->
-								<!--     </ion-slide> -->
-								<!-- </ion-slides> -->
-								<!-- ========================================================================================================= -->
-								<!-- ========================================================================================================= -->
-
-								<!-- Testing -->
-								<ion-img class="full-img" (click)="viewPhoto()" [src]="images[activeImageIndex]">
-								</ion-img>
-								<ion-slides loop slidesPerView="3">
-									<ion-slide *ngFor="let image of images; let i=index " ng-init="s = i">
-										<ion-img (click)="updateIndex(i)" [src]="image"></ion-img>
-									</ion-slide>
-								</ion-slides>
-								<!-- ========================================================================================================= -->
-
-								<!-- <ion-list> -->
-								<!--     <ion-item lines="none">Battery: 72%</ion-item> -->
-								<!--     <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item> -->
-								<!-- </ion-list> -->
-
-
-								<!-- <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button> -->
-								<!-- <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button> -->
-							</div>
-
-						</div>
-					</div>
-				</div>
-			</div>
 
 			<div class="panel panel-default">
 				<div class="panel-heading" role="tab" id="headingThree">
@@ -118,7 +118,6 @@
 				<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 					<div class="panel-body">
 						<div class="detection-list-wrapper">
-							Vegeta was detected kak far from here but the oak is flippen fast so count to three.
 						</div>
 					</div>
 				</div>
@@ -138,7 +137,6 @@
 				<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
 					<div class="panel-body">
 						<div class="flight-path-wrapper">
-							Your drone got bliksemed into a fig tree.
 						</div>
 					</div>
 				</div>
