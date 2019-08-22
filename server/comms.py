@@ -38,11 +38,14 @@ def connect_drone():
         _bebop.start_video_stream()
         print('Done!')
 
-        _bebop.set_max_altitude(2.5)
-        _bebop.set_max_distance(10)
-        _bebop.enable_geofence(1)
-        _bebop.set_max_tilt_rotation_speed(300)
-        _bebop.set_max_rotation_speed(200)
+        _bebop.set_video_stream_mode('high_reliability_low_framerate')
+        _bebop.set_video_framerate('30_FPS')
+        _bebop.set_video_resolutions('rec720_stream720')
+        # _bebop.set_max_altitude(2.5)
+        # _bebop.set_max_distance(10)
+        # _bebop.enable_geofence(1)
+        # _bebop.set_max_tilt_rotation_speed(300)
+        # _bebop.set_max_rotation_speed(200)
 
     return success
 
@@ -54,7 +57,7 @@ def disconnect_drone():
     if _bebop.sensors.flying_state == 'flying' or _bebop.sensors.flying_state == 'hovering':
         _bebop.safe_land(5)
 
-    _bebop.safe_sleep(1)
+    _bebop.smart_sleep(1)
 
     _bebop.disconnect()
 
@@ -138,7 +141,7 @@ def arm():
     
     # Drone stream
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/bebop.sdp -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals-tiny.cfg', 'backup/animals-tiny_last.weights', 'data/bebop.sdp', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
+    _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/bebop.sdp', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
 
     _runningCommand = subprocess.Popen(_cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
