@@ -12,7 +12,7 @@ import time
 from pyparrot.Bebop import Bebop
 # import threading
 
-_bebop = Bebop()
+_bebop = None
 
 # Port for the server
 _port = 42069
@@ -23,19 +23,65 @@ app = Flask(__name__)
 CORS(app)
 
 # ============================================================================
+#                             Drone functions
+# ============================================================================
+def connect_drone():
+    global _bebop
+
+    _bebop = Bebop()
+    _bebop.ask_for_state_update()
+
+    success = _bebop.connect(5)
+
+    if success:
+        print('Establishing video stream with drone...', end='')
+        _bebop.start_video_stream()
+        print('Done!')
+
+        _bebop.set_max_altitude(2.5)
+        _bebop.set_max_distance(10)
+        _bebop.enable_geofence(1)
+        _bebop.set_max_tilt_rotation_speed(300)
+        _bebop.set_max_rotation_speed(200)
+
+    return success
+
+def disconnect_drone():
+    global _bebop
+
+    _bebop.ask_for_state_update()
+
+    if _bebop.sensors.flying_state == 'flying' or _bebop.sensors.flying_state == 'hovering':
+        _bebop.safe_land(5)
+
+    _bebop.safe_sleep(1)
+
+    _bebop.disconnect()
+
+def launch_drone():
+    global _bebop
+
+    _bebop.safe_takeoff(5)
+
+def land_drone():
+    global _bebop
+
+    _bebop.safe_land(5)
+
+# ============================================================================
 #                           Socket for the app
 # ============================================================================
 _currentConnections = 0
 _runningCommand = False
 
 # Create the socket, with all origins allowed
-
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 # Connection event
 @io.on('connect')
 def connect():
     global _currentConnections
+    global _bebop
 
     # Only allow one app to be connected at any given time
     if _currentConnections >= 1:
@@ -44,14 +90,13 @@ def connect():
 
         raise ConnectionRefusedError('Unauthorized!')
     else:
-        _currentConnections += 1
-        print('\nApp connected with ID', request.sid)
-        print('Current connections ->', _currentConnections, '\n')
-
         # Establish connection to drone
-        success = _bebop.connect(5)
-
-        if not success:
+        if connect_drone():
+            _currentConnections += 1
+            print('\nApp connected with ID', request.sid)
+            print('Current connections ->', _currentConnections, '\n')
+        else:
+            raise ConnectionRefusedError('Failure')
             emit('error')
 
 # Disconnection event
@@ -60,7 +105,8 @@ def disconnect():
     global _currentConnections
     global _runningCommand
 
-    _bebop.disconnect()
+    # Disconnect drone
+    disconnect_drone()
     
     _currentConnections -= 1
     print('App disconnected with ID', request.sid)
@@ -76,11 +122,6 @@ def disconnect():
 @io.on('arm_drone')
 def arm():
     global _runningCommand
-
-    print('Establishing video stream with drone...', end='')
-    _bebop.start_video_stream()
-
-    print('Done!')
 
     print('Starting object recognition...')
 
@@ -104,14 +145,22 @@ def arm():
     # Move back into the server directory
     os.chdir('../../../server/')
 
+    detection_armed = False
     # Wait for detection to start, then alert the app
     for line in iter(_runningCommand.stderr.readline, b''):
         if b'Done!' in line:
             print('Drone is armed! Beware poachers')
             emit('drone_armed')
 
+            detection_armed = True
             _runningCommand.stderr.close()
             break
+
+    if detection_armed:
+        # Launch the drone
+        launch_drone()
+    else:
+        print('Something went wrong arming detection...')
 
 # Disarm event
 @io.on('disarm_drone')
@@ -124,7 +173,7 @@ def disarm():
         _runningCommand.kill()
         _runningCommand = False
 
-    _bebop.stop_video_stream()
+    land_drone()
 
     emit('drone_disarmed')
 
