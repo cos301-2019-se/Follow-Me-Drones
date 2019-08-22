@@ -72,7 +72,7 @@ export class DroneSocketService {
 
     // ping server here
 
-    this.socket = io.connect(`http://${ip}:${port}`, socketSettings);
+    this.socket = io.connect(`https://${ip}:${port}`, socketSettings);
     console.log(this.socket);
 
     const thisSocket = this;
