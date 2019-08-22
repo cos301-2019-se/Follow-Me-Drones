@@ -54,7 +54,7 @@ def disconnect_drone():
     if _bebop.sensors.flying_state == 'flying' or _bebop.sensors.flying_state == 'hovering':
         _bebop.safe_land(5)
 
-    _bebop.safe_sleep(1)
+    _bebop.smart_sleep(1)
 
     _bebop.disconnect()
 
