@@ -22,16 +22,6 @@ export class DroneDataService {
     //   JSON.stringify(
     //     new Drone('9ce62288-c418-11e9-aa8c-2a2ae2dbcce4', 'Jetson Nano !5', 42069, '127.0.0.1', './assets/drone-icons/drone-3.svg', '')
     //   ));
-    const currentClass = this;
-    this.storage.forEach( (value, key, index) => {
-      if (!key.endsWith('_sessions')) {
-        const currentStoredDrone = JSON.parse(value);
-        currentClass.drones.push(
-          new Drone( currentStoredDrone.id, currentStoredDrone.name, currentStoredDrone.port, currentStoredDrone.ipAddress,
-            currentStoredDrone.icon, currentStoredDrone.comment )
-        );
-      }
-    });
 
 
     /* ========================================================================================================================
@@ -73,6 +63,19 @@ export class DroneDataService {
     // this.drones.push( new Drone('Devon Laptop', 42069, '192.168.1.23', './assets/drone-icons/drone-4.svg', ''));
     // this.drones.push( new Drone('Gilad Laptop', 42069, '192.168.1.19', './assets/drone-icons/drone-4.svg', ''));
     /* ======================================================================================================================== */
+  }
+
+  retreiveFromStorage() {
+    const currentClass = this;
+    return this.storage.forEach( (value, key, index) => {
+      if (!key.endsWith('_sessions')) {
+        const currentStoredDrone = JSON.parse(value);
+        currentClass.drones.push(
+          new Drone( currentStoredDrone.id, currentStoredDrone.name, currentStoredDrone.port, currentStoredDrone.ipAddress,
+            currentStoredDrone.icon, currentStoredDrone.comment )
+        );
+      }
+    });
   }
 
   addNewDrone(drone) {

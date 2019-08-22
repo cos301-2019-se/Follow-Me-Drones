@@ -89,6 +89,7 @@ export class Drone {
           console.log(message);
           domObject.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
+          console.log('CHANGE STATE TO: ONLINE');
           drone.setDroneState(DroneState.ONLINE);
 
         } else if ( socketEvent.event === 'connect') {
@@ -101,6 +102,7 @@ export class Drone {
           drone.setDroneState(DroneState.OFFLINE);
 
         } else if ( socketEvent.event === 'connect_success') {
+          console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
 
         } else if (socketEvent.event === 'drone_armed') {
@@ -110,6 +112,7 @@ export class Drone {
           drone.setDroneState(DroneState.BUSY);
 
         } else if (socketEvent.event === 'drone_disarmed') {
+          console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
         }
       },

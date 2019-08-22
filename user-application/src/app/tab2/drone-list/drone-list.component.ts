@@ -25,27 +25,34 @@ export class DroneListComponent implements AfterViewInit {
   ////////////////////////////////////////////////////////////////////////////////
   private drones: Drone[] = [];
   messages: Subject<any>;
-  constructor(public toastController: ToastController,
-    public actionSheetController: ActionSheetController,
-    public modalController: ModalController,
-    public droneDataService: DroneDataService,
-    public flightSessionController: FlightSessionController,
-    public alertController : AlertController,
+  constructor(
+              public toastController: ToastController,
+              public actionSheetController: ActionSheetController,
+              public modalController: ModalController,
+              public droneDataService: DroneDataService,
+              public flightSessionController: FlightSessionController,
+              public alertController : AlertController,
               public router: Router
               ) {
-                this.drones = this.droneDataService.getDrones();
-  }
-  
-  ngAfterViewInit() {
-    const thisClass = this;
-    this.drones.forEach( (drone) => {
-        thisClass.checkOneDroneStatus(drone);
+
+    const currentClass = this;
+    this.droneDataService.retreiveFromStorage().then( () => {
+      currentClass.drones = currentClass.droneDataService.getDrones();
+      let counter = 0;
+      currentClass.drones.forEach( (drone) => {
+        console.log(counter++);
+        currentClass.checkOneDroneStatus(drone);
+      });
     });
+  }
+
+  ngAfterViewInit() {
   }
 
   checkOneDroneStatus(drone) {
       drone.serverOnline( (online) => {
         if (online) {
+          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
           drone.setDroneState(DroneState.ONLINE);
         } else {
           drone.setDroneState(DroneState.OFFLINE);
@@ -77,6 +84,7 @@ export class DroneListComponent implements AfterViewInit {
   connectDrone(drone) {
     drone.connectDrone(this, (droneConnected) => {
       if (droneConnected) {
+        console.log('CHANGE STATE TO: CONNECTED');
         drone.setDroneState(DroneState.CONNECTED);
       }
     });
@@ -102,6 +110,7 @@ export class DroneListComponent implements AfterViewInit {
           message = 'Now that is an Avengers level threat!';
           this.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
+          console.log('CHANGE STATE TO: ONLINE');
           drone.setDroneState(DroneState.ONLINE);
 
         } else if ( socketEvent.event === 'connect') {
@@ -114,6 +123,7 @@ export class DroneListComponent implements AfterViewInit {
           drone.setDroneState(DroneState.OFFLINE);
 
         } else if ( socketEvent.event === 'connect_success') {
+          console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
 
         } else if (socketEvent.event === 'drone_armed') {
@@ -123,6 +133,7 @@ export class DroneListComponent implements AfterViewInit {
           drone.setDroneState(DroneState.BUSY);
 
         } else if (socketEvent.event === 'drone_disarmed') {
+          console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
         }
       },

@@ -8,7 +8,7 @@ export class FlightSession {
     console.log('Arming drone!');
     this.active = true;
     this.sessionName = 'mock_name';
-    this.droneName = 'mock_drone_name'
+    // this.droneName = 'Brendon Laptop';
   }
   setSesssion( obj ) {
     this.sessionName = obj.sessionName;
