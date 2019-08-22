@@ -56,7 +56,7 @@ obj/
 
 *.zip
 
-darknet19_448.conv.23
+darknet*.conv.*
 
 *.log
 

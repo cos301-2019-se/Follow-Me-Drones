@@ -166,9 +166,13 @@ int main()
 
                 cout << "Writing all image names into data/train.txt..." << endl;
 
+                cmd = "./darknet detector train cfg/animals.data " + cfg + " darknet53.conv.74";
+
+                cout << cmd << endl;
+
                 chdir("../src/darknet_");
                 system("find data/animal-images -name \\*.jpg > data/train.txt");
-                system(("./darknet detector train cfg/animals.data " + cfg + "cfg/animals.cfg darknet19_448.conv.23").c_str());
+                system((cmd).c_str());
                 chdir("../../interface");
                 break;
 
