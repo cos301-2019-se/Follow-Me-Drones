@@ -25,12 +25,13 @@ export class DroneListComponent implements AfterViewInit {
   ////////////////////////////////////////////////////////////////////////////////
   private drones: Drone[] = [];
   messages: Subject<any>;
-  constructor(public toastController: ToastController,
-    public actionSheetController: ActionSheetController,
-    public modalController: ModalController,
-    public droneDataService: DroneDataService,
-    public flightSessionController: FlightSessionController,
-    public alertController : AlertController,
+  constructor(
+              public toastController: ToastController,
+              public actionSheetController: ActionSheetController,
+              public modalController: ModalController,
+              public droneDataService: DroneDataService,
+              public flightSessionController: FlightSessionController,
+              public alertController : AlertController,
               public router: Router
               ) {
 
