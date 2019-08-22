@@ -67,9 +67,12 @@ export class FlightSessionController {
   getAllPastSessions() {
     const allPastSessions = Array() ;
     this.pastSessions.forEach((sessions: FlightSession[], droneId: string) => {
-      allPastSessions.push(sessions);
+      sessions.forEach(( session: FlightSession ) => {
+        allPastSessions.push(session);
+      }) ;
     });
-    return allPastSessions[0];
+    console.log(allPastSessions);
+    return allPastSessions;
 
   }
 
@@ -81,7 +84,9 @@ export class FlightSessionController {
 
     drone.armDrone();
     drone.setDroneState( DroneState.ARMING );
-    this.activeSessions.set( drone.id, new FlightSession());
+    const newFlightSession = new FlightSession();
+    newFlightSession.droneName = drone.name;
+    this.activeSessions.set( drone.id, newFlightSession);
     return true;
 
   }

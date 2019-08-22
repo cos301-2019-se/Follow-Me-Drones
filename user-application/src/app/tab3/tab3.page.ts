@@ -13,7 +13,7 @@ export class Tab3Page {
   private drones: Drone[] = [];
   private filteredDrones: Drone[] = [];
   constructor(
-    private dronesData : DroneDataService,
+    private dronesData: DroneDataService,
   ) {
     this.segmentValue = SegmentStatus.ALL;
     this.drones = this.dronesData.getDrones();
