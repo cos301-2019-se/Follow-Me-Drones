@@ -288,7 +288,7 @@ def detection():
 # ============================================================================
 
 def zipdir(directory, password):
-    subprocess.call(['7z', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d%h') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.call(['7zr', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d%h') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def startup_process():
     pass
