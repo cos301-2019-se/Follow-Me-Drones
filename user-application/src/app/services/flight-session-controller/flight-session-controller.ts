@@ -86,6 +86,7 @@ export class FlightSessionController {
     drone.setDroneState( DroneState.ARMING );
     const newFlightSession = new FlightSession();
     newFlightSession.droneName = drone.name;
+    console.log('creating new session and setting name');
     this.activeSessions.set( drone.id, newFlightSession);
     return true;
 
@@ -109,6 +110,9 @@ export class FlightSessionController {
     drone.setDroneState( DroneState.CONNECTED);
     this.activeSessions.get(drone.id).active = false;
     this.activeSessions.delete(drone.id);
+  }
+  getActiveSessionFor(id) {
+    return this.activeSessions.get(id);
   }
 
 

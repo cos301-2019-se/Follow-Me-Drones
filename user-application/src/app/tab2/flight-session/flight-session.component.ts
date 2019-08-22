@@ -32,12 +32,17 @@ export class FlightSessionComponent implements OnInit {
                 private droneData: DroneDataService,
                 private route: ActivatedRoute,
                 private flightSessionController: FlightSessionController) {
-
-  }
-
-  ngOnInit() {
+    console.log(this.route.snapshot.paramMap.get('drone'));
     this.drone = this.droneData.getDrone( this.route.snapshot.paramMap.get('drone'));
+    const isActive = this.flightSessionController.getActiveSessionFor(this.drone.id);
+    if ( isActive !== undefined ) {
+      this.imageArray = this.flightSessionController.getActiveSessionFor(this.drone.id).detectionImages;
+    } else {
+      this.imageArray = [];
+    }
   }
+
+  ngOnInit() { }
 
   getImageSource(index) {
     return this.imageArray[index];
