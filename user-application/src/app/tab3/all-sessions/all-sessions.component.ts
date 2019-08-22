@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input} from '@angular/core';
 import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
 import { FlightSession } from '../../services/flight-session/flight-session';
 
@@ -9,13 +9,14 @@ import { FlightSession } from '../../services/flight-session/flight-session';
   styleUrls: ['./all-sessions.component.scss'],
 })
 export class AllSessionsComponent implements OnInit {
-  allSessions: FlightSession [] = [];
+  @Input() allSessions: FlightSession [] = [];
   constructor( private flightSessions: FlightSessionController) {
-    console.log(this.flightSessions);
-
-    this.allSessions = this.flightSessions.getAllSessions();
-
     console.log(this.allSessions);
+
+
+    // this.allSessions = this.flightSessions.getAllSessions();
+
+    // console.log(this.allSessions);
 
     // const mock1 = new FlightSession();
     // mock1.setSessionName('Sunday Morning');
