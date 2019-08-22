@@ -11,10 +11,11 @@ import { AppComponent } from './app.component';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 import { IonicStorageModule } from '@ionic/storage';
+import { TabsPageModule } from './tabs/tabs.module';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, TabsPageModule, IonicStorageModule.forRoot()],
   providers: [
     StatusBar,
     Geolocation,
