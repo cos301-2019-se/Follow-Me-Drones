@@ -1,0 +1,11 @@
+[Unit]
+Description=Python servenator
+After=network-online.target
+
+[Service]
+Restart=on-failure
+WorkingDirectory=/home/jetson/Follow-Me-Drones/server
+ExecStart=/usr/bin/python3 /home/jetson/Follow-Me-Drones/server/comms.py
+
+[Install]
+WantedBy=multi-user.target
