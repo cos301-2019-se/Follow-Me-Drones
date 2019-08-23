@@ -130,7 +130,7 @@ if (success):
                 # Create a virtual dome in which the drone must remain
                 _bebop.set_max_altitude(2.5)
                 _bebop.set_max_distance(10)
-                _bebop.enable_geofence(1)
+                # _bebop.enable_geofence(1)
                 _bebop.set_max_tilt_rotation_speed(300)
                 _bebop.set_max_rotation_speed(200)
 
