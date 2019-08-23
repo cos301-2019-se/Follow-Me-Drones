@@ -7,11 +7,11 @@
 ### Team Overview
 |    Full Name    	| Student Number 	|                                 Profile                                	|
 |:---------------:	|:--------------:	|:----------------------------------------------------------------------:	|
-|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-) 	|    11026953    	|  <a href="https://github.com/LenBekker" target="_blank">GitHub</a> 	|
-| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a> 	|
-|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <a href="https://github.com/gtabul" target="_blank">GitHub</a>    	|
-|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <a href="https://github.com/Brendon127" target="_blank">GitHub</a>   	|
-|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <a href="https://github.com/u14177553" target="_blank">GitHub</a>     	|
+|  Len Bekker [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#len-bekker-u11026953-) 	|    11026953    	|  <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/LenBekker" target="_blank"> GitHub</a> <a href="https://www.linkedin.com/in/len-bekker" target="_blank">LinkedIn</a>	|
+| Devon Petrie [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#devon-petrie-u17019266-) 	|    17019266    	| <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/Devon-TUKS" target="_blank"> GitHub</a> <a href="https://www.linkedin.com/in/devon-petrie-840b8a191/" target="_blank">LinkedIn</a> 	|
+|  Gilad Tabul [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#gilad-tabul-u16154658-) 	|    16154658    	|    <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/gtabul" target="_blank"> GitHub</a> <a href="https://www.linkedin.com/in/gilad-tabul/" target="_blank">LinkedIn</a>   	|
+|  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/Brendon127" target="_blank"> GitHub</a> <a href="https://drive.google.com/file/d/1iJJTT4iV3kHGo73pd33XE5DBXhNFcVEG/view" target="_blank">CV</a>  	|
+|   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/u14177553" target="_blank"> GitHub</a> <a href="https://www.linkedin.com/in/venterfrancois/" target="_blank">LinkedIn</a>    	|
 
 ---
 
@@ -30,7 +30,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 
 <a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
 
-<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a> 
+<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a>
+
+<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">User Manual</a>
 
 ---
 
@@ -68,7 +70,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 |   COS 301   	|     Software Engineering     	|
 
 ##### Profiles:
-<a href="https://github.com/LenBekker" target="_blank">GitHub</a>
+<img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/LenBekker" target="_blank" id="lenG"> GitHub</a>
+
+<img src="https://i.imgur.com/E8SCQNw.png" width=20> <a href="https://www.linkedin.com/in/len-bekker/" target="_blank">LinkedIn</a>
 
 ---
 
@@ -87,7 +91,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 ##### Skills
 * Problem solving
 * Drone flying experience
-	* Racing drones, DJI Phanton, DJI Mavic Pro
+* Racing drones, DJI Phanton, DJI Mavic Pro
 * Multitude of programming languages learned through my degree and from experience outside of it.
 
 ##### Current Modules:
@@ -99,7 +103,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 |   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
-<a href="https://github.com/Devon-TUKS" target="_blank">GitHub</a>
+<img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/Devon-TUKS" target="_blank"> GitHub</a>
+
+<img src="https://i.imgur.com/E8SCQNw.png" width=20><a href="https://github.com/gtabul" target="_blank"><a href="https://www.linkedin.com/in/devon-petrie-840b8a191/" target="_blank">LinkedIn</a>
 
 ---
 
@@ -130,7 +136,11 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 |   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
-<a href="https://github.com/gtabul" target="_blank">GitHub</a>
+
+
+<img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/gtabul" target="_blank"> GitHub</a>
+
+<img src="https://i.imgur.com/E8SCQNw.png" width=20><a href="https://github.com/gtabul" target="_blank"><a href="https://www.linkedin.com/in/gilad-tabul/" target="_blank">LinkedIn</a>
 
 ---
 
@@ -160,7 +170,9 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 |   COS 333     | Computer Security and Ethics  |
 
 ##### Profiles:
-<a href="https://github.com/Brendon127" target="_blank">GitHub</a>
+<img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/Brendon127" target="_blank"> GitHub</a>
+
+<a href="https://drive.google.com/file/d/1iJJTT4iV3kHGo73pd33XE5DBXhNFcVEG/view" target="_blank">CV</a>
 
 ---
 
@@ -186,6 +198,8 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 |   COS 326   	|       Database Systems   	    |
 
 ##### Profiles:
-<a href="https://github.com/u14177553" target="_blank">GitHub</a>
+<img src="https://i.imgur.com/R15saK1.png" width=15> <a href="https://github.com/u14177553" target="_blank">GitHub</a>
+
+<img src="https://i.imgur.com/E8SCQNw.png" width=20><a href="https://github.com/gtabul" target="_blank"><a href="https://www.linkedin.com/in/venterfrancois/" target="_blank">LinkedIn</a>
 
 ---
