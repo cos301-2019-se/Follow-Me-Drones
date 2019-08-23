@@ -2,7 +2,7 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Tab2Page } from './tab2.page';
 import { DroneListComponent } from './drone-list/drone-list.component';
 import { DroneSocketService } from '../services/drone-data/drone-socket/drone-socket.service';
@@ -14,6 +14,7 @@ import { DroneInfoComponent } from './drone-info/drone-info.component';
     IonicModule,
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forChild([
       { path: '', component: Tab2Page },
       { path: 'flight-session/:drone', component: FlightSessionComponent },
