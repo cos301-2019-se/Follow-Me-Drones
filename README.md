@@ -91,7 +91,6 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 * Multitude of programming languages learned through my degree and from experience outside of it.
 
 ##### Current Modules:
-##### Current Modules:
 | Module Code 	|      Module Description      	|
 |:-----------:	|:----------------------------:	|
 |   COS 301   	|     Software Engineering     	|

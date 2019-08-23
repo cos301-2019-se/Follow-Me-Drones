@@ -1,0 +1,2 @@
+systemctl status commserver.service
+
