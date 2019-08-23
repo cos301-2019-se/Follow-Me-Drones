@@ -56,7 +56,7 @@ obj/
 
 *.zip
 
-darknet19_448.conv.23
+darknet*.conv.*
 
 *.log
 
@@ -78,3 +78,9 @@ package-lock.json
 # Drone control stuff
 
 *.mav
+
+# virtualenv stuff
+venv/
+
+# Python
+__pycache__/

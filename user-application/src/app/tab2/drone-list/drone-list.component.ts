@@ -1,12 +1,15 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { DroneData } from '../../../data-models/drone-data.model';
-import { DroneSocketService } from '../../services/drone-socket/drone-socket.service';
+import { Component, AfterViewInit, HostListener } from '@angular/core';
+import { DroneSocketService } from '../../services/drone-data/drone-socket/drone-socket.service';
 import { Observable, Subject } from 'rxjs/Rx';
 import { ToastController, ActionSheetController, ModalController } from '@ionic/angular';
+import { Drone } from '../../services/drone-data/drone/drone';
+import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
+import { DroneDataService } from '../../services/drone-data/drone-data.service';
 import { FlightSessionComponent } from '../flight-session/flight-session.component';
-import { Drone } from '../../services/drone/drone';
-// import { DatabaseService } from '../../services/database/database.service';
-//import { SqliteService } from '../../services/database/sqlite.service';
+import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
+import { Router } from '@angular/router';
+import { IonItemSliding } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-drone-list',
@@ -14,130 +17,158 @@ import { Drone } from '../../services/drone/drone';
   styleUrls: ['./drone-list.component.scss'],
 })
 
+
 export class DroneListComponent implements AfterViewInit {
-  private droneList: DroneData[] = [];
+  
+  ////////////////////////////////////////////////////////////////////////////////
+  // Init
+  ////////////////////////////////////////////////////////////////////////////////
   private drones: Drone[] = [];
-  isValid: boolean;
   messages: Subject<any>;
-  count = 0;
-  // db: DatabaseService;
-  constructor(private droneSock: DroneSocketService,
+  constructor(
               public toastController: ToastController,
               public actionSheetController: ActionSheetController,
-              public modalController: ModalController) {
-    this.generateListDynamically();
-    // this.db = new DatabaseService( new SqliteService() );
-    // console.log(this.db);
-    // this.messages = <Subject<any>> this.droneSock
-    //   .connect()
-    //   .map((res: any): any => {
-    //     return res;
-    //   });
+              public modalController: ModalController,
+              public droneDataService: DroneDataService,
+              public flightSessionController: FlightSessionController,
+              public alertController : AlertController,
+              public router: Router
+              ) {
 
-
-    // this.messages.subscribe( detection => {
-    //   this.count++;
-    //   let currentObj = detection.data.objects;
-    //   let response;
-    //   this.presentToast(currentObj[0].name);
-    // });
-
+    const currentClass = this;
+    this.droneDataService.retreiveFromStorage().then( () => {
+      currentClass.drones = currentClass.droneDataService.getDrones();
+      let counter = 0;
+      currentClass.drones.forEach( (drone) => {
+        console.log(counter++);
+        currentClass.checkOneDroneStatus(drone);
+      });
+    });
   }
 
   ngAfterViewInit() {
   }
 
-  generateListDynamically() {
-    /* ========================================================================================================================
-     *  Totolink
-     *======================================================================================================================
-     */
-     this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.16', './assets/drone-icons/drone-1.svg', '')));
-    this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.12', './assets/drone-icons/drone-2.svg', '')));
-    this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.13', './assets/drone-icons/drone-3.svg', '')));
-    this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.15', './assets/drone-icons/drone-4.svg', '')));
-
-    /* ======================================================================================================================== */
-
-
-    /* ========================================================================================================================
-     *  Gilad Home
-     *======================================================================================================================
-     */
-    //this.drones.push( new Drone(new DroneData('Jetson Nano 5', 6969, '192.168.1.32', './assets/drone-icons/drone-1.svg', '')));
-   // this.drones.push( new Drone(new DroneData('Jetson Nano !5', 6969, '192.168.1.17', './assets/drone-icons/drone-2.svg', '')));
-    //this.drones.push( new Drone(new DroneData('Brendon Laptop', 6969, '192.168.1.28', './assets/drone-icons/drone-3.svg', '')));
-    //this.drones.push( new Drone(new DroneData('Devon Laptop', 6969, '192.168.1.23', './assets/drone-icons/drone-4.svg', '')));
-    /* ======================================================================================================================== */
+  checkOneDroneStatus(drone) {
+      drone.serverOnline( (online) => {
+        if (online) {
+          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
+          drone.setDroneState(DroneState.ONLINE);
+        } else {
+          drone.setDroneState(DroneState.OFFLINE);
+        }
+      });
 
   }
-  getClickedDrone(event) {
-    let currentNode = event.target;
+  ////////////////////////////////////////////////////////////////////////////////
 
-    while ((currentNode.getAttribute('data-index') === null)) {
-      currentNode = currentNode.parentNode;
+  ////////////////////////////////////////////////////////////////////////////////
+  // Flight Sessions
+  ////////////////////////////////////////////////////////////////////////////////
+  startSession(drone) {
+    if (!this.flightSessionController.startFlightSession(drone)) {
+      // TODO: Let user know accordingly
+      alert('Problem!');
     }
 
-    const index = currentNode.getAttribute('data-index');
-    return index;
-
   }
 
-  armDrone(event) {
-    const  index = this.getClickedDrone(event);
-    console.log(`selected -> ${index}`);
-    this.drones[index].armDrone();
+  endSession(drone) {
+    this.flightSessionController.endFlightSession(drone);
   }
+  ////////////////////////////////////////////////////////////////////////////////
 
-
-  async connectDrone(event) {
-    const index = this.getClickedDrone(event);
-    await this.drones[index].connect();
-    const currentDrone = this.drones[index];
-    this.drones[index].messages.subscribe( detection => {
-      const currentObj = detection.data.objects;
-      this.presentToast(`${currentDrone.dronedata.name} spotted ${currentObj[0].name}`);
-      console.log(currentObj[0].name);
+  ////////////////////////////////////////////////////////////////////////////////
+  // Connection
+  ////////////////////////////////////////////////////////////////////////////////
+  connectDrone(drone) {
+    drone.setDroneState(DroneState.CONNECTING);
+    drone.connectDrone(this, (droneConnected) => {
+      if (droneConnected) {
+        console.log('CHANGE STATE TO: CONNECTED');
+        drone.setDroneState(DroneState.CONNECTED);
+      }
     });
 
-    if (this.drones[index].isConnected()) { // TODO: if drone is found
-      console.log('Drone successfully connected');
-    } else {
-      console.log('snne');
-      alert('nee');
-      // TODO: Notify user that drone is not available
-
-    }
+    // this.setupSocketEvents(drone);
   }
 
-  disconnectDrone(event) {
+  disconnectDrone(drone) {
     // TODO: Add prompt to ask if sure to disconnect
-
-    const index = this.getClickedDrone(event);
-
-    this.drones[index].disconnect();
+    drone.disconnectDrone();
+    // drone.endFlightSession();
   }
 
+  setupSocketEvents(drone) {
+    const currentClass = this;
+    drone.messages.subscribe( {
+      next: (socketEvent)  => {
+        if (socketEvent.event === 'detection') {
+          const animal = socketEvent.data.detection;
+          // drone.fetchImage( socketEvent.data.image );
+          this.flightSessionController.detection(drone, socketEvent.data);
+          let message =  `${drone.name} spotted ${animal}`;
+          message = 'Now that is an Avengers level threat!';
+          this.presentToast(message);
+        } else if (socketEvent.event === 'disconnect') {
+          console.log('CHANGE STATE TO: ONLINE');
+          drone.setDroneState(DroneState.ONLINE);
+
+        } else if ( socketEvent.event === 'connect') {
+          console.log('connected in next()');
+
+        } else if ( socketEvent.event === 'reconnect_attempt') {
+          drone.reconnect();
+
+        } else if ( socketEvent.event === 'reconnect_failed') {
+          drone.setDroneState(DroneState.OFFLINE);
+
+        } else if ( socketEvent.event === 'connect_success') {
+          console.log('CHANGE STATE TO: CONNECTED');
+          drone.setDroneState(DroneState.CONNECTED);
+
+        } else if (socketEvent.event === 'drone_armed') {
+          drone.setDroneState(DroneState.ARMED);
+
+        } else if (socketEvent.event === 'drone_busy') {
+          drone.setDroneState(DroneState.BUSY);
+
+        } else if (socketEvent.event === 'drone_disarmed') {
+          console.log('CHANGE STATE TO: CONNECTED');
+          drone.setDroneState(DroneState.CONNECTED);
+        }
+      },
+      error: (error)  => {
+        console.log(error);
+      },
+      complete: () => {
+        console.log('completed');
+      }
+    });
+  }
+  ////////////////////////////////////////////////////////////////////////////////
+
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Notifications and Popups
+  ////////////////////////////////////////////////////////////////////////////////
   async presentToast(message) {
     const toast = await this.toastController.create({
       message,
       duration: 2000
     });
-    toast.present();
+    await toast.present(); //This bliksem
   }
 
-  async presentActionSheet(event) {
-
-    const index = this.getClickedDrone(event);
-    const clickedDrone = this.drones[index];
-
+  async presentActionSheet(drone) {
     const actionSheet = await this.actionSheetController.create({
       header: 'Drone Info',
       buttons: [ {
         text: 'View Info',
         handler: () => {
           console.log('Delete clicked');
-          this.presentModal(clickedDrone);
+          this.presentModal(drone);
         }
 
       }, {
@@ -155,10 +186,9 @@ export class DroneListComponent implements AfterViewInit {
     await actionSheet.present();
 
   }
-  async presentModal(event) {
+  async presentModal(drone) {
 
-    const index = this.getClickedDrone(event);
-    const clickedDrone = this.drones[index];
+    const clickedDrone = await drone; //This other bliksem
 
     const modal = await this.modalController.create({
       component: FlightSessionComponent,
@@ -166,4 +196,87 @@ export class DroneListComponent implements AfterViewInit {
     });
     return await modal.present();
   }
+
+  /* Function to confirm permanent deletion of an existing drone */
+  async presentDeleteConfirmation(drone, slidingItem: IonItemSliding) {
+    const alert = await this.alertController.create({
+      message: 'Are you sure you want to permanently delete this drone?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            slidingItem.close();
+          }
+        },
+        {
+          cssClass: 'yes-button',
+          text: 'Yes',
+          handler: () => {
+            this.deleteDrone(drone, slidingItem);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+  ////////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Drone Settings
+  ////////////////////////////////////////////////////////////////////////////////
+  /* Function to detect which direction user swiped and invokes appropriate function */
+  async swipeEvent(drone, slidingItem : IonItemSliding){
+    await slidingItem.getSlidingRatio()
+    .then((slidingRatio) => {
+      if(slidingRatio.valueOf() < 0) {
+        this.editDrone(drone, slidingItem);
+      } else if(slidingRatio.valueOf() > 0) {
+        this.presentDeleteConfirmation(drone, slidingItem);
+      }
+    });
+  }
+  
+  /* Function to modify existing drone settings */
+  editDrone(drone, slidingItem: IonItemSliding) {
+    this.router.navigate(['/tabs/tab2/edit-drone', drone.id]);
+    slidingItem.close();
+  }
+  
+  /* Function to permanently delete an existing drone */
+  deleteDrone(drone, slidingItem: IonItemSliding) {
+    this.droneDataService.deleteDrone(drone);
+    slidingItem.close();
+  }
+  ////////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Drone Status Checks
+  ////////////////////////////////////////////////////////////////////////////////
+  isOffline(drone) {
+    return drone.getState() === DroneState.OFFLINE ? true : false;
+  }
+  isOnline(drone) {
+    return drone.getState() === DroneState.ONLINE ? true : false;
+  }
+  isConnecting(drone) {
+    return drone.getState() === DroneState.CONNECTING ? true : false;
+  }
+  isConnected(drone) {
+    return drone.getState() === DroneState.CONNECTED ? true : false;
+  }
+  isArming(drone) {
+    return drone.getState() === DroneState.ARMING ? true : false;
+  }
+  isArmed(drone) {
+    return drone.getState() === DroneState.ARMED ? true : false;
+  }
+  isBusy(drone) {
+    return drone.getState() === DroneState.BUSY ? true : false;
+  }
+  ////////////////////////////////////////////////////////////////////////////////
+  onSelect( drone ) {
+    this.router.navigate(['/tabs/tab2/flight-session', drone.id]);
+  }
+
 }

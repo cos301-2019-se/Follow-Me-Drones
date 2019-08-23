@@ -1,0 +1,3 @@
+<div class="app-session-wrapper" *ngFor="let session of previousSessions; let i = index">
+	<app-session [sessionName]='session.getSessionName()' [isActive]='session.isActive()' [droneName]='session.droneName' [coverImage]='session.getFirstImage()' ></app-session>
+</div>

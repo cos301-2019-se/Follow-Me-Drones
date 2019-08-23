@@ -281,9 +281,9 @@ void send_json_custom(char const* send_buf, int port, int timeout)
 
         std::string content(send_buf);
         content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
-
-        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:8080/detection";
-        //std::cout << to_send << std::endl;
+        
+        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:" + std::__cxx11::to_string(port) + "/detection";
+        std::cout << to_send << std::endl;
 
         system(to_send.c_str());
 
@@ -294,7 +294,7 @@ void send_json_custom(char const* send_buf, int port, int timeout)
     }
 }
 
-void send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
+bool send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
 {
     try 
     {
@@ -310,6 +310,8 @@ void send_json(detection *dets, int nboxes, int classes, char **names, long long
             std::cout << "JSON data:" << std::endl;
             std::cout << send_buf << std::endl;
             std::cout << " JSON-stream sent. \n";
+
+            return true;
         }
         else
             std::cout << "No objects found" << std::endl;
@@ -320,6 +322,7 @@ void send_json(detection *dets, int nboxes, int classes, char **names, long long
     catch (...) {
         cerr << " Error in send_json() function \n";
     }
+    return false;
 }
 // ----------------------------------------
 

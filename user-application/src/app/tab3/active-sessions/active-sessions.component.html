@@ -1,0 +1,3 @@
+<div class="app-session-wrapper" *ngFor="let session of activeSessions">
+	<app-session [sessionName]='session.getSessionName()' [isActive]='session.isActive()' [droneName]='session.getDroneName()' [coverImage]='session.getFirstImage()' ></app-session>
+</div>

@@ -174,7 +174,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
 
     int count = 0;
-    if(!prefix && !dont_show){
+    if(!dont_show)
+    {
         int full_screen = 0;
         create_window_cv("Demo", full_screen, 1352, 1013);
     }
@@ -185,8 +186,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     {
         int src_fps = 25;
         src_fps = get_stream_fps_cpp_cv(cap);
-        output_video_writer =
-            create_video_writer(out_filename, 'D', 'I', 'V', 'X', src_fps, get_width_mat(det_img), get_height_mat(det_img), 1);
+        output_video_writer = create_video_writer(out_filename, 'D', 'I', 'V', 'X', src_fps, get_width_mat(det_img), get_height_mat(det_img), 1);
 
         //'H', '2', '6', '4'
         //'D', 'I', 'V', 'X'
@@ -199,7 +199,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
     double before = get_wall_time();
 
-    while(1){
+    while(1)
+    {
         ++count;
         {
             if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
@@ -209,7 +210,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             int local_nboxes = nboxes;
             detection *local_dets = dets;
 
-            //if (nms) do_nms_obj(local_dets, local_nboxes, l.classes, nms);    // bad results
+            // if (nms) do_nms_obj(local_dets, local_nboxes, l.classes, nms);    // bad results
             if (nms) do_nms_sort(local_dets, local_nboxes, l.classes, nms);
             
             printf("\033[2J");
@@ -217,20 +218,25 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             printf("\nFPS:%.1f\n",fps);
             printf("Objects:\n\n");
 
+            bool objectDetected = false;
             ++frame_id;
-            if (demo_json_port > 0) {
+            if (demo_json_port > 0)
+            {
                 int timeout = 400000;
-                send_json(local_dets, local_nboxes, l.classes, demo_names, frame_id, demo_json_port, timeout);
+                objectDetected = send_json(local_dets, local_nboxes, l.classes, demo_names, frame_id, demo_json_port, timeout);
             }
 
             draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
             free_detections(local_dets, local_nboxes);
 
-            if(!prefix){
-                if (!dont_show) {
+            if(!prefix)
+            {
+                if (!dont_show)
+                {
                     show_image_mat(show_img, "Demo");
                     int c = wait_key_cv(1);
-                    if (c == 10) {
+                    if (c == 10)
+                    {
                         if (frame_skip == 0) frame_skip = 60;
                         else if (frame_skip == 4) frame_skip = 0;
                         else if (frame_skip == 60) frame_skip = 4;
@@ -241,10 +247,33 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                         flag_exit = 1;
                     }
                 }
-            }else{
-                char buff[256];
-                sprintf(buff, "%s_%08d.jpg", prefix, count);
-                if(show_img) save_cv_jpg(show_img, buff);
+            }
+            else
+            {
+                if(objectDetected)
+                {
+                    char buff[256];
+                    sprintf(buff, "%s_%08d.jpg", prefix, count);
+                    if(show_img)
+                        save_cv_jpg(show_img, buff);
+                }
+
+                if (!dont_show)
+                {
+                    show_image_mat(show_img, "Demo");
+                    int c = wait_key_cv(1);
+                    if (c == 10)
+                    {
+                        if (frame_skip == 0) frame_skip = 60;
+                        else if (frame_skip == 4) frame_skip = 0;
+                        else if (frame_skip == 60) frame_skip = 4;
+                        else frame_skip = 0;
+                    }
+                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
+                    {
+                        flag_exit = 1;
+                    }
+                }
             }
 
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090

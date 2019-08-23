@@ -1,9 +1,38 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>
-      Tab Three
-    </ion-title>
-  </ion-toolbar>
+	<ion-toolbar>
+		<ion-title>Flight Sessions</ion-title>
+		<ion-buttons slot="end">
+			<ion-button>
+				<ion-list>
+					<ion-select interface="popover" (ionChange)="onContextChange($event.target.value)">
+						<ion-select-option value="all-drones" selected="true">All drones</ion-select-option>
+						<div *ngFor="let drone of drones;">
+							<ion-select-option [value]="drone.name">{{ drone.name }}</ion-select-option>
+						</div>
+					</ion-select>
+				</ion-list>
+			</ion-button>
+		</ion-buttons>
+	</ion-toolbar>
+	
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content> 
+	<ion-segment>
+		<ion-segment-button checked (click)="setAll()" value="all">
+			<ion-label>All</ion-label>
+		</ion-segment-button>
+		<ion-segment-button (click)="setPrevious()" value="previous">
+			<ion-label>Previous</ion-label>
+		</ion-segment-button>
+		<ion-segment-button (click)="setActive()" value="active">
+			<ion-label>Active</ion-label>
+		</ion-segment-button>
+	</ion-segment>
+
+	<app-all-sessions [allSessions]='sessions' *ngIf="isAll()"></app-all-sessions>
+	<app-active-sessions *ngIf="isActive()"></app-active-sessions>
+	<app-previous-sessions *ngIf="isPrevious()"></app-previous-sessions>
+
+
+</ion-content>

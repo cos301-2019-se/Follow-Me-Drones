@@ -2,30 +2,34 @@ sudo: required
 dist: xenial
 addons:
   firefox: latest-esr
-      
-language: node_js
-node_js:
-  - 10
 
 cache:
   directories:
     - './user-application/node_modules'
     - './server/node_modules'
 
-before_install:
-  - cd './user-application'
-
 services:
   - xvfb
 
-before_script:
-# - sudo ln -s /var/lib/dbus/machine-id /etc/machine-id
-  - npm install -g ionic cordova
-  - npm install
-  
+matrix:
+  include:
+    - language: node_js
+      node_js:
+        - "11"
+      before_install:
+        - cd './user-application'
+      install:
+        - npm install -g ionic cordova
+        - npm install
+      script:
+        - ng test --watch=false
 
-script:
-  - ng test --watch=false
-  - cd '../server'
-  - npm install
-  - npm test
+    - language: python
+      python:
+        - "3.7"  
+      before_install:
+        - cd './server'
+      install:
+        - pip install -r requirements.txt
+      script:
+        - python3 tests.py

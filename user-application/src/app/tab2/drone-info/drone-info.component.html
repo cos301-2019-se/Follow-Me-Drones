@@ -1,0 +1,33 @@
+<ion-content>
+  <form [formGroup]="droneForm">
+    <ion-item>
+      <ion-label>Drone Icon</ion-label>
+      <ion-avatar slot="end">
+        <img id='drone-image' src="./assets/drone-icons/drone-2.svg">
+      </ion-avatar>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label position="stacked">Drone Name</ion-label>
+      <ion-input id='drone-name' formControlName="droneName" ngControl="droneName" placeholder="Drone Name" clearInput="true" required></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label position="stacked">IP address</ion-label>
+      <ion-input id='drone-ipAddress' formControlName="droneIP" ngControl="droneIP" placeholder="X.X.X.X" clearInput="true" required></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label position="stacked">Connection Port</ion-label>
+      <ion-input id='drone-port' type="number" formControlName="dronePort" ngControl="dronePort" placeholder="1-65535" clearInput="true" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Comments</ion-label>
+      <ion-textarea id='drone-comments' formControlName="droneComments" ngControl="droneComments" placeholder="Comments" clearInput="true"></ion-textarea>
+    </ion-item>
+    
+    <ion-button id='submit' type="submit" (click)="submitDroneInfo()" color="primary" expand="block">Submit</ion-button>
+    <ion-button id='cancel' type="cancel" (click)="cancel()" color="danger" expand="block">Cancel</ion-button>
+  </form>
+</ion-content>

@@ -1,35 +1,148 @@
-
 <ion-header>
-  <ion-toolbar>
-	<ion-title>Drone Info</ion-title>
-  </ion-toolbar>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button defaultHref=""></ion-back-button>
+			<ion-title> {{ drone.name }}</ion-title>
+		</ion-buttons>	
+	</ion-toolbar>
 </ion-header>
 <ion-content>
-<div *ngIf="images || ImageIndex">
-    <ion-list>
-        <ion-img class="full-img" (click)="viewPhoto()" [src]="images[ImageIndex]"></ion-img>
-        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="armDrone()">Arm Drone</ion-button>
-        <ion-button expand="block" fill="outline" size="large" color="dark" (click)="returnHome()">Return Home</ion-button>
-		<ion-item lines="none">ID: {{ dronedata.name }}</ion-item>
-        <ion-item lines="none">Battery: 72%</ion-item>
-        <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item>
-    </ion-list>
 
-    <ion-footer>
-        <ion-slides loop slidesPerView="3">
-            <ion-slide ng-init="s = 0">
-                <ion-img (click)="updateIndex(0)" [src]="images[0]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 1">
-                <ion-img (click)="updateIndex(1)" [src]="images[1]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 2">
-                <ion-img (click)="updateIndex(2)" [src]="images[2]"></ion-img>
-            </ion-slide>
-            <ion-slide ng-init="s = 3">
-                <ion-img (click)="updateIndex(3)" [src]="images[3]"></ion-img>
-            </ion-slide>
-        </ion-slides>
-    </ion-footer>
-</div>
+	<div class="wrapper center-block">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingTwo">
+					<h4 class="panel-title">
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+							href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"
+							(click)="arrowToggle(arrowTwo);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowTwo" #arrowTwo></ion-icon>
+							Detection Images
+						</a>
+					</h4>
+				</div>
+				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+					<div class="panel-body">
+						<div class="flight-session-wrapper">
+							<div *ngIf="images || ImageIndex">
+
+								<!-- <ion-avatar class="avatar"> -->
+								<!-- 	<img [src]="getDroneIcon()"> -->
+								<!-- </ion-avatar> -->
+
+
+								<!-- Production -->
+								<ion-img class="full-img" (click)="viewPhoto()" [src]="getImageSource(activeImageIndex)"></ion-img>
+								<ion-slides loop slidesPerView="3">
+								    <ion-slide *ngFor="let image of imageArray; let i=index " ng-init="s = i">
+								        <ion-img  (click)="updateIndex(i)" [src]="getImageSource(i)"></ion-img>
+								    </ion-slide>
+								</ion-slides>
+								<!-- ========================================================================================================= -->
+								<!-- ========================================================================================================= -->
+
+								<!-- Testing -->
+								<!-- <ion-img class="full-img" (click)="viewPhoto()" [src]="images[activeImageIndex]"> -->
+								<!-- </ion-img> -->
+								<!-- <ion-slides loop slidesPerView="3"> -->
+								<!-- 	<ion-slide *ngFor="let image of images; let i=index " ng-init="s = i"> -->
+								<!-- 		<ion-img (click)="updateIndex(i)" [src]="image"></ion-img> -->
+								<!-- 	</ion-slide> -->
+								<!-- </ion-slides> -->
+								<!-- ========================================================================================================= -->
+
+								<!-- <ion-list> -->
+								<!--     <ion-item lines="none">Battery: 72%</ion-item> -->
+								<!--     <ion-item lines="none">Lat: -25.755710, Lon: 28.232592</ion-item> -->
+								<!-- </ion-list> -->
+
+
+								<!-- <ion-button expand="block" size="medium" color="success" (click)="returnHome()">Online</ion-button> -->
+								<!-- <ion-button expand="block" size="medium" color="primary" (click)="armDrone()">Connect</ion-button> -->
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingOne">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+						aria-expanded="false" aria-controls="collapseOne" (click)="arrowToggle(arrowOne);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowOne" #arrowOne></ion-icon>
+							Drone Connectivity
+						</a>
+					</h4>
+				</div>
+				<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+					<div class="panel-body">
+						<div class="button-and-icon-wrapper">
+							<!-- <ion-thumbnail>
+								<img class="avatar" [src]="getDroneIcon()">
+							</ion-thumbnail> -->
+							<ion-grid>
+								<ion-row>
+									<div class="ion-chip-wrapper">
+										<ion-col>
+											<ion-chip class="ion-chip ion-chip-large" color="success">
+												<ion-label color="success">Online</ion-label>
+											</ion-chip>
+										</ion-col>
+										<ion-col>
+											<ion-chip class="ion-chip ion-chip-large" color="primary">
+												<ion-label color="primary">Connect</ion-label>
+											</ion-chip>
+										</ion-col>
+									</div>
+								</ion-row>
+							</ion-grid>
+								
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingThree">
+					<h4 class="panel-title">
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+							href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"
+							(click)="arrowToggle(arrowThree);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowThree" #arrowThree></ion-icon>
+							Detection List
+						</a>
+					</h4>
+				</div>
+				<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+					<div class="panel-body">
+						<div class="detection-list-wrapper">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingFour">
+					<h4 class="panel-title">
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+							href="#collapseFour" aria-expanded="false" aria-controls="collapseFour"
+							(click)="arrowToggle(arrowFour);">
+							<ion-icon name="ios-arrow-down" class="arrow" id="arrowFour" #arrowFour></ion-icon>
+							Flight Path
+						</a>
+					</h4>
+				</div>
+				<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+					<div class="panel-body">
+						<div class="flight-path-wrapper">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
 </ion-content>
