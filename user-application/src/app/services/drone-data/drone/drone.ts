@@ -32,7 +32,7 @@ export class Drone {
     this.connected = false; // TODO: REMOVE
 
     this.socket = new DroneSocketService();
-    this.serverLocation = `https://${this.ipAddress}:${this.port}`;
+    this.serverLocation = `http://${this.ipAddress}:${this.port}`;
 
   }
 
@@ -128,7 +128,7 @@ export class Drone {
     this.port = port;
     this.ipAddress = ipAddress;
     this.comment = comment;
-    this.serverLocation = `https://${this.ipAddress}:${this.port}`;
+    this.serverLocation = `http://${this.ipAddress}:${this.port}`;
   }
 
   disconnectDrone() {

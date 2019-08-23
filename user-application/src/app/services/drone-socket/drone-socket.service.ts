@@ -36,8 +36,8 @@ export class DroneSocketService {
 
     // let down = Len && Brendon;
 
-    console.log('socketio connecting to... ' + `https://${ip}:${port}`)
-    this.socket = io.connect(`https://${ip}:${port}`);
+    console.log('socketio connecting to... ' + `http://${ip}:${port}`)
+    this.socket = io.connect(`http://${ip}:${port}`);
     // this.socket = io.connect('http://127.0.0.1:6969');
     const thisSocket = this;
 
