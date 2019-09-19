@@ -1,160 +1,201 @@
-from pyparrot.Bebop import Bebop
-# import threading
-from pynput import keyboard
-from termios import tcflush, TCIFLUSH
-import math
-import sys
+import os
+import csv
 
-# Movement variables
-_dx = 0
-_dy = 0
-_dz = 0
-_rad = 0
+import olympe
+import olympe_deps as od
 
-# Key press functions
-def on_press(key):
-    global _dx
-    global _dy
-    global _dz
-    global _rad
+from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff
+from olympe.messages.ardrone3.Animations import Flip
+from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
+from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
+from olympe.messages.battery import health
 
-    try:
-        # print('alphanumeric key {0} pressed'.format(key.char))
+"""
+Basic commands
 
-        # Moving Forward / Back / Left / Right
-        # w
-        if key.char == 'w':
-            print('Moving forward')
-            _bebop.fly_direct(roll=0, pitch=75, yaw=0, vertical_movement=0, duration=0.005)
-            # _dx = 1
-        
-        if key.char == 's':
-            print('Moving backward')
-            _bebop.fly_direct(roll=0, pitch=-75, yaw=0, vertical_movement=0, duration=0.005)
-            # _dx = -1
-        
-        if key.char == 'q':
-            print('Strafe left')
-            _bebop.fly_direct(roll=-75, pitch=-0, yaw=0, vertical_movement=0, duration=0.005)
-            #_dy = -1
-        
-        if key.char == 'e':
-            print('Strafe right')
-            _bebop.fly_direct(roll=75, pitch=-0, yaw=0, vertical_movement=0, duration=0.005)
-            #_dy = 1
+drone = olympe.Drone("192.168.42.1")
+drone.connection()
+drone(TakeOff()).wait()
+drone(moveBy(10, 0, 0, 0)).wait()
+drone(PCMD(flag, roll, pitch, yaw, gaz, timestampAndSeqNum, _timeout=10, _no_expect=False, _float_tol=(1e-07, 1e-09)))
+drone(Landing()).wait()
+drone.disconnection()
+"""
 
-        # FLIPS!!!!!!
-        # shift+w
-        if key.char == 'W':
-            print('forward flip')
-            _bebop.flip('front')
+class Drone:
+    def __init__(self):
+        # make bebop object
+        # Debug levels
+        # 4 - debug
+        # 3 - info
+        # 2 - warning
+        # 1 - error
+        # 0 - critical
+        self.bebop = olympe.Drone("192.168.42.1", loglevel=2, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
+        self.stream_dir = os.path.join(os.getcwd(), 'stream/')
 
-        # shift+q
-        if key.char == 'Q':
-            print('left flip')
-            _bebop.flip('left')
+        if not os.path.exists(self.stream_dir):
+            os.mkdir('stream')
 
-        # shift+e
-        if key.char == 'E':
-            print('right flip')
-            _bebop.flip('right')
+        print("Olympe streaming output dir: {}".format(self.stream_dir))
 
-        if key.char == 'S':
-            print('backward flip')
-            _bebop.flip('back')
-            
-        # Rotating
-        if key.char == 'a':
-            print('Rotating left')
-            _bebop.fly_direct(roll=0, pitch=0, yaw=-100, vertical_movement=0, duration=0.005)
-            #_rad = math.radians(15)
-        
-        if key.char == 'd':
-            print('Rotating right')
-            _bebop.fly_direct(roll=0, pitch=0, yaw=100, vertical_movement=0, duration=0.005)
+        self.h264_frame_stats = []
+        self.h264_stats_file = open(os.path.join(self.stream_dir, 'h264_stats.csv'), 'w+')
+        self.h264_stats_writer = csv.DictWriter(self.h264_stats_file, ['fps', 'bitrate'])
+        self.h264_stats_writer.writeheader()
 
-        # print('Moving:', _dx, _dy, _dz, _rad)
-        # _bebop.move_relative(_dx, _dy, _dz, _rad)
-        
-    except AttributeError:
-        print('special key {0} pressed'.format(key))
+    # ============================================================================
+    #                             Drone functions
+    # ============================================================================
+    def connect_drone(self, liveStream):
+        # Connect the the drone
+        success = self.bebop.connection()
 
-        # Vertical controls
-        # ctrl
-        if key == keyboard.Key.ctrl:
-            print('Moving down')
-            _bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-50, duration=0.005)
+        if not success:
+            return False
 
-        # space
-        if key == keyboard.Key.space:
-            print('Moving up')
-            _bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=50, duration=0.005)
+        # You can record the video stream from the drone if you plan to do some
+        # post processing.
+        self.bebop.set_streaming_output_files(
+            h264_data_file=os.path.join(self.stream_dir, 'h264_data.264'),
+            h264_meta_file=os.path.join(self.stream_dir, 'h264_metadata.json'),
+            # Here, we don't record the (huge) raw YUV video stream
+            # raw_data_file=os.path.join(self.stream_dir,'raw_data.bin'),
+            # raw_meta_file=os.path.join(self.stream_dir,'raw_metadata.json'),
+        )
 
-        # _bebop.move_relative(_dx, _dy, _dz, _rad)
+        # Setup your callback functions to do some live video processing
+        if(liveStream):
+            self.bebop.set_streaming_callbacks(raw_cb=self.yuv_frame_cb, h264_cb=self.h264_frame_cb)
+        else:
+            self.bebop.set_streaming_callbacks(h264_cb=self.h264_frame_cb)
 
-def on_release(key):
-    tcflush(sys.stdin, TCIFLUSH)
-    print('{0} released'.format(key))
-    if key == keyboard.Key.esc:
-        # Stop listener
-        return False
+        return True
 
-    _dx = 0
-    _dy = 0
-    _dz = 0
-    _rad = 0
+    def start_video_stream(self):
+        # Start video streaming
+        self.bebop.start_video_streaming()
 
-# make my bebop object
-_bebop = Bebop()
+    def disconnect_drone(self):
+        # Land if the drone is flying
+        flyingState = self.getFlyingState()
 
-# connect to the bebop
-success = _bebop.connect(5)
-# success = True
+        if flyingState != 'landed':
+            self.land_drone()
 
-if (success):
-    try:
-        # start up the video
-        print('Turning on the video stream')
-        _bebop.start_video_stream()
+        # Properly stop the video stream and disconnect
+        self.bebop.stop_video_streaming()
+        self.bebop.disconnection()
 
-        while(True):
-            _bebop.ask_for_state_update()
-            print('\033[2J') # Clear screen
-            print('\033[00H') # Move cursor to top left
-            print('{0}% ({1}) Command: '.format(_bebop.sensors.battery, _bebop.sensors.flying_state), end='')
+    def yuv_frame_cb(self, yuv_frame):
+        """
+        This function will be called by Olympe for each decoded YUV frame.
 
-            # print('Command: ', end='')
-            _option = input()
-            
-            if _option == 'to': # take-off
-                # Create a virtual dome in which the drone must remain
-                _bebop.set_max_altitude(2.5)
-                _bebop.set_max_distance(10)
-                _bebop.enable_geofence(1)
-                _bebop.set_max_tilt_rotation_speed(300)
-                _bebop.set_max_rotation_speed(200)
+            :type yuv_frame: olympe.VideoFrame
+        """
+        # the VideoFrame.info() dictionary contains some useful informations
+        # such as the video resolution
+        info = yuv_frame.info()
+        height, width = info["yuv"]["height"], info["yuv"]["width"]
 
-                print('Taking off...', end='')
-                _bebop.safe_takeoff(5)
-            elif _option == 'x': # land
-                print('Landing...', end='')
-                _bebop.safe_land(5)
-                print('Done!')
-            elif _option == 'm':
-                # Collect events until released
-                with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-                    listener.join()
-                tcflush(sys.stdin, TCIFLUSH)
-            elif _option == 'quit':
-                print('Bye')
-                break
+        # convert pdraw YUV flag to OpenCV YUV flag
+        cv2_cvt_color_flag = {
+            olympe.PDRAW_YUV_FORMAT_I420: cv2.COLOR_YUV2BGR_I420,
+            olympe.PDRAW_YUV_FORMAT_NV12: cv2.COLOR_YUV2BGR_NV12,
+        }[info["yuv"]["format"]]
+
+        # yuv_frame.as_ndarray() is a 2D numpy array with the proper "shape"
+        # i.e (3 * height / 2, width) because it's a YUV I420 or NV12 frame
+
+        # Use OpenCV to convert the yuv frame to RGB
+        cv2frame = cv2.cvtColor(yuv_frame.as_ndarray(), cv2_cvt_color_flag)
+
+        # Use OpenCV to show this frame
+        cv2.imshow("Olympe Streaming Example", cv2frame)
+        cv2.waitKey(1)  # please OpenCV for 1 ms...
+
+    def h264_frame_cb(self, h264_frame):
+        """
+        This function will be called by Olympe for each new h264 frame.
+
+            :type yuv_frame: olympe.VideoFrame
+        """
+
+        # Get a ctypes pointer and size for this h264 frame
+        frame_pointer, frame_size = h264_frame.as_ctypes_pointer()
+
+        # For this example we will just compute some basic video stream stats
+        # (bitrate and FPS) but we could choose to resend it over an another
+        # interface or to decode it with our preferred hardware decoder..
+
+        # Compute some stats and dump them in a csv file
+        info = h264_frame.info()
+        frame_ts = info["ntp_raw_timestamp"]
+        if not bool(info["h264"]["is_sync"]):
+            if len(self.h264_frame_stats) > 0:
+                while True:
+                    start_ts, _ = self.h264_frame_stats[0]
+                    if (start_ts + 1e6) < frame_ts:
+                        self.h264_frame_stats.pop(0)
+                    else:
+                        break
+            self.h264_frame_stats.append((frame_ts, frame_size))
+            h264_fps = len(self.h264_frame_stats)
+            h264_bitrate = (
+                8 * sum(map(lambda t: t[1], self.h264_frame_stats)))
+            self.h264_stats_writer.writerow(
+                {'fps': h264_fps, 'bitrate': h264_bitrate})
+
+    def postprocessing(self):
+        # Convert the raw .264 file into an .mp4 file
+        h264_filepath = os.path.join(self.stream_dir, 'h264_data.264')
+        mp4_filepath = os.path.join(self.stream_dir, 'h264_data.mp4')
+        subprocess.run(
+            shlex.split('ffmpeg -i {} -c:v copy {}'.format(
+                h264_filepath, mp4_filepath)),
+            check=True
+        )
+
+        # Replay this MP4 video file using the default video viewer (VLC?)
+        # subprocess.run(
+        #     shlex.split('xdg-open {}'.format(mp4_filepath)),
+        #     check=True
+        # )
+
+    def getFlyingState(self):
+        try:
+            state = self.bebop.get_state(FlyingStateChanged)['state']
+
+            if state is FlyingStateChanged_State.landed:
+                return 'landed'
+            elif state is FlyingStateChanged_State.hovering:
+                return 'hovering'
+            elif state is FlyingStateChanged_State.landing:
+                return 'landing'
+            elif state is FlyingStateChanged_State.takingoff:
+                return 'taking off'
+            elif state is FlyingStateChanged_State.flying:
+                return 'flying'
             else:
-                print('Invalid command')
-    except KeyboardInterrupt:
-        print('Interrupt received... Bye!')
+                return state
+        except:
+            return 'uninitialized'
 
-    # disconnect nicely so we don't need a reboot
-    _bebop.safe_land(5)
-    _bebop.disconnect()
-else:
-    print('Error connecting to bebop.  Retry')
+    def getBatteryPercentage(self):
+        try:
+            return self.bebop.query_state('battery')['common.CommonState.BatteryStateChanged']['percent']
+        except:
+            return 'uninitialized'
+
+    def launch_drone(self):
+        print('Taking off...', end='', flush=True)
+        self.bebop(TakeOff()).wait()
+        print('Done!')
+
+    def land_drone(self):
+        print('Landing...', end='', flush=True)
+        self.bebop(Landing()).wait()
+        print('Done!')
+
+    def end_session(self):
+        self.h264_stats_file.close()
