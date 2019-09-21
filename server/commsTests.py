@@ -9,9 +9,9 @@ import base64
 import time
 
 # Drone stuff
-from drone import Drone
+# from drone import Drone
 
-bebop = Drone()
+# bebop = Drone()
 
 # Port for the server
 port = 42069
@@ -45,13 +45,13 @@ def connect():
         raise ConnectionRefusedError('Unauthorized!')
     else:
         # Establish connection to drone
-        if bebop.connect_drone(liveStream = False):
-            currentConnections += 1
-            print('\nApp connected with ID', request.sid)
-            print('Current connections ->', currentConnections, '\n')
-        else:
-            raise ConnectionRefusedError('Failure')
-            emit('error')
+        # if bebop.connect_drone(liveStream = False):
+        currentConnections += 1
+        print('\nApp connected with ID', request.sid)
+        print('Current connections ->', currentConnections, '\n')
+        # else:
+            # raise ConnectionRefusedError('Failure')
+            # emit('error')
 
 def stopProcesses():
     global darknet_command
@@ -73,10 +73,10 @@ def stopProcesses():
 @io.on('disconnect')
 def disconnect():
     global currentConnections
-    global bebop
+    # global bebop
 
     # Disconnect drone
-    bebop.disconnect_drone()
+    # bebop.disconnect_drone()
     
     currentConnections -= 1
     print('App disconnected with ID', request.sid)
@@ -89,7 +89,7 @@ def disconnect():
 def arm():
     global darknet_command
     global ffmpeg_command
-    global bebop
+    # global bebop
 
     print('Starting object recognition...', end='')
 
@@ -126,32 +126,18 @@ def arm():
             break
 
     if detection_armed:
-        # Launch the drone
-
-        # Start video streaming from drone to .264 file
-        bebop.start_video_stream()
-
-        # Wait for file headers to be set correctly before continuing
-        time.sleep(1) # Hackerman
-
-        # start ffmpeg to restream the .264 file to udp
-        # ffmpeg -re -i stream/h264_data.264 -c copy -movflags frag_keyframe+empty_moov -max_muxing_queue_size 9999 -f h264 udp://127.0.0.1:5123
-        ffmpeg = ['/bin/ffmpeg', '-re', '-i', 'stream/h264_data.264', '-c', 'copy', '-f', 'h264', 'udp://127.0.0.1:5123']
-
-        ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
-        bebop.launch_drone()
+        pass
     else:
         print('Something went wrong arming detection...')
 
 # Disarm event
 @io.on('disarm_drone')
 def disarm():
-    global bebop
+    # global bebop
 
     stopProcesses()
 
-    bebop.land_drone()
+    # bebop.land_drone()
 
     emit('drone_disarmed')
 
@@ -321,12 +307,12 @@ def startup_process():
     pass
 
 def shutdown_process():
-    global bebop
+    # global bebop
 
     print('Beginning shutdown process... \n')
 
     # End session with drone
-    bebop.end_session()
+    # bebop.end_session()
 
     # Create an encrypted zip file of all the detections
     print('Encrypting all detection images... ', end='', flush=True)

@@ -126,8 +126,6 @@ def arm():
             break
 
     if detection_armed:
-        # Launch the drone
-
         # Start video streaming from drone to .264 file
         bebop.start_video_stream()
 
@@ -140,6 +138,7 @@ def arm():
 
         ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
+        # Launch the drone
         bebop.launch_drone()
     else:
         print('Something went wrong arming detection...')
