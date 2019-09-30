@@ -4,7 +4,7 @@ import csv
 import olympe
 import olympe_deps as od
 
-from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff
+from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff, NavigateHome
 from olympe.messages.ardrone3.Animations import Flip
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
@@ -33,16 +33,14 @@ class Drone:
         # 0 - critical
         self.bebop = olympe.Drone("192.168.42.1", loglevel=2, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
         self.stream_dir = os.path.join(os.getcwd(), 'stream/')
+        
+        self.is_connected = False
+        self.is_streaming = False
 
         if not os.path.exists(self.stream_dir):
             os.mkdir('stream')
 
         print("Olympe streaming output dir: {}".format(self.stream_dir))
-
-        self.h264_frame_stats = []
-        self.h264_stats_file = open(os.path.join(self.stream_dir, 'h264_stats.csv'), 'w+')
-        self.h264_stats_writer = csv.DictWriter(self.h264_stats_file, ['fps', 'bitrate'])
-        self.h264_stats_writer.writeheader()
 
     # ============================================================================
     #                             Drone functions
@@ -53,6 +51,8 @@ class Drone:
 
         if not success:
             return False
+
+        self.is_connected = True
 
         # You can record the video stream from the drone if you plan to do some
         # post processing.
@@ -73,19 +73,37 @@ class Drone:
         return True
 
     def start_video_stream(self):
+        self.h264_frame_stats = []
+        self.h264_stats_file = open(os.path.join(self.stream_dir, 'h264_stats.csv'), 'w+')
+        self.h264_stats_writer = csv.DictWriter(self.h264_stats_file, ['fps', 'bitrate'])
+        self.h264_stats_writer.writeheader()
+
         # Start video streaming
         self.bebop.start_video_streaming()
 
+        self.is_streaming = True
+
+    def stop_video_stream(self):
+        if self.is_streaming:
+            # Properly stop the video stream
+            self.bebop.stop_video_streaming()
+            self.h264_stats_file.close()
+            self.is_streaming = False
+
     def disconnect_drone(self):
-        # Land if the drone is flying
-        flyingState = self.getFlyingState()
+        if self.is_connected():
+            # Land if the drone is flying
+            flyingState = self.getFlyingState()
+            
+            if flyingState != 'landed':
+                self.go_home()
+                self.land_drone()
 
-        if flyingState != 'landed':
-            self.land_drone()
+            # Properly stop the video stream and disconnect
+            self.stop_video_stream()
+            self.bebop.disconnection()
 
-        # Properly stop the video stream and disconnect
-        self.bebop.stop_video_streaming()
-        self.bebop.disconnection()
+            self.is_connected = False
 
     def yuv_frame_cb(self, yuv_frame):
         """
@@ -197,5 +215,7 @@ class Drone:
         self.bebop(Landing()).wait()
         print('Done!')
 
-    def end_session(self):
-        self.h264_stats_file.close()
+    def go_home(self):
+        print('ET going home...', end='', flush=True)
+        self.bebop(NavigateHome(1)).wait() # Start navigating home
+        print('Done!')

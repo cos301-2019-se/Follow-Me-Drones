@@ -13,6 +13,10 @@ from drone import Drone
 
 bebop = Drone()
 
+# Session time, used for directory names
+# Initialised when drone is armed
+session_time = False
+
 # Port for the server
 port = 42069
 host = '0.0.0.0'
@@ -20,6 +24,11 @@ host = '0.0.0.0'
 # Flask app
 app = Flask(__name__)
 CORS(app)
+
+# Filter global variables
+lastDetectedFrame = 0
+previousDetections = []
+newDetections = []
 
 # ============================================================================
 #                           Socket for the app
@@ -58,12 +67,13 @@ def stopProcesses():
     global ffmpeg_command
 
     # If the detection is running and the app disconnects, turn it off
-    if darknet_command or ffmpeg_command:
+    if darknet_command:
         print('Turning off object detection...', end='')
         darknet_command.kill()
         darknet_command = False
         print('Done!')
 
+    if ffmpeg_command:
         print('Turning off ffmpeg stream...', end='')
         ffmpeg_command.kill()
         ffmpeg_command = False
@@ -82,6 +92,7 @@ def disconnect():
     print('App disconnected with ID', request.sid)
     print('Current connections ->', currentConnections)
 
+    # Stop the ffmpeg and darknet processes
     stopProcesses()
 
 # Arming event
@@ -90,6 +101,8 @@ def arm():
     global darknet_command
     global ffmpeg_command
     global bebop
+    global session_time
+    session_time = time.strftime('%d%h%Y')
 
     print('Starting object recognition...', end='')
 
@@ -106,7 +119,14 @@ def arm():
     
     # Drone stream
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/bebop.sdp -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']#, '-dont_show']
+    
+    # will only fail if the directory already exists (i.e. drone armed, disarmed and armed again in same session)
+    try:
+        os.mkdir('../../detections/' + session_time)
+    except:
+        pass
+
+    cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
 
     darknet_command = subprocess.Popen(cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
@@ -150,14 +170,18 @@ def disarm():
 
     stopProcesses()
 
+    # land the drone at its home location and stop the video stream
+    bebop.go_home()
     bebop.land_drone()
+    bebop.stop_video_stream()
 
     emit('drone_disarmed')
 
 # Return home event
 @io.on('return-home')
 def ETGoHome():
-    pass
+    global bebop
+    bebop.go_home()
 
 # Default GET, should never happen
 @app.route('/', methods=["GET"])
@@ -175,7 +199,8 @@ def ping():
 
 # Converts the image in detections/ to base64
 def convertImageToBase64(image_id):
-    img = '../object-recognition/detections/' + image_id
+    global session_time
+    img = '../object-recognition/detections/' + session_time + '/' + image_id
 
     with open(img, 'rb') as img_file:
         return str(base64.b64encode(img_file.read()))
@@ -196,11 +221,6 @@ def alertAppOfDetection(frame_id, detection):
     img = 'img_' + str(frame_id).zfill(8) + '.jpg'
 
     io.emit('detection', {'detection': detection, 'image': img})
-
-# Filter global variables
-lastDetectedFrame = 0
-previousDetections = []
-newDetections = []
 
 # Endpoint for POST requests alerting the server of a detection
 @app.route('/detection', methods=['POST'])
@@ -269,9 +289,9 @@ def detection():
                 if not animalAlreadyDetected:
                     print('\n', '\033[36m', 'New detection!', '\033[37m') # Blue writing
                     print('\tFrame ->', detection['frame_id'])
-                    print('\tHerd of ->', detectedAnimal, '\n')
+                    print('\tMultiple ->', detectedAnimal, '\n')
 
-                    alertAppOfDetection(detection['frame_id'], 'herd of ' + detectedAnimal)
+                    alertAppOfDetection(detection['frame_id'], 'multiple ' + detectedAnimal + ' detected')
 
                 # Create a new list of the currently detected animals, with herd flag set to true
                 newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': True})
@@ -313,42 +333,49 @@ def detection():
 #                  Print the logo and run socket/server
 # ============================================================================
 
-def zipdir(directory, password):
-    subprocess.call(['7zr', 'a', '-mem=AES256', '-p' + password, '-y', time.strftime('%Y%m%d%h') + '-detections.zip', directory + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+def zipdir(session_dir, password):
+    subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def startup_process():
     pass
 
 def shutdown_process():
     global bebop
+    global session_time
 
     print('Beginning shutdown process... \n')
 
     # End session with drone
-    bebop.end_session()
+    bebop.stop_video_stream()
+    bebop.disconnect_drone()
 
-    # Create an encrypted zip file of all the detections
-    print('Encrypting all detection images... ', end='', flush=True)
+    if session_time:
+        # Create an encrypted zip file of all the detections
+        print('Encrypting all detection images... ', end='', flush=True)
 
-    os.chdir('../object-recognition/')
-    
-    # Create an encrypted zip of the files
-    zipdir('detections', 'Capstone69')
+        os.chdir('../object-recognition/detections')
+        
+        # Create an encrypted zip of the files
+        zipdir(session_time, 'Capstone69')
 
-    print('Done!')
+        print('Done!')
 
-    # Delete all the unencrypted images
-    print('Deleting all unencrypted detection images... ', end='', flush=True)
+        # Delete all the unencrypted images
+        print('Deleting all unencrypted detection images... ', end='', flush=True)
 
-    os.chdir('detections/')
+        os.chdir(session_time)
 
-    files=glob.glob('*.jpg')
-    for filename in files:
-        os.remove(filename)
+        files=glob.glob('*.jpg')
+        for filename in files:
+            os.remove(filename)
 
-    print('Done!')
+        os.chdir('../')
 
-    os.chdir('../../server/')
+        os.rmdir(session_time)
+
+        print('Done!')
+
+        os.chdir('../../server/')
 
     # Stop the server
     io.emit('disconnect')
