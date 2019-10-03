@@ -8,6 +8,8 @@ from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, Us
 from olympe.messages.ardrone3.Animations import Flip
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
+from olympe.messages.ardrone3.PilotingSettings import MaxDistance, NoFlyOverMaxDistance
+from olympe.enums.ardrone3.Piloting import Circle_Direction
 from olympe.messages.battery import health
 
 """
@@ -70,6 +72,10 @@ class Drone:
         else:
             self.bebop.set_streaming_callbacks(h264_cb=self.h264_frame_cb)
 
+        # Create a geofence that the drone must remain within
+        self.bebop(MaxDistance(10)) # The drone won't fly over 10m away
+        self.bebop(NoFlyOverMaxDistance(1))
+        
         return True
 
     def start_video_stream(self):
@@ -91,7 +97,7 @@ class Drone:
             self.is_streaming = False
 
     def disconnect_drone(self):
-        if self.is_connected():
+        if self.is_connected:
             # Land if the drone is flying
             flyingState = self.getFlyingState()
             
@@ -208,6 +214,8 @@ class Drone:
     def launch_drone(self):
         print('Taking off...', end='', flush=True)
         self.bebop(TakeOff()).wait()
+        self.bebop(moveBy(0, 3, 0, 0)).wait()
+        circle()
         print('Done!')
 
     def land_drone(self):
@@ -217,5 +225,10 @@ class Drone:
 
     def go_home(self):
         print('ET going home...', end='', flush=True)
-        self.bebop(NavigateHome(1)).wait() # Start navigating home
+        # Start navigating home
+        self.bebop(NavigateHome(1)).wait()
         print('Done!')
+
+    def circle(self):
+        # Start circling in a clockwise direction
+        self.bebop(Circle(Circle_Direction.CW))
