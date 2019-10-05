@@ -36,6 +36,13 @@ export class FlightSessionController {
 
 
   }
+  getSessionByUUID(uuid): FlightSession {
+    const allSessions = this.getAllSessions();
+    console.log('getting them all');
+    console.log(allSessions);
+    const session = allSessions.filter( sesh => sesh.sessionID === uuid);
+    return session[0];
+  }
 
   getCurrentSession(uuid) {
     if (this.activeSessions.get(uuid) !== undefined) {

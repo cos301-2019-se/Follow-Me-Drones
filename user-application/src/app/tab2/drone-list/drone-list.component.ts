@@ -31,7 +31,7 @@ export class DroneListComponent implements AfterViewInit {
               public modalController: ModalController,
               public droneDataService: DroneDataService,
               public flightSessionController: FlightSessionController,
-              public alertController : AlertController,
+              public alertController: AlertController,
               public router: Router
               ) {
 

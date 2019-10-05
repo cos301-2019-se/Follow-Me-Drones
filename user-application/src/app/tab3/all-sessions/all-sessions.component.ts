@@ -1,6 +1,7 @@
 import { Component, OnInit, Input} from '@angular/core';
 import { FlightSessionController } from '../../services/flight-session-controller/flight-session-controller';
 import { FlightSession } from '../../services/flight-session/flight-session';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -10,22 +11,14 @@ import { FlightSession } from '../../services/flight-session/flight-session';
 })
 export class AllSessionsComponent implements OnInit {
   @Input() allSessions: FlightSession [] = [];
-  constructor( private flightSessions: FlightSessionController) {
+  constructor(
+              private flightSessions: FlightSessionController,
+              public router: Router
+  ) {
     console.log(this.allSessions);
-
-
-    // this.allSessions = this.flightSessions.getAllSessions();
-
-    // console.log(this.allSessions);
-
-    // const mock1 = new FlightSession();
-    // mock1.setSessionName('Sunday Morning');
-    // mock1.active = true;
-    // const mock2 = new FlightSession();
-    // mock2.setSessionName('Monday Afternoon');
-
-    // this.allSessions.push( mock1 );
-    // this.allSessions.push( mock2 );
+  }
+  navigateTo(session) {
+    this.router.navigate(['/tabs/tab3/detailed-session', session.getID()]);
   }
 
   ngOnInit() {}
