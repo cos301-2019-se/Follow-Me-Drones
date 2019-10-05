@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 import { UUID } from 'angular2-uuid';
 import {Validators, FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
 
 @Component({
   selector: 'app-drone-info',
@@ -41,7 +42,6 @@ export class DroneInfoComponent implements OnInit {
 
     if ( route.snapshot.routeConfig.path !== 'new-drone' ) {
       this.drone = dronesData.getDrone(route.snapshot.paramMap.get('drone'));
-      console.log(this.drone);
       this.state = DroneInfoState.EDIT;
       this.droneForm.controls['droneName'].setValue(this.drone.name);
       this.droneForm.controls['dronePort'].setValue(this.drone.port);
@@ -54,17 +54,24 @@ export class DroneInfoComponent implements OnInit {
 
   submitDroneInfo(): void {
     if (this.state === DroneInfoState.ADD_NEW) {
-      console.log('Add new');
       const name = this.droneForm.value['droneName'];
       const port = this.droneForm.value['dronePort'];
       const droneIP = this.droneForm.value['droneIP'];
       const comment = this.droneForm.value['droneComments'];
-      this.dronesData.addNewDrone(new Drone( UUID.UUID() , name, port, droneIP, './assets/drone-icons/drone-1.svg', comment  ));
+      const tempDrone = new  Drone( UUID.UUID() , name, port, droneIP, './assets/drone-icons/drone-1.svg', comment  );
+      tempDrone.serverOnline( (online) => {
+        if (online) {
+          tempDrone.setDroneState(DroneState.ONLINE);
+        } else {
+          tempDrone.setDroneState(DroneState.OFFLINE);
+        }
+      });
+
+      this.dronesData.addNewDrone(tempDrone);
 
       this.router.navigate(['/tabs/tab2/']);
     } else if ( this.state === DroneInfoState.EDIT) {
       // TODO: Check if drone is in active session. If it is the user can't edit the information
-      console.log('Edit!');
       const newName = this.droneForm.value['droneName'];
       const newPort = this.droneForm.value['dronePort'];
       const newIpAddress = this.droneForm.value['droneIP'];
