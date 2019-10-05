@@ -320,12 +320,12 @@ if __name__ == "__main__":
     # Start the video stream
     if magic.start():
         # Arm the drone
-        # magic.arm()
+        magic.arm()
         # Perform some live video processing while the drone is flying
         magic.fly()
         # Stop the video stream
-        # magic.stop()
+        magic.stop()
         # Recorded video stream postprocessing
-        # magic.postprocessing()
+        magic.postprocessing()
     else:
         print('Failed to connect to the drone')

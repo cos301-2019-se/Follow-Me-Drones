@@ -62,23 +62,6 @@ def connect():
             raise ConnectionRefusedError('Failure')
             emit('error')
 
-def stopProcesses():
-    global darknet_command
-    global ffmpeg_command
-
-    # If the detection is running and the app disconnects, turn it off
-    if darknet_command:
-        print('Turning off object detection...', end='')
-        darknet_command.kill()
-        darknet_command = False
-        print('Done!')
-
-    if ffmpeg_command:
-        print('Turning off ffmpeg stream...', end='')
-        ffmpeg_command.kill()
-        ffmpeg_command = False
-        print('Done!')
-
 # Disconnection event
 @io.on('disconnect')
 def disconnect():
@@ -128,7 +111,7 @@ def arm():
 
     cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
 
-    darknet_command = subprocess.Popen(cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    darknet_command = subprocess.Popen(cmd, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
     # Move back into the server directory
     os.chdir('../../../server/')
@@ -183,6 +166,21 @@ def ETGoHome():
     global bebop
     bebop.go_home()
 
+# Return home event
+@io.on('location-update')
+def locationUpdate():
+    global bebop
+
+    if bebop.getBatteryPercentage <= 15:
+        bebop.go_home()
+        bebop.land_drone()
+
+        io.emit('battery-low')
+    else:
+        latitude = request.get_json()['location']['latitude']
+        longitude = request.get_json()['location']['longitude']
+        bebop.newCenterLocation(latitude, longitude)
+
 # Default GET, should never happen
 @app.route('/', methods=["GET"])
 def index():
@@ -192,6 +190,23 @@ def index():
 @app.route('/ping', methods=["GET"])
 def ping():
     return '[{"pong"}]', 200
+
+def stopProcesses():
+    global darknet_command
+    global ffmpeg_command
+
+    # If the detection is running and the app disconnects, turn it off
+    if darknet_command:
+        print('Turning off object detection...', end='')
+        darknet_command.kill()
+        darknet_command = False
+        print('Done!')
+
+    if ffmpeg_command:
+        print('Turning off ffmpeg stream...', end='')
+        ffmpeg_command.kill()
+        ffmpeg_command = False
+        print('Done!')
 
 # ============================================================================
 #                             Handling images

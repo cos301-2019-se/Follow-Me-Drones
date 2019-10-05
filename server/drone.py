@@ -4,7 +4,9 @@ import csv
 import olympe
 import olympe_deps as od
 
-from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff, NavigateHome
+from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff, NavigateHome, Circle, moveTo
+from olympe.messages.ardrone3.GPSSettings import ReturnHomeMinAltitude, HomeType
+from olympe.enums.ardrone3.GPSSettings import HomeType_Type
 from olympe.messages.ardrone3.Animations import Flip
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
@@ -38,6 +40,8 @@ class Drone:
         
         self.is_connected = False
         self.is_streaming = False
+
+        self.hover_altitude = 3
 
         if not os.path.exists(self.stream_dir):
             os.mkdir('stream')
@@ -73,9 +77,11 @@ class Drone:
             self.bebop.set_streaming_callbacks(h264_cb=self.h264_frame_cb)
 
         # Create a geofence that the drone must remain within
-        self.bebop(MaxDistance(10)) # The drone won't fly over 10m away
+        self.bebop(MaxDistance(20)) # The drone won't fly over 20m away
         self.bebop(NoFlyOverMaxDistance(1))
-        
+        self.bebop(ReturnHomeMinAltitude(10)) # When the drone flies home, it will make sure to be above 10m first
+        self.bebop(HomeType(HomeType_Type.TAKEOFF)) # Set the home to be where the drone took off
+
         return True
 
     def start_video_stream(self):
@@ -211,11 +217,19 @@ class Drone:
         except:
             return 'uninitialized'
 
+    def circle(self):
+        # Start circling in a clockwise direction
+        self.bebop(Circle(Circle_Direction.CW))
+
+    def newCenterLocation(self, latitude, longitude):
+        self.bebop(moveTo(latitude, longitude, self.hover_altitude))
+        self.circle()
+
     def launch_drone(self):
         print('Taking off...', end='', flush=True)
-        self.bebop(TakeOff()).wait()
-        self.bebop(moveBy(0, 3, 0, 0)).wait()
-        circle()
+        # self.bebop(TakeOff()).wait()
+        # self.bebop(moveBy(0, self.hover_altitude, 0, 0)).wait()
+        # self.circle()
         print('Done!')
 
     def land_drone(self):
@@ -228,7 +242,3 @@ class Drone:
         # Start navigating home
         self.bebop(NavigateHome(1)).wait()
         print('Done!')
-
-    def circle(self):
-        # Start circling in a clockwise direction
-        self.bebop(Circle(Circle_Direction.CW))
