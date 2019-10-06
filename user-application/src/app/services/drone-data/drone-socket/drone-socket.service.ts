@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import * as Rx from 'rxjs/Rx';
 import { DroneState } from '../drone/drone-state.enum';
 import { HttpClient } from '@angular/common/http';
+import * as $ from 'jquery';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +61,28 @@ export class DroneSocketService {
     request.withCredentials = false;
     request.setRequestHeader('Content-Type', 'application/json');
     request.send();
+  }
+
+  sendCoords(url, data) {
+    // const request = new XMLHttpRequest();
+    // request.onreadystatechange = function() {
+    //   if (this.readyState === 4 && this.status === 200) {
+    //   } else if (this.readyState === 4 && this.status === 0) {
+    //   }
+    // };
+    // request.open('GET', url, true);
+    // request.withCredentials = false;
+    // request.setRequestHeader('Content-Type', 'application/json');
+    // request.send();
+      $.ajax({
+        contentType: 'application/json',
+        type: 'POST',
+        url,
+        data,
+        success: (ret) => {
+          console.log('sent');
+        },
+      });
   }
 
   connectSocket(ip, port, done): Rx.Subject<MessageEvent> {

@@ -4,7 +4,7 @@ import { FlightSession } from '../flight-session/flight-session';
 import { Drone } from '../drone-data/drone/drone';
 import { DroneState } from '../drone-data/drone/drone-state.enum';
 import { Storage } from '@ionic/storage';
-
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,9 @@ export class FlightSessionController {
   private activeSessions: Map< string, FlightSession>;
   private numActiveSessions: number;
 
-  constructor( private storage: Storage) {
+  constructor( private storage: Storage,
+               private geolocation: Geolocation
+  ) {
     this.activeSessions = new Map<string, FlightSession>();
     this.pastSessions = new Map<string , FlightSession[]> ();
     this.storage.forEach( (value, key, index ) => {
@@ -83,16 +85,19 @@ export class FlightSessionController {
 
   }
 
-  startFlightSession(drone) {
+  startFlightSession(drone, sessionName) {
 
     if ( drone.getState() === DroneState.ARMED) {
       return false;
     }
 
     drone.armDrone();
+    drone.setGeolocationInfo(this.geolocation);
+    drone.pingCoordinates();
     drone.setDroneState( DroneState.ARMING );
     const newFlightSession = new FlightSession();
     newFlightSession.droneName = drone.name;
+    newFlightSession.sessionName = sessionName;
     console.log('creating new session and setting name');
     this.activeSessions.set( drone.id, newFlightSession);
     return true;
@@ -103,7 +108,8 @@ export class FlightSessionController {
 
     const oldPastSessions = this.pastSessions.get(drone.id);
     if ( oldPastSessions !== undefined ) {
-      const updatedPastSessions = oldPastSessions.concat(this.activeSessions.get(drone.id));
+      const sesh = this.activeSessions.get(drone.id);
+      const updatedPastSessions = oldPastSessions.concat(sesh);
       this.pastSessions.set(drone.id, updatedPastSessions);
     } else {
       const firstSession = Array(this.activeSessions.get(drone.id));
@@ -114,6 +120,7 @@ export class FlightSessionController {
     this.storage.set(drone.id + '_sessions', this.pastSessions.get(drone.id));
 
     drone.disArm();
+    drone.stopPingCoordinates();
     drone.setDroneState( DroneState.CONNECTED);
     this.activeSessions.get(drone.id).active = false;
     this.activeSessions.delete(drone.id);

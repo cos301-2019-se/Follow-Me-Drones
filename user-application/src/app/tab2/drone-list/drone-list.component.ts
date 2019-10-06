@@ -25,6 +25,7 @@ export class DroneListComponent implements AfterViewInit {
   ////////////////////////////////////////////////////////////////////////////////
   private drones: Drone[] = [];
   messages: Subject<any>;
+  seshName: string;
   constructor(
               public toastController: ToastController,
               public actionSheetController: ActionSheetController,
@@ -66,7 +67,9 @@ export class DroneListComponent implements AfterViewInit {
   // Flight Sessions
   ////////////////////////////////////////////////////////////////////////////////
   startSession(drone) {
-    if (!this.flightSessionController.startFlightSession(drone)) {
+    // const seshName = prompt('Please enter a flight session name?');
+    const seshName = 'temp';
+    if (!this.flightSessionController.startFlightSession(drone, seshName)) {
       // TODO: Let user know accordingly
       alert('Problem!');
     }
@@ -107,8 +110,7 @@ export class DroneListComponent implements AfterViewInit {
           const animal = socketEvent.data.detection;
           // drone.fetchImage( socketEvent.data.image );
           this.flightSessionController.detection(drone, socketEvent.data);
-          let message =  `${drone.name} spotted ${animal}`;
-          message = 'Now that is an Avengers level threat!';
+          const message =  `${drone.name} spotted ${animal}`;
           this.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
           console.log('CHANGE STATE TO: ONLINE');
@@ -185,6 +187,34 @@ export class DroneListComponent implements AfterViewInit {
     });
     await actionSheet.present();
 
+  }
+  async presentAlertPrompt() {
+    const currentClass = this;
+    let sarie = '';
+    const alert = await this.alertController.create({
+      inputs: [
+        {
+          name: 'sessionName',
+          type: 'text',
+          id: '',
+          value: '',
+          placeholder: 'Session Name'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Ok',
+          handler: (data) => {
+            currentClass.seshName = data.sessionName;
+            sarie = 'janus';
+            console.log(data);
+            console.log('Confirm Ok');
+          }
+        }
+      ]
+    });
+    await alert.present();
+    return sarie;
   }
   async presentModal(drone) {
 

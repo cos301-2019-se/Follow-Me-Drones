@@ -10,7 +10,6 @@ export class FlightSession {
   constructor() {
     console.log('Arming drone!');
     this.active = true;
-    this.sessionName = 'mock_name';
     this.sessionID = UUID.UUID();
     // this.droneName = 'Brendon Laptop';
   }

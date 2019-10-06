@@ -9,6 +9,11 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class DetailedSessionViewComponent implements OnInit {
   session: FlightSession;
+  activeImageIndex = 0;
+    images = ['assets/mockshots/predictionGiraffe.jpg',
+    'assets/mockshots/predictionLeopard.jpg',
+    'assets/mockshots/predictionLion.jpg',
+    'assets/mockshots/predictionRhino.jpg'];
   constructor(
     private flightSessionController: FlightSessionController,
     private route: ActivatedRoute
@@ -16,8 +21,12 @@ export class DetailedSessionViewComponent implements OnInit {
     console.log(this.route.snapshot.paramMap.get('session'));
     const vari = this.route.snapshot.paramMap.get('session');
     this.session = this.flightSessionController.getSessionByUUID(vari);
+    this.images = this.session.getImages();
   }
 
+  updateIndex(s) {
+    this.activeImageIndex = s;
+  }
   ngOnInit() {}
 
 }

@@ -14,11 +14,15 @@ export class Drone {
   connected: boolean; // TODO: remove
   armed: boolean; // TODO: remove
   pingServer: any;
+  coords: any;
+  intCoord: number;
   serverLocation: string;
 
   socket: DroneSocketService;
   messages: Subject<any>;
   connectionStatus: Subject<any>;
+  geolocation: any;
+
 
   constructor(uuid, name, port, ipAddress, icon, comment) {
     this.id = uuid;
@@ -66,8 +70,41 @@ export class Drone {
   }
   disArm() {
     this.socket.disArm();
+    // this.stopPingCoordinates();
+  }
+  setGeolocationInfo(geo) {
+    this.geolocation = geo;
   }
 
+  pingCoordinates() {
+    const currentClass = this;
+    const socket = this.socket;
+    this.coords = setInterval( () => {
+      this.geolocation.getCurrentPosition().then((resp) => {
+        // console.log(`currentLocation!\n lat: ${resp.coords.latitude} \n lon: ${resp.coords.longitude}`);
+        // console.log(currentClass.coords);
+        const url = this.serverLocation + '/coords';
+        const c = {
+          lon: resp.coords.latitude,
+          lat: resp.coords.longitude
+        };
+        // socket.sendCoords(url, JSON.stringify(c));
+        // alert(`lon: ${c.lon} \n  lat ${c.lat}`);
+      }).catch((error) => {
+        console.log('Error getting location', error);
+        alert('error');
+      });
+    }, 5000);
+    console.log(this.coords);
+  }
+
+  stopPingCoordinates() {
+    console.log(this.coords);
+    clearInterval(this.coords);
+    for ( let i = 0; i < 1000; i++) {
+      clearInterval(i);
+    }
+  }
 
   connectDrone(domObject, done) {
     console.log('sarie');
@@ -84,8 +121,8 @@ export class Drone {
           const animal = socketEvent.data.detection;
           // drone.fetchImage( socketEvent.data.image );
           domObject.flightSessionController.detection(drone, socketEvent.data);
-          let message =  `${drone.name} spotted ${animal}`;
-          message = 'Now that is an Avengers level threat!';
+          const message =  `${drone.name} spotted ${animal}`;
+          // message = 'Now that is an Avengers level threat!';
           console.log(message);
           domObject.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
@@ -106,6 +143,7 @@ export class Drone {
           drone.setDroneState(DroneState.CONNECTED);
 
         } else if (socketEvent.event === 'drone_armed') {
+          // start pinging coordinates
           drone.setDroneState(DroneState.ARMED);
 
         } else if (socketEvent.event === 'drone_busy') {
