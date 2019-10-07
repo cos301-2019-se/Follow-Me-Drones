@@ -6,6 +6,7 @@ from olympe.messages.ardrone3.Animations import Flip
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
 from olympe.messages.battery import health
+from olympe.messages.ardrone3.PilotingSettings import NoFlyOverMaxDistance
 
 """
 Basic commands
@@ -38,7 +39,7 @@ class BlackMagic:
         # 2 - warning
         # 1 - error
         # 0 - critical
-        self.bebop = olympe.Drone("192.168.42.1", loglevel=2, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
+        self.bebop = olympe.Drone("192.168.42.1", loglevel=0, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
         self.stream_dir = os.path.join(os.getcwd(), 'stream/')
 
         if not os.path.exists(self.stream_dir):
@@ -50,6 +51,9 @@ class BlackMagic:
         self.h264_stats_file = open(os.path.join(self.stream_dir, 'h264_stats.csv'), 'w+')
         self.h264_stats_writer = csv.DictWriter(self.h264_stats_file, ['fps', 'bitrate'])
         self.h264_stats_writer.writeheader()
+
+        self.darknet_command = False
+        self.ffmpeg_command = False
 
     def start(self):
         # Connect the the drone
@@ -65,22 +69,25 @@ class BlackMagic:
         )
 
         # Setup your callback functions to do some live video processing
-        # self.bebop.set_streaming_callbacks(
-        #     raw_cb=self.yuv_frame_cb,
-        #     h264_cb=self.h264_frame_cb
-        # )
+        self.bebop.set_streaming_callbacks(
+            raw_cb=self.yuv_frame_cb,
+            h264_cb=self.h264_frame_cb
+        )
+
+        self.bebop(NoFlyOverMaxDistance(0))
+        # self.bebop.start_video_streaming()
 
         return success
 
     def arm(self):
         # start darknet
-        darknet = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv']#, '-prefix', '../../detections/img', '-dont_show']
+        darknet = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals-tiny.cfg', 'backup/animals-tiny_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv']#, '-prefix', '../../detections/img', '-dont_show']
 
-        darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        self.darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
-        for line in iter(darknet_command.stderr.readline, b''):
+        for line in iter(self.darknet_command.stderr.readline, b''):
             if b'Done!' in line:
-                darknet_command.stderr.close()
+                self.darknet_command.stderr.close()
                 break
         
         self.bebop.start_video_streaming()
@@ -88,16 +95,36 @@ class BlackMagic:
         time.sleep(1) # Hackerman
 
         # start ffmpeg
-        # ffmpeg -re -i stream/h264_data.264 -c copy -movflags frag_keyframe+empty_moov -max_muxing_queue_size 9999 -f h264 udp://127.0.0.1:5123
-        ffmpeg = ['/bin/ffmpeg', '-re', '-i', 'stream/h264_data.264', '-c', 'copy', '-f', 'h264', 'udp://127.0.0.1:5123']
+        # /bin/ffmpeg -re -i stream/h264_data.264 -c copy -movflags frag_keyframe+empty_moov -max_muxing_queue_size 9999 -f h264 udp://127.0.0.1:5123
+        ffmpeg = ['/bin/ffmpeg', '-re', '-i', 'stream/h264_data.264', '-c', 'copy', '-movflags', 'frag_keyframe+empty_moov', '-max_muxing_queue_size', '9999', '-f', 'h264', 'udp://127.0.0.1:5123']
 
-        ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd())#, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
+        self.ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd())#, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+   
+    def disarm(self):
+        # If the detection is running and the app disconnects, turn it off
+        if self.darknet_command:
+            print('Turning off object detection...', end='')
+            self.darknet_command.kill()
+            self.darknet_command = False
+            print('Done!')
+
+        if self.ffmpeg_command:
+            print('Turning off ffmpeg stream...', end='')
+            self.ffmpeg_command.kill()
+            self.ffmpeg_command = False
+            print('Done!')
+
+    def startDroneStream(self):
+        self.bebop.start_video_streaming()
+
+    def stopDroneStream(self):
+        self.bebop.stop_video_streaming()
+
     def stop(self):
         # Properly stop the video stream and disconnect
         self.bebop.stop_video_streaming()
         self.bebop.disconnection()
-        # self.h264_stats_file.close()
+        self.h264_stats_file.close()
 
     def yuv_frame_cb(self, yuv_frame):
         """
@@ -176,82 +203,83 @@ class BlackMagic:
 
     # Key press functions
     def on_press(self, key):
+        print('\r{0}% Manual mode (\'esc\' to exit) '.format(self.getBatteryPercentage()), end='', flush=True)
         try:
             # print('alphanumeric key {0} pressed'.format(key.char))
 
             # Moving Forward / Back / Left / Right
             # w
             if key.char == 'w':
-                print('Moving forward')
+                # print('Moving forward')
                 # self.bebop(moveBy(0.2, 0, 0, 0))
                 # PCMD(flag, roll, pitch, yaw, gaz, timestampAndSeqNum, _timeout=10, _no_expect=False, _float_tol=(1e-07, 1e-09))
-                self.bebop(PCMD(1, 0, 75, 0, 0, 50))
+                self.bebop(PCMD(1, 0, 100, 0, 0, 50))
             
             if key.char == 's':
-                print('Moving backward')
+                # print('Moving backward')
                 # self.bebop(moveBy(-0.2, 0, 0, 0))
-                self.bebop(PCMD(1, 0, -75, 0, 0, 50))
+                self.bebop(PCMD(1, 0, -100, 0, 0, 50))
             
             if key.char == 'q':
-                print('Strafe left')
+                # print('Strafe left')
                 # self.bebop(moveBy(0, -0.2, 0, 0))
-                self.bebop(PCMD(1, -75, 0, 0, 0, 50))
+                self.bebop(PCMD(1, -100, 0, 0, 0, 50))
             
             if key.char == 'e':
-                print('Strafe right')
+                # print('Strafe right')
                 # self.bebop(moveBy(0, 0.2, 0, 0))
-                self.bebop(PCMD(1, 75, 0, 0, 0, 50))
+                self.bebop(PCMD(1, 100, 0, 0, 0, 50))
 
             # FLIPS!!!!!!
             # shift+w
             if key.char == 'W':
-                print('forward flip')
+                # print('forward flip')
                 self.bebop(Flip(olympe.enums.ardrone3.Animations.Flip_Direction.front)).wait()
 
             # shift+q
             if key.char == 'Q':
-                print('left flip')
+                # print('left flip')
                 self.bebop(Flip(olympe.enums.ardrone3.Animations.Flip_Direction.left)).wait()
 
             # shift+e
             if key.char == 'E':
-                print('right flip')
+                # print('right flip')
                 self.bebop(Flip(olympe.enums.ardrone3.Animations.Flip_Direction.right)).wait()
 
             if key.char == 'S':
-                print('backward flip')
+                # print('backward flip')
                 self.bebop(Flip(olympe.enums.ardrone3.Animations.Flip_Direction.back)).wait()
                 
             # Rotating
             if key.char == 'a':
-                print('Rotating left')
+                # print('Rotating left')
                 # self.bebop(moveBy(0, 0, 0, -math.radians(30)))
-                self.bebop(PCMD(1, 0, 0, -25, 0, 50))
+                self.bebop(PCMD(1, 0, 0, -100, 0, 0))
             
             if key.char == 'd':
-                print('Rotating right')
+                # print('Rotating right')
                 # self.bebop(moveBy(0, 0, 0, math.radians(30)))
-                self.bebop(PCMD(1, 0, 0, 25, 0, 50))
+                self.bebop(PCMD(1, 0, 0, 100, 0, 0))
             
         except AttributeError:
-            print('special key {0} pressed'.format(key))
+            # print('special key {0} pressed'.format(key))
 
             # Vertical controls
             # ctrl
             if key == keyboard.Key.ctrl:
-                print('Moving down')
+                # print('Moving down')
                 # self.bebop(moveBy(0, 0, 1, 0)).wait()
-                self.bebop(PCMD(1, 0, 0, 0, -25, 50))
+                self.bebop(PCMD(1, 0, 0, 0, -50, 50))
 
             # space
             if key == keyboard.Key.space:
-                print('Moving up')
+                # print('Moving up')
                 # self.bebop(moveBy(0, 0, -1, 0)).wait()
-                self.bebop(PCMD(1, 0, 0, 0, 25, 50))
+                self.bebop(PCMD(1, 0, 0, 0, 50, 50))
 
     def on_release(self, key):
         tcflush(sys.stdin, TCIFLUSH)
-        print('{0} released'.format(key))
+        # print('{0} released'.format(key))
         if key == keyboard.Key.esc:
             # Stop listener
             return False
@@ -302,7 +330,15 @@ class BlackMagic:
                 elif _option == 'auto':
                     # Enable autotakeoff
                     self.bebop(UserTakeOff(1))
+                elif _option == 'arm':
+                    self.arm()
+                elif _option == 'disarm':
+                    self.disarm()
                 elif _option == 'm':
+                    print('\033[2J') # Clear screen
+                    print('\033[00H') # Move cursor to top left
+                    print('\r{0}% Manual mode (\'esc\' to exit) '.format(self.getBatteryPercentage()), end='', flush=True)
+
                     # Collect events until released
                     with keyboard.Listener(on_press=self.on_press, on_release=self.on_release) as listener:
                         listener.join()
@@ -319,8 +355,6 @@ if __name__ == "__main__":
     magic = BlackMagic()
     # Start the video stream
     if magic.start():
-        # Arm the drone
-        magic.arm()
         # Perform some live video processing while the drone is flying
         magic.fly()
         # Stop the video stream

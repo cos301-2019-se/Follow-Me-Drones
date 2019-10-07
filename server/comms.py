@@ -46,6 +46,8 @@ def connect():
     global currentConnections
     global bebop
 
+    print('App trying to connect...')
+
     # Only allow one app to be connected at any given time
     if currentConnections >= 1:
         # print('\nToo many apps attempted to connect to drone, kicked', request.sid)
@@ -54,11 +56,13 @@ def connect():
         raise ConnectionRefusedError('Unauthorized!')
     else:
         # Establish connection to drone
-        if bebop.connect_drone(liveStream = False):
+        # if bebop.connect_drone(liveStream = True):
+        if True:
             currentConnections += 1
             print('\nApp connected with ID', request.sid)
             print('Current connections ->', currentConnections, '\n')
         else:
+            print('Failed to connect to drone')
             raise ConnectionRefusedError('Failure')
             emit('error')
 
@@ -69,7 +73,7 @@ def disconnect():
     global bebop
 
     # Disconnect drone
-    bebop.disconnect_drone()
+    # bebop.disconnect_drone()
     
     currentConnections -= 1
     print('App disconnected with ID', request.sid)
@@ -87,19 +91,19 @@ def arm():
     global session_time
     session_time = time.strftime('%d%h%Y')
 
-    print('Starting object recognition...', end='')
+    print('Starting object recognition...', end='', flush=True)
 
     # Move into the darknet directory
     os.chdir('../object-recognition/src/darknet_/')
 
     # Video camera
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights -c 2 -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c', '2', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
+    # cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c', '2', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
     
     # Video stream
-    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    # _cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'data/videos/african-wildlife.mp4', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
-    
+    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv -prefix ../../detections/img
+    cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals-tiny.cfg', 'backup/animals-tiny_last.weights', 'data/videos/botswana-wildlife.mp4', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
+
     # Drone stream
     # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/bebop.sdp -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
     
@@ -109,7 +113,7 @@ def arm():
     except:
         pass
 
-    cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
+    # cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
 
     darknet_command = subprocess.Popen(cmd, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
@@ -142,7 +146,7 @@ def arm():
         ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         # Launch the drone
-        bebop.launch_drone()
+        # bebop.launch_drone()
     else:
         print('Something went wrong arming detection...')
 
@@ -154,9 +158,9 @@ def disarm():
     stopProcesses()
 
     # land the drone at its home location and stop the video stream
-    bebop.go_home()
-    bebop.land_drone()
-    bebop.stop_video_stream()
+    # bebop.go_home()
+    # bebop.land_drone()
+    # bebop.stop_video_stream()
 
     emit('drone_disarmed')
 
@@ -166,28 +170,13 @@ def ETGoHome():
     global bebop
     bebop.go_home()
 
-# Return home event
-@io.on('location-update')
-def locationUpdate():
-    global bebop
-
-    if bebop.getBatteryPercentage <= 15:
-        bebop.go_home()
-        bebop.land_drone()
-
-        io.emit('battery-low')
-    else:
-        latitude = request.get_json()['location']['latitude']
-        longitude = request.get_json()['location']['longitude']
-        bebop.newCenterLocation(latitude, longitude)
-
 # Default GET, should never happen
-@app.route('/', methods=["GET"])
+@app.route('/', methods=['GET'])
 def index():
     return '<html><head><title>Turn back now</title></head><body><p style="color: red; width: 100%; text-align: center; margin-top: 20%">01011001011011110111010100100000011100110110100001101111011101010110110001100100011011100010011101110100001000000110001001100101001000000110100001100101011100100110010100100001</p></body></html>', 200
 
 # Endpoint to ping server
-@app.route('/ping', methods=["GET"])
+@app.route('/ping', methods=['GET'])
 def ping():
     return '[{"pong"}]', 200
 
@@ -207,6 +196,40 @@ def stopProcesses():
         ffmpeg_command.kill()
         ffmpeg_command = False
         print('Done!')
+
+# Update coords event
+@app.route('/coords', methods=['POST'])
+def coords():
+    global bebop
+
+    # print('Changing location')
+
+    # percentage = bebop.getBatteryPercentage()
+    # print('\nBattery percentage: {}%'.format(percentage))
+
+    # # make sure the drone is initialized
+    # if percentage != 'uninitialized':
+    #     percentage = int(percentage)
+
+    #     # If the battery percentage is below 15% then return home and land
+    #     if percentage <= 15:
+    #         bebop.go_home()
+    #         bebop.land_drone()
+
+    #         print('Battery low, returning home')
+    #         io.emit('battery-low')
+    #     else:
+    #         print('Received:', request.get_json())
+
+    #         lat = request.get_json()['lat']
+    #         lon = request.get_json()['lon']
+
+    #         print('Moving to:', lat, lon)
+    #         bebop.newCenterLocation(lat, lon)
+    # else:
+    #     print('uninitialized')
+
+    return '', 200
 
 # ============================================================================
 #                             Handling images
