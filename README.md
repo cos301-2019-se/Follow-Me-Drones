@@ -4,6 +4,34 @@
 
 ## Follow Me Drones (5 Guys 1 Branch)
 
+---
+
+### Project Description
+
+The primary aim of the Follow Me Drones System (FMDS) is to provide support to a ranger in the field. 
+The system will identify any dangers in the vicinity of the ranger by identifying that which is possibly undetectable to a human walking in the bush.
+It will estimate the objects threat level to the ranger and notify them ranger of any detections. 
+
+---
+
+<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a>
+
+<a href="https://github.com/cos301-2019-se/Follow-Me-Drones/blob/master/documentation/Coding%20Standards.pdf" target="_blank">Coding Standards</a>
+
+<a href="https://github.com/cos301-2019-se/Follow-Me-Drones/blob/master/documentation/Testing%20Policy.pdf" target="_blank">Testing Policy</a>
+
+<a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
+
+<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">User Manual</a>
+
+<a href="https://github.com/5-guys-1-branch/capstone-documentation" target="_blank">Documentation Github Repository</a> <br>
+
+<a href="https://youtu.be/aaXZ4n5ukHA" target="_blank">Virtual Demo</a> <br>
+
+<a href="https://github.com/cos301-2019-se/Follow-Me-Drones" target="_blank">Project Github Repository</a> <br> 
+
+---
+
 ### Team Overview
 |    Full Name    	| Student Number 	|                                 Profile                                	|
 |:---------------:	|:--------------:	|:----------------------------------------------------------------------:	|
@@ -13,28 +41,7 @@
 |  Brendon van Biljoen [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#brendon-van-biljoen-u17011842-)  	|    17011842    	|   <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/Brendon127" target="_blank"> GitHub</a> <a href="https://drive.google.com/file/d/1iJJTT4iV3kHGo73pd33XE5DBXhNFcVEG/view" target="_blank">CV</a>  	|
 |   Francois Venter [<img src="https://i.imgur.com/UWnHKMe.jpg" alt="Top" width="15">](#francois-venter-u14177553-)   	|    14177553    	|     <img src="https://i.imgur.com/R15saK1.png" width=15><a href="https://github.com/u14177553" target="_blank"> GitHub</a> <a href="https://www.linkedin.com/in/venterfrancois/" target="_blank">LinkedIn</a>    	|
 
----
-
-### Project Description
-
-The primary aim of the Follow Me Drones System (FMDS) is to provide support to a ranger in the field. 
-The system will identify any dangers in the vicinity of the ranger by identifying that which is possibly undetectable to a human walking in the bush.
-It will estimate the objects threat level to the ranger and notify them ranger of any detections. 
-Each identified object will be recorded and will have a pin placed on a 2D virtual map where the object was detected.
-
----
-
-<a href="https://github.com/cos301-2019-se/Follow-Me-Drones" target="_blank">Project Github Repository</a> <br> 
-
-<a href="https://github.com/5-guys-1-branch/capstone-documentation" target="_blank">Documentation Github Repository</a> <br>
-
-<a href="https://app.zenhub.com/workspaces/follow-me-drones-5cc8ba6d17cad12342431a8c/board?repos=182156295" target="_blank">Project Management Tool</a> 
-
-<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">SRS Document</a>
-
-<a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">User Manual</a>
-
----
+--- 
 
 ### Meet The Team
 
@@ -179,7 +186,7 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 #### Francois Venter (u14177553) [<img src="https://i.imgur.com/VkNBW2q.jpg" alt="Top" width="15">](#team-overview)
 ##### BSc Information Technology
 
-<img src="https://i.imgur.com/7UYivDc.jpg" alt="Francois Photo" width="250">
+<img src="https://i.imgur.com/XuqhIFD.png" alt="Francois Photo" width="250">
 
 ##### Interests
 * Artificial Intelligence
