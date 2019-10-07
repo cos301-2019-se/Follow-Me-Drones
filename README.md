@@ -11,7 +11,6 @@
 The primary aim of the Follow Me Drones System (FMDS) is to provide support to a ranger in the field. 
 The system will identify any dangers in the vicinity of the ranger by identifying that which is possibly undetectable to a human walking in the bush.
 It will estimate the objects threat level to the ranger and notify them ranger of any detections. 
-Each identified object will be recorded and will have a pin placed on a 2D virtual map where the object was detected.
 
 ---
 
@@ -26,6 +25,8 @@ Each identified object will be recorded and will have a pin placed on a 2D virtu
 <a href="https://drive.google.com/open?id=1uquxcVTQogtvpnWpmbJuZlNMxGlGTG-Z" target="_blank">User Manual</a>
 
 <a href="https://github.com/5-guys-1-branch/capstone-documentation" target="_blank">Documentation Github Repository</a> <br>
+
+<a href="https://youtu.be/aaXZ4n5ukHA" target="_blank">Virtual Demo</a> <br>
 
 <a href="https://github.com/cos301-2019-se/Follow-Me-Drones" target="_blank">Project Github Repository</a> <br> 
 
