@@ -5,6 +5,11 @@ import cv2
 import olympe
 import olympe_deps as od
 import math
+import time
+import shlex
+import threading
+
+import subprocess
 
 # enums
 from olympe.enums.ardrone3.Piloting import Circle_Direction, MoveTo_Orientation_mode
@@ -45,17 +50,21 @@ class Drone:
         # 0 - critical
         self.bebop = olympe.Drone('192.168.42.1', loglevel=0, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
         self.stream_dir = os.path.join(os.getcwd(), 'stream/')
-        
+
+        if not os.path.exists(self.stream_dir):
+            os.mkdir('stream')
+
+        print('Olympe streaming output dir: {}'.format(self.stream_dir))
+
         self.is_connected = False
         self.is_streaming = False
 
         self.hover_altitude = 2.0
         self.drone_location = 0.0
 
-        if not os.path.exists(self.stream_dir):
-            os.mkdir('stream')
-
-        print('Olympe streaming output dir: {}'.format(self.stream_dir))
+        self.ffmpeg_interval = False
+        self.ffmpeg_command = False
+        self.ffmpeg = shlex.split('/bin/ffmpeg -re -i stream/h264_data.264 -c copy -f h264 udp://127.0.0.1:5123')
 
     # ============================================================================
     #                             Drone functions
@@ -76,10 +85,7 @@ class Drone:
         # post processing.
         self.bebop.set_streaming_output_files(
             h264_data_file=os.path.join(self.stream_dir, 'h264_data.264'),
-            h264_meta_file=os.path.join(self.stream_dir, 'h264_metadata.json'),
-            # Here, we don't record the (huge) raw YUV video stream
-            # raw_data_file=os.path.join(self.stream_dir,'raw_data.bin'),
-            # raw_meta_file=os.path.join(self.stream_dir,'raw_metadata.json'),
+            h264_meta_file=os.path.join(self.stream_dir, 'h264_metadata.json')
         )
 
         # Setup your callback functions to do some live video processing
@@ -93,32 +99,78 @@ class Drone:
                 h264_cb=self.h264_frame_cb
             )
 
-        # Create a geofence that the drone must remain within
-        # self.bebop(MaxDistance(20)) # The drone won't fly over 20m away
-        # self.bebop(NoFlyOverMaxDistance(1)) # Enable the geofence
+        self.bebop(NoFlyOverMaxDistance(0)) # Disable the geofence
         self.bebop(ReturnHomeMinAltitude(10)) # When the drone flies home, it will make sure to be above 10m first
         self.bebop(HomeType(HomeType_Type.TAKEOFF)) # Set the home to be where the drone took off
-        self.bebop(CirclingRadiusChanged(1)) # Radius for the circling event
 
         return True
 
     def start_video_stream(self):
-        self.h264_frame_stats = []
-        self.h264_stats_file = open(os.path.join(self.stream_dir, 'h264_stats.csv'), 'w+')
-        self.h264_stats_writer = csv.DictWriter(self.h264_stats_file, ['fps', 'bitrate'])
-        self.h264_stats_writer.writeheader()
+        if not self.is_streaming:
+            self.h264_frame_stats = []
 
-        # Start video streaming
-        self.bebop.start_video_streaming()
+            self.h264_stats_file = open(
+                os.path.join(self.stream_dir, 'h264_stats.csv'),
+                'w+'
+            )
 
-        self.is_streaming = True
+            self.h264_stats_writer = csv.DictWriter(
+                self.h264_stats_file,
+                ['fps', 'bitrate']
+            )
+
+            self.h264_stats_writer.writeheader()
+
+            # Start video streaming
+            self.bebop.start_video_streaming()
+
+            time.sleep(1) # hackerman
+
+            # if ffmpeg is already running, kill it
+            if self.ffmpeg_command:
+                self.ffmpeg_command.kill()
+
+            # start ffmpeg       
+            self.ffmpeg_command = subprocess.Popen(
+                self.ffmpeg,
+                cwd=os.getcwd(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+            self.is_streaming = True
+
+    def maintain_stream(self, seconds):
+        def maintain():
+            self.maintain_stream(seconds)
+
+            self.stop_video_stream()
+
+            self.start_video_stream()
+
+        self.ffmpeg_interval = threading.Timer(seconds, maintain)
+        self.ffmpeg_interval.start()
+
+    def stop_maintenance(self):
+        if self.ffmpeg_interval:
+            self.ffmpeg_interval.cancel()
+            self.ffmpeg_interval = False
 
     def stop_video_stream(self):
         if self.is_streaming:
+            # Stop ffmpeg
+            self.ffmpeg_command.kill()
+            self.ffmpeg_command = False
+
             # Properly stop the video stream
             self.bebop.stop_video_streaming()
+
             self.h264_stats_file.close()
+
             self.is_streaming = False
+
+    def is_drone_streaming(self):
+        return self.is_streaming
 
     def disconnect_drone(self):
         if self.is_connected:
@@ -130,7 +182,6 @@ class Drone:
                 self.land_drone()
 
             # Properly stop the video stream and disconnect
-            self.stop_video_stream()
             self.bebop.disconnection()
 
             self.is_connected = False

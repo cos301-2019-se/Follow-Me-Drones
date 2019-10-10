@@ -52,7 +52,7 @@ static const int letter_box = 0;
 
 void *fetch_in_thread(void *ptr)
 {
-    int dont_close_stream = 0;    // set 1 if your IP-camera periodically turns off and turns on video-stream
+    int dont_close_stream = 1;    // set 1 if your IP-camera periodically turns off and turns on video-stream
     if(letter_box)
         in_s = get_image_from_stream_letterbox(cap, net.w, net.h, net.c, &in_img, dont_close_stream);
     else

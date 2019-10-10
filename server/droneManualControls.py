@@ -1,12 +1,21 @@
 import olympe
 import olympe_deps as od
 
-from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff
-from olympe.messages.ardrone3.Animations import Flip
-from olympe.messages.ardrone3.PilotingState import FlyingStateChanged
+# enums
+from olympe.enums.ardrone3.Piloting import Circle_Direction, MoveTo_Orientation_mode
+from olympe.enums.ardrone3.GPSSettings import HomeType_Type
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
+
+# messages
+from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff, NavigateHome, Circle, moveTo
+from olympe.messages.ardrone3.GPSSettings import ReturnHomeMinAltitude, HomeType
+from olympe.messages.ardrone3.Animations import Flip
+from olympe.messages.ardrone3.PilotingState import FlyingStateChanged, GpsLocationChanged, moveToChanged, NavigateHomeStateChanged
+from olympe.messages.ardrone3.PilotingSettingsState import CirclingRadiusChanged
+from olympe.messages.ardrone3.PilotingSettings import MaxDistance, NoFlyOverMaxDistance
+from olympe.messages.ardrone3.GPSSettingsState import GPSFixStateChanged, HomeChanged
+
 from olympe.messages.battery import health
-from olympe.messages.ardrone3.PilotingSettings import NoFlyOverMaxDistance
 
 """
 Basic commands
@@ -39,7 +48,7 @@ class BlackMagic:
         # 2 - warning
         # 1 - error
         # 0 - critical
-        self.bebop = olympe.Drone("192.168.42.1", loglevel=0, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
+        self.bebop = olympe.Drone("192.168.42.1", loglevel=3, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
         self.stream_dir = os.path.join(os.getcwd(), 'stream/')
 
         if not os.path.exists(self.stream_dir):
@@ -58,6 +67,9 @@ class BlackMagic:
     def start(self):
         # Connect the the drone
         success = self.bebop.connection()
+        self.drone_home = self.bebop.get_state(HomeChanged)
+
+        print('Drone home:', self.drone_home)
 
         # start video stream
         self.bebop.set_streaming_output_files(
@@ -70,49 +82,54 @@ class BlackMagic:
 
         # Setup your callback functions to do some live video processing
         self.bebop.set_streaming_callbacks(
-            raw_cb=self.yuv_frame_cb,
+            # raw_cb=self.yuv_frame_cb,
             h264_cb=self.h264_frame_cb
         )
 
         self.bebop(NoFlyOverMaxDistance(0))
-        # self.bebop.start_video_streaming()
+        self.bebop(ReturnHomeMinAltitude(10)) # When the drone flies home, it will make sure to be above 10m first
+        self.bebop(HomeType(HomeType_Type.TAKEOFF)) # Set the home to be where the drone took off
+        # self.bebop(CirclingRadiusChanged(1)) # Radius for the circling event
 
         return success
 
     def arm(self):
-        # start darknet
-        darknet = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals-tiny.cfg', 'backup/animals-tiny_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.7', '-json_port', '42069', '-out_filename', '../../output.mkv']#, '-prefix', '../../detections/img', '-dont_show']
-
-        self.darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
-
-        for line in iter(self.darknet_command.stderr.readline, b''):
-            if b'Done!' in line:
-                self.darknet_command.stderr.close()
-                break
-        
         self.bebop.start_video_streaming()
 
-        time.sleep(1) # Hackerman
+        # time.sleep(1) # Hackerman
+
+        # # start darknet
+        # darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights ../../../server/stream/h264_data.264 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv')# -dont_show')
+        # # darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv')# -dont_show')
+
+        # self.darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stderr=subprocess.PIPE)#, stdout=subprocess.DEVNULL)
+
+        # for line in iter(self.darknet_command.stderr.readline, b''):
+        #     if b'Done!' in line:
+        #         self.darknet_command.stderr.close()
+        #         break
+
+        # time.sleep(1) # Hackerman
 
         # start ffmpeg
-        # /bin/ffmpeg -re -i stream/h264_data.264 -c copy -movflags frag_keyframe+empty_moov -max_muxing_queue_size 9999 -f h264 udp://127.0.0.1:5123
-        ffmpeg = ['/bin/ffmpeg', '-re', '-i', 'stream/h264_data.264', '-c', 'copy', '-movflags', 'frag_keyframe+empty_moov', '-max_muxing_queue_size', '9999', '-f', 'h264', 'udp://127.0.0.1:5123']
+        # ffmpeg = shlex.split('/bin/ffmpeg -re -i stream/h264_data.264 -c copy -f h264 udp://127.0.0.1:5123')
 
-        self.ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd())#, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # self.ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
    
     def disarm(self):
+        self.bebop.stop_video_streaming()
         # If the detection is running and the app disconnects, turn it off
-        if self.darknet_command:
-            print('Turning off object detection...', end='')
-            self.darknet_command.kill()
-            self.darknet_command = False
-            print('Done!')
+        # if self.darknet_command:
+        #     print('Turning off object detection...', end='')
+        #     self.darknet_command.kill()
+        #     self.darknet_command = False
+        #     print('Done!')
 
-        if self.ffmpeg_command:
-            print('Turning off ffmpeg stream...', end='')
-            self.ffmpeg_command.kill()
-            self.ffmpeg_command = False
-            print('Done!')
+        # if self.ffmpeg_command:
+        #     print('Turning off ffmpeg stream...', end='')
+        #     self.ffmpeg_command.kill()
+        #     self.ffmpeg_command = False
+        #     print('Done!')
 
     def startDroneStream(self):
         self.bebop.start_video_streaming()
@@ -309,22 +326,65 @@ class BlackMagic:
         except:
             return 'uninitialized'
 
+    def moveToCoords(self):
+        self.bebop(FlyingStateChanged(state='hovering', _timeout=5))
+        print(self.bebop.get_state(moveToChanged))
+        
+        # -25.766915, 28.251963 - Francois pool
+        lat = -25.766915
+        lon = 28.251963
+        # alt = self.drone_location['altitude']
+        alt = 4
+        print('Moving to coords...', end='', flush=True)
+        self.bebop(
+                moveTo(lat, lon, alt, MoveTo_Orientation_mode.TO_TARGET, 0.0)
+                >> FlyingStateChanged(state='hovering', _timeout=5)
+                >> moveToChanged(latitude=lat, longitude=lon, altitude=alt, orientation_mode=MoveTo_Orientation_mode.TO_TARGET, status='DONE', _policy='wait')
+                >> FlyingStateChanged(state='hovering', _timeout=5)
+            )
+        print('Done!')
+
+    def goHome(self):
+        print('ET going home...', end='', flush=True)
+        # Start navigating home
+        self.bebop(
+            moveTo(self.drone_location['latitude'], self.drone_location['longitude'], self.drone_location['altitude'], 1, 0.0)
+            >> FlyingStateChanged(state='hovering', _timeout=5)
+            >> moveToChanged(latitude=self.drone_location['latitude'], longitude=self.drone_location['longitude'], altitude=self.drone_location['altitude'], orientation_mode=MoveTo_Orientation_mode.TO_TARGET, status='DONE', _policy='wait')
+            >> FlyingStateChanged(state='hovering', _timeout=5)
+        ).wait()
+        print('Done!')
+
     def fly(self):
         try:
             while(True):
                 print('\033[2J') # Clear screen
                 print('\033[00H') # Move cursor to top left
-                print('{0}% ({1}) Command: '.format(self.getBatteryPercentage(), self.getFlyingState()), end='')
+                print('{0}% ({1}) Command: '.format(self.getBatteryPercentage(), self.getFlyingState()), end='', flush=True)
 
                 # print('Command: ', end='')
                 _option = input()
                 
                 if _option == 'to': # take-off
-                    print('Taking off...', end='')
-                    self.bebop(TakeOff()).wait()
+                    print('Taking off...', end='', flush=True)
+                    
+                    # self.bebop(
+                    #     FlyingStateChanged(state='hovering', _policy='check') |
+                    #     FlyingStateChanged(state='flying', _policy='check') |
+                    #     (
+                    #         GPSFixStateChanged(fixed=1, _timeout=10, _policy='check_wait')
+                    #         >> (
+                    #             TakeOff(_no_expect=True)
+                    #             & FlyingStateChanged(state='hovering', _timeout=10, _policy='check_wait')
+                    #         )     
+                    #     )
+                    # ).wait()
+
+                    self.bebop(TakeOff(_no_expect=True)).wait()
+                    self.drone_location = self.bebop.get_state(GpsLocationChanged)
                     print('Done!')
                 elif _option == 'x': # land
-                    print('Landing...', end='')
+                    print('Landing...', end='', flush=True)
                     self.bebop(Landing()).wait()
                     print('Done!')
                 elif _option == 'auto':
@@ -334,6 +394,8 @@ class BlackMagic:
                     self.arm()
                 elif _option == 'disarm':
                     self.disarm()
+                elif _option =='go':
+                    self.moveToCoords()
                 elif _option == 'm':
                     print('\033[2J') # Clear screen
                     print('\033[00H') # Move cursor to top left
@@ -360,6 +422,6 @@ if __name__ == "__main__":
         # Stop the video stream
         magic.stop()
         # Recorded video stream postprocessing
-        magic.postprocessing()
+        # magic.postprocessing()
     else:
         print('Failed to connect to the drone')

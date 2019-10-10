@@ -3,10 +3,11 @@ from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
 
 import subprocess
-import os
+import signal, os
 import glob
 import base64
 import time
+import shlex
 
 # Drone stuff
 from drone import Drone
@@ -35,7 +36,6 @@ newDetections = []
 # ============================================================================
 currentConnections = 0
 darknet_command = False
-ffmpeg_command = False
 
 # Create the socket, with all origins allowed
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
@@ -56,8 +56,7 @@ def connect():
         raise ConnectionRefusedError('Unauthorized!')
     else:
         # Establish connection to drone
-        # if bebop.connect_drone(liveStream = True):
-        if True:
+        if bebop.connect_drone(liveStream = False):
             currentConnections += 1
             print('\nApp connected with ID', request.sid)
             print('Current connections ->', currentConnections, '\n')
@@ -72,23 +71,23 @@ def disconnect():
     global currentConnections
     global bebop
 
+    # Stop the processes
+    stopProcesses()
+
     # Disconnect drone
-    # bebop.disconnect_drone()
+    bebop.disconnect_drone()
     
     currentConnections -= 1
     print('App disconnected with ID', request.sid)
     print('Current connections ->', currentConnections)
 
-    # Stop the ffmpeg and darknet processes
-    stopProcesses()
-
 # Arming event
 @io.on('arm_drone')
 def arm():
     global darknet_command
-    global ffmpeg_command
     global bebop
     global session_time
+
     session_time = time.strftime('%d%h%Y')
 
     print('Starting object recognition...', end='', flush=True)
@@ -96,26 +95,20 @@ def arm():
     # Move into the darknet directory
     os.chdir('../object-recognition/src/darknet_/')
 
-    # Video camera
-    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights -c 2 -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    # cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', '-c', '2', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../output.mkv', '-prefix', '../../detections/img']
-    
-    # Video stream
-    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/videos/african-wildlife.mp4 -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv -prefix ../../detections/img
-    cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals-tiny.cfg', 'backup/animals-tiny_last.weights', 'data/videos/botswana-wildlife.mp4', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
+    # darknet
+    darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
 
-    # Drone stream
-    # ./darknet detector demo cfg/animals.data cfg/animals.cfg backup/animals_last.weights data/bebop.sdp -thresh 0.8 -json_port 42069 -prefix ../../detections/img -out_filename ../../output.mkv
-    
     # will only fail if the directory already exists (i.e. drone armed, disarmed and armed again in same session)
     try:
         os.mkdir('../../detections/' + session_time)
     except:
         pass
 
-    # cmd = ['./darknet', 'detector', 'demo', 'cfg/animals.data', 'cfg/animals.cfg', 'backup/animals_last.weights', 'udp://127.0.0.1:5123', '-thresh', '0.8', '-json_port', '42069', '-out_filename', '../../' + session_time + '-output.mkv', '-prefix', '../../detections/' + session_time + '/img']#, '-dont_show']
+    # if darknet is already running, kill it
+    if darknet_command:
+        darknet_command.kill()
 
-    darknet_command = subprocess.Popen(cmd, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
+    darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stderr=subprocess.PIPE)#, stdout=subprocess.DEVNULL)
 
     # Move back into the server directory
     os.chdir('../../../server/')
@@ -135,16 +128,9 @@ def arm():
     if detection_armed:
         # Start video streaming from drone to .264 file
         bebop.start_video_stream()
+        emit('drone_armed')
+        bebop.maintain_stream(13) # Maintain ffmpeg every X seconds
 
-        # Wait for file headers to be set correctly before continuing
-        time.sleep(1) # Hackerman
-
-        # start ffmpeg to restream the .264 file to udp
-        # ffmpeg -re -i stream/h264_data.264 -c copy -movflags frag_keyframe+empty_moov -max_muxing_queue_size 9999 -f h264 udp://127.0.0.1:5123
-        ffmpeg = ['/bin/ffmpeg', '-re', '-i', 'stream/h264_data.264', '-c', 'copy', '-f', 'h264', 'udp://127.0.0.1:5123']
-
-        ffmpeg_command = subprocess.Popen(ffmpeg, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
         # Launch the drone
         # bebop.launch_drone()
     else:
@@ -153,6 +139,7 @@ def arm():
 # Disarm event
 @io.on('disarm_drone')
 def disarm():
+    global darknet_command
     global bebop
 
     stopProcesses()
@@ -160,8 +147,7 @@ def disarm():
     # land the drone at its home location and stop the video stream
     # bebop.go_home()
     # bebop.land_drone()
-    # bebop.stop_video_stream()
-
+    print('disarmed')
     emit('drone_disarmed')
 
 # Return home event
@@ -180,9 +166,10 @@ def index():
 def ping():
     return '[{"pong"}]', 200
 
+# Stop the darknet command and the drone streaming
 def stopProcesses():
     global darknet_command
-    global ffmpeg_command
+    global bebop
 
     # If the detection is running and the app disconnects, turn it off
     if darknet_command:
@@ -191,16 +178,16 @@ def stopProcesses():
         darknet_command = False
         print('Done!')
 
-    if ffmpeg_command:
-        print('Turning off ffmpeg stream...', end='')
-        ffmpeg_command.kill()
-        ffmpeg_command = False
+    if bebop.is_drone_streaming():
+        print('Turning off drone stream...', end='')
+        bebop.stop_maintenance()
+        bebop.stop_video_stream()
         print('Done!')
 
 # Update coords event
 @app.route('/coords', methods=['POST'])
 def coords():
-    global bebop
+    # global bebop
 
     # print('Changing location')
 
@@ -246,14 +233,18 @@ def convertImageToBase64(image_id):
 # Endpoint for the app to request an image based on an image_id
 @app.route('/image', methods=['POST'])
 def return_image():
-    blob = convertImageToBase64(request.get_json()['image'])
-    #blob = convertImageToBase64(request.jsond)
-    return (jsonify(blob), 200)
+    global session_time
+
+    if session_time:
+        blob = convertImageToBase64(request.get_json()['image'])
+        return (jsonify(blob), 200)
+    else:
+        return '', 500
 
 # ============================================================================
 #                           Handling detections
-# ===== =======================================================================
- 
+# ============================================================================
+
 # Function to alert the app of a detection
 def alertAppOfDetection(frame_id, detection):
     img = 'img_' + str(frame_id).zfill(8) + '.jpg'
@@ -384,7 +375,7 @@ def shutdown_process():
     print('Beginning shutdown process... \n')
 
     # End session with drone
-    bebop.stop_video_stream()
+    stopProcesses()
     bebop.disconnect_drone()
 
     if session_time:
