@@ -19,12 +19,7 @@
 ### Project Description
 
   
-
-The primary aim of the Follow Me Drones System (FMDS) is to provide support to a ranger in the field.
-
-The system will identify any dangers in the vicinity of the ranger by identifying that which is possibly undetectable to a human walking in the bush, this will be accomplished while the drone is following the ranger.
-
-It will estimate the objects threat level to the ranger and notify them ranger of any detections.
+Our project is a conservation-oriented project which aims to provide support to game rangers in the field. A drone, which is seamlessly deployed by the game ranger via our mobile application, runs object recognition in real-time through the video feed provided by the drone’s built-in camera. The drone then maintains a close following distance to the ranger via the GPS location transmitted by our application and attempts to circle round the ranger to make sure all directions are covered. If any animal (within a specified subset of animals) or human is detected through the video feed, the ranger is provided with a notification of the detection and a screenshot of the detection is sent to the ranger’s mobile phone.
 
   
 
