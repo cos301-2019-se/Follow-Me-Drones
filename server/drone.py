@@ -74,7 +74,7 @@ class Drone:
         success = self.bebop.connection()
 
         self.drone_home = self.bebop.get_state(HomeChanged)
-        print('Drone home:', self.drone_home)
+        print('\nDrone home:', self.drone_home)
 
         if not success:
             return False
@@ -159,8 +159,9 @@ class Drone:
     def stop_video_stream(self):
         if self.is_streaming:
             # Stop ffmpeg
-            self.ffmpeg_command.kill()
-            self.ffmpeg_command = False
+            if self.ffmpeg_command:
+                self.ffmpeg_command.kill()
+                self.ffmpeg_command = False
 
             # Properly stop the video stream
             self.bebop.stop_video_streaming()
@@ -310,8 +311,9 @@ class Drone:
             FlyingStateChanged(state='hovering', _policy='check') |
             FlyingStateChanged(state='flying', _policy='check') |
             (
-                GPSFixStateChanged(fixed=1, _timeout=10, _policy='check_wait')
-                >> (
+                # GPSFixStateChanged(fixed=1, _timeout=10, _policy='check_wait')
+                # >> (
+                (
                     TakeOff(_no_expect=True)
                     & FlyingStateChanged(state='hovering', _timeout=10, _policy='check_wait')
                 )     
