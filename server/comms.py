@@ -82,6 +82,26 @@ def disconnect():
     print('App disconnected with ID', request.sid)
     print('Current connections ->', currentConnections)
 
+# darknet_interval = False
+# def maintain_darknet_stream(seconds):
+#     global darknet_interval
+#     def maintain():
+#         global darknet_command
+#         maintain_stream(seconds)
+
+#         if darknet_command and darknet_command.poll() != None:
+#             disarm()
+#             arm()
+
+#     darknet_interval = threading.Timer(seconds, maintain)
+#     darknet_interval.start()
+
+# def stop_darknet_maintenance():
+#     global darknet_interval
+#     if darknet_interval:
+#         darknet_interval.cancel()
+#         darknet_interval = False
+
 # Arming event
 @io.on('arm_drone')
 def arm():
@@ -97,8 +117,8 @@ def arm():
     os.chdir('../object-recognition/src/darknet_/')
 
     # darknet
-    # darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
-    darknet = shlex.split('./darknet detector demo cfg/coco.data cfg/yolov3.cfg backup/yolov3.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
+    darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
+    # darknet = shlex.split('./darknet detector demo cfg/coco.data cfg/yolov3.cfg backup/yolov3.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
 
     # will only fail if the directory already exists (i.e. drone armed, disarmed and armed again in same session)
     try:
@@ -110,7 +130,7 @@ def arm():
     if darknet_command:
         darknet_command.kill()
 
-    darknet_command = subprocess.Popen(darknet, cwd=os.getcwd(), stderr=subprocess.PIPE)#, stdout=subprocess.DEVNULL)
+    darknet_command = subprocess.Popen(darknet, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
     # Move back into the server directory
     os.chdir('../../../server/')
@@ -134,6 +154,8 @@ def arm():
 
         bebop.maintain_stream(12) # Maintain ffmpeg every X seconds
 
+        # maintain_darknet_stream(5)
+
         # Launch the drone
         # bebop.launch_drone()
     else:
@@ -146,6 +168,7 @@ def disarm():
     global bebop
 
     stopProcesses()
+    # stop_darknet_maintenance()
 
     # Land the drone at its home location and stop the video stream
     # bebop.go_home()
