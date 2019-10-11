@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
-#include <string>
-
 using std::cerr;
 using std::endl;
 
@@ -296,7 +294,7 @@ void send_json_custom(char const* send_buf, int port, int timeout)
 
 bool send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
 {
-    try 
+    try
     {
         char *send_buf = detection_to_json(dets, nboxes, classes, names, frame_id, NULL);
 

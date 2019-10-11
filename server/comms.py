@@ -8,6 +8,7 @@ import glob
 import base64
 import time
 import shlex
+import threading
 
 # Drone stuff
 from drone import Drone
@@ -81,6 +82,26 @@ def disconnect():
     print('App disconnected with ID', request.sid)
     print('Current connections ->', currentConnections)
 
+# darknet_interval = False
+# def maintain_darknet_stream(seconds):
+#     global darknet_interval
+#     def maintain():
+#         global darknet_command
+#         maintain_stream(seconds)
+
+#         if darknet_command and darknet_command.poll() != None:
+#             disarm()
+#             arm()
+
+#     darknet_interval = threading.Timer(seconds, maintain)
+#     darknet_interval.start()
+
+# def stop_darknet_maintenance():
+#     global darknet_interval
+#     if darknet_interval:
+#         darknet_interval.cancel()
+#         darknet_interval = False
+
 # Arming event
 @io.on('arm_drone')
 def arm():
@@ -97,6 +118,7 @@ def arm():
 
     # darknet
     darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
+    # darknet = shlex.split('./darknet detector demo cfg/coco.data cfg/yolov3.cfg backup/yolov3.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
 
     # will only fail if the directory already exists (i.e. drone armed, disarmed and armed again in same session)
     try:
@@ -108,7 +130,7 @@ def arm():
     if darknet_command:
         darknet_command.kill()
 
-    darknet_command = subprocess.Popen(darknet, cwd='/home/sentinal/Desktop/Uni/Follow-Me-Drones/object-recognition/src/darknet_/', stderr=subprocess.PIPE)#, stdout=subprocess.DEVNULL)
+    darknet_command = subprocess.Popen(darknet, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
     # Move back into the server directory
     os.chdir('../../../server/')
@@ -129,7 +151,10 @@ def arm():
         # Start video streaming from drone to .264 file
         bebop.start_video_stream()
         emit('drone_armed')
-        bebop.maintain_stream(13) # Maintain ffmpeg every X seconds
+
+        bebop.maintain_stream(12) # Maintain ffmpeg every X seconds
+
+        # maintain_darknet_stream(5)
 
         # Launch the drone
         # bebop.launch_drone()
@@ -143,11 +168,12 @@ def disarm():
     global bebop
 
     stopProcesses()
+    # stop_darknet_maintenance()
 
-    # land the drone at its home location and stop the video stream
+    # Land the drone at its home location and stop the video stream
     # bebop.go_home()
     # bebop.land_drone()
-    print('disarmed')
+    
     emit('drone_disarmed')
 
 # Return home event
@@ -363,8 +389,9 @@ def detection():
 # ============================================================================
 
 def zipdir(session_dir, password):
-    subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
+    # subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    pass
+    
 def startup_process():
     pass
 
