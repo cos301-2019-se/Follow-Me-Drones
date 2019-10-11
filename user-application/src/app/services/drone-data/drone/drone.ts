@@ -84,8 +84,8 @@ export class Drone {
           const animal = socketEvent.data.detection;
           // drone.fetchImage( socketEvent.data.image );
           domObject.flightSessionController.detection(drone, socketEvent.data);
-          let message =  `${drone.name} spotted ${animal}`;
-          message = 'Now that is an Avengers level threat!';
+          const message =  `${drone.name} spotted ${animal}`;
+          // message = 'Now that is an Avengers level threat!';
           console.log(message);
           domObject.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {

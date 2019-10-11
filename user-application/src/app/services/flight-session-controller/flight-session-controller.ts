@@ -83,7 +83,7 @@ export class FlightSessionController {
 
   }
 
-  startFlightSession(drone) {
+  startFlightSession(drone, sessionName) {
 
     if ( drone.getState() === DroneState.ARMED) {
       return false;
@@ -93,6 +93,7 @@ export class FlightSessionController {
     drone.setDroneState( DroneState.ARMING );
     const newFlightSession = new FlightSession();
     newFlightSession.droneName = drone.name;
+    newFlightSession.sessionName = sessionName;
     console.log('creating new session and setting name');
     this.activeSessions.set( drone.id, newFlightSession);
     return true;
@@ -103,7 +104,8 @@ export class FlightSessionController {
 
     const oldPastSessions = this.pastSessions.get(drone.id);
     if ( oldPastSessions !== undefined ) {
-      const updatedPastSessions = oldPastSessions.concat(this.activeSessions.get(drone.id));
+      const sesh = this.activeSessions.get(drone.id);
+      const updatedPastSessions = oldPastSessions.concat(sesh);
       this.pastSessions.set(drone.id, updatedPastSessions);
     } else {
       const firstSession = Array(this.activeSessions.get(drone.id));
