@@ -52,7 +52,7 @@ static const int letter_box = 0;
 
 void *fetch_in_thread(void *ptr)
 {
-    int dont_close_stream = 0;    // set 1 if your IP-camera periodically turns off and turns on video-stream
+    int dont_close_stream = 1;    // set 1 if your IP-camera periodically turns off and turns on video-stream
     if(letter_box)
         in_s = get_image_from_stream_letterbox(cap, net.w, net.h, net.c, &in_img, dont_close_stream);
     else
@@ -229,8 +229,16 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
             free_detections(local_dets, local_nboxes);
 
-            if(!prefix)
+            if(prefix)
             {
+                if(objectDetected)
+                {
+                    char buff[256];
+                    sprintf(buff, "%s_%08d.jpg", prefix, count);
+                    if(show_img)
+                        save_cv_jpg(show_img, buff);
+                }
+
                 if (!dont_show)
                 {
                     show_image_mat(show_img, "Demo");
@@ -250,14 +258,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
             else
             {
-                if(objectDetected)
-                {
-                    char buff[256];
-                    sprintf(buff, "%s_%08d.jpg", prefix, count);
-                    if(show_img)
-                        save_cv_jpg(show_img, buff);
-                }
-
                 if (!dont_show)
                 {
                     show_image_mat(show_img, "Demo");
