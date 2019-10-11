@@ -55,7 +55,7 @@ Our project is a conservation-oriented project which aims to provide support to 
 
   
 
-<a  href="https://github.com/cos301-2019-se/Follow-Me-Drones"  target="_blank">Project Github Repository</a>  <br>
+<a  href="https://travis-ci.org/cos301-2019-se/Follow-Me-Drones/builds"  target="_blank">Project Testing</a>  <br>
 
   
 
