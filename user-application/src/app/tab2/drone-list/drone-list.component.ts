@@ -68,7 +68,7 @@ export class DroneListComponent implements AfterViewInit {
   ////////////////////////////////////////////////////////////////////////////////
   startSession(drone) {
     // const seshName = prompt('Please enter a flight session name?');
-    const seshName = 'temp';
+    const seshName = new Date().toDateString() + ' ' + new Date().toLocaleTimeString();
     if (!this.flightSessionController.startFlightSession(drone, seshName)) {
       // TODO: Let user know accordingly
       alert('Problem!');
