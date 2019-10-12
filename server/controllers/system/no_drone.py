@@ -4,6 +4,7 @@ class NoDrone(SystemState):
         print('Starting without drone')
         pass
     def connectDrone(self):
+        print('Connecting without drone')
         pass
     def disconnectDrone(self):
         pass
