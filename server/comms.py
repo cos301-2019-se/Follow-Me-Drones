@@ -154,7 +154,7 @@ def coords():
 # Converts the image in detections/ to base64
 def convertImageToBase64(image_id):
     session_time = systemContoller.getSessionTime()
-    img = '../object-recognition/detections/' + session_time + '/' + image_id
+    img = '../object-recognition/detections/' +  session_time  + '/' + image_id
 
     with open(img, 'rb') as img_file:
         return str(base64.b64encode(img_file.read()))

@@ -12,7 +12,7 @@ class DetectionController():
         # return self.filter(self.detection)
         return self.formatDetection(self.tempRandomFilter(self.detection))
     def formatDetection(self, detection):
-        detection['image'] = str(detection['frame_id']).zfill(8) + '.jpg'
+        detection['image'] = 'img_' + str(detection['frame_id']).zfill(8) + '.jpg'
         detection['animal'] = detection['objects'][0]['name']
         return detection
     def tempRandomFilter(self, detection):

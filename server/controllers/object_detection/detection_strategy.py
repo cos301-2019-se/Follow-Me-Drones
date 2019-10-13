@@ -15,8 +15,7 @@ class DetectionStrategy(ABC):
     def fileStructureMaintainence(self):
         self.session_time = time.strftime('%d%h%Y')
         try:
-            os.chdir('../object-recognition/src/darknet_/')
-            os.mkdir('../../detections/' + self.session_time) # Same as mkdir -p
+            os.mkdir('../object-recognition/detections/' + self.session_time) # Same as mkdir -p
         except:
             pass
         print('return')
