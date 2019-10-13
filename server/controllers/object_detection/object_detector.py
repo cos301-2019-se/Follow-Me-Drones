@@ -4,7 +4,8 @@ class ObjectDetector():
         
     def startDetection(self):
         self.strategy.startDetection()
-        pass
+    
     def stopDetection(self):
-        self.strategy.startDetection()
-
+        print('Turning off object detection...', end='')
+        self.darknet_command.kill()
+        print('Done!')

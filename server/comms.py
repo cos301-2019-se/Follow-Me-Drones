@@ -12,8 +12,6 @@ from exceptions.connection_exceptions import DroneConnectionError
 from exceptions.connection_exceptions import IncorrectNetwork
 from exceptions.detection_exceptions import DetectionException
 
-
-
 import subprocess
 import signal, os
 import glob
@@ -30,7 +28,6 @@ host = '0.0.0.0'
 app = Flask(__name__)
 CORS(app)
 
-
 # ============================================================================
 #                           Socket for the app
 # ============================================================================
@@ -39,10 +36,10 @@ io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 from controllers.system.no_drone import NoDrone
 # systemContoller = SystemController( NoDrone( Webcam(camera_id=0) ) )
-systemContoller = SystemController( NoDrone( Video() ) )
+# systemContoller = SystemController( NoDrone( Video() ) )
 
-# from controllers.system.with_drone import WithDrone
-# systemContoller = SystemController( WithDrone() )
+from controllers.system.with_drone import WithDrone
+systemContoller = SystemController( WithDrone() )
 
 @io.on('connect')
 def connect():
@@ -79,12 +76,6 @@ def disarm():
     except Exception:
         pass
 
-# Return home event
-@io.on('return-home')
-def ETGoHome():
-    global bebop
-    # bebop.go_home()
-
 # Default GET, should never happen
 @app.route('/', methods=['GET'])
 def index():
@@ -94,24 +85,6 @@ def index():
 @app.route('/ping', methods=['GET'])
 def ping():
     return '[{"pong"}]', 200
-
-# Stop the darknet command and the drone streaming
-def stopProcesses():
-    global darknet_command
-    global bebop
-
-    # If the detection is running and the app disconnects, turn it off
-    if darknet_command:
-        print('Turning off object detection...', end='')
-        darknet_command.kill()
-        darknet_command = False
-        print('Done!')
-
-    # if bebop.is_drone_streaming():
-        print('Turning off drone stream...', end='')
-        # bebop.stop_maintenance()
-        # bebop.stop_video_stream()
-        print('Done!')
 
 # Update coords event
 @app.route('/coords', methods=['POST'])
@@ -169,13 +142,9 @@ def return_image():
 #                           Handling detections
 # ============================================================================
 
-# Function to alert the app of a detection
-def alertAppOfDetection(frame_id, detection):
-    img = 'img_' + str(frame_id).zfill(8) + '.jpg'
+# Create a detection controller that can use the io object
+detectionController = DetectionController(io)
 
-    io.emit('detection', {'detection': detection, 'image': img})
-
-detectionController = DetectionController()
 # Endpoint for POST requests alerting the server of a detection
     # Tests:
     # Single animal -> curl -X POST -d '{"frame_id":121, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
@@ -194,6 +163,7 @@ detectionController = DetectionController()
     #      }]
     #   }
     #
+
 @app.route('/detection', methods=['POST'])
 def detection():
     detection = request.json
@@ -212,21 +182,14 @@ def detection():
 # ============================================================================
 
 def zipdir(session_dir, password):
-    # subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    pass
-    
-def startup_process():
-    pass
+    subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def shutdown_process():
     global bebop
-    global session_time
+    
+    session_time = systemContoller.getSessionTime()
 
     print('Beginning shutdown process... \n')
-
-    # End session with drone
-    stopProcesses()
-    # bebop.disconnect_drone()
 
     if session_time:
         # Create an encrypted zip file of all the detections
@@ -291,7 +254,6 @@ def run(p = port, h = host):
     print('Server running on http://' + h + ':' + str(p), '\n')
 
     try:
-        startup_process()
         io.run(app, port = p, host = h)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')

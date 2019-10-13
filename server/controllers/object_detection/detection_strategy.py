@@ -5,13 +5,17 @@ import shlex
 
 class DetectionStrategy(ABC):
     def __init__(self):
-        pass
+        self.darknet_command = False
+        self.session_time = False
+
     @abstractmethod
     def startDetection(self):
         pass
-    @abstractmethod
+
     def stopDetection(self):
-        pass
+        if self.darknet_command:
+            self.darknet_command.kill()
+        
     def fileStructureMaintainence(self):
         self.session_time = time.strftime('%d%h%Y')
         try:
@@ -22,5 +26,3 @@ class DetectionStrategy(ABC):
 
     def getSessionTime(self):
         return self.session_time
-
-

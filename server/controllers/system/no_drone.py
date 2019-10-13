@@ -19,9 +19,3 @@ class NoDrone(SystemState):
             pass
     def disarmDrone(self):
         self.objectDetectionStrategy.stopDetection()
-
-
-
-
-
-
