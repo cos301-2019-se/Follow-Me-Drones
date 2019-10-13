@@ -2,6 +2,18 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, ConnectionRefusedError
 from flask_cors import CORS
 
+from controllers.system.system_controller import SystemController
+from controllers.object_detection.detection_controller import DetectionController
+
+from controllers.object_detection.video import Video
+from controllers.object_detection.webcam import Webcam
+
+from exceptions.connection_exceptions import DroneConnectionError
+from exceptions.connection_exceptions import IncorrectNetwork
+from exceptions.detection_exceptions import DetectionException
+
+
+
 import subprocess
 import signal, os
 import glob
@@ -9,15 +21,6 @@ import base64
 import time
 import shlex
 import threading
-
-# Drone stuff
-from drone import Drone
-
-bebop = Drone()
-
-# Session time, used for directory names
-# Initialised when drone is armed
-session_time = False
 
 # Port for the server
 port = 42069
@@ -27,160 +30,60 @@ host = '0.0.0.0'
 app = Flask(__name__)
 CORS(app)
 
-# Filter global variables
-lastDetectedFrame = 0
-previousDetections = []
-newDetections = []
 
 # ============================================================================
 #                           Socket for the app
 # ============================================================================
-currentConnections = 0
-darknet_command = False
-
 # Create the socket, with all origins allowed
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
-# Connection event
+from controllers.system.no_drone import NoDrone
+# systemContoller = SystemController( NoDrone( Webcam(camera_id=0) ) )
+systemContoller = SystemController( NoDrone( Video() ) )
+
+# from controllers.system.with_drone import WithDrone
+# systemContoller = SystemController( WithDrone() )
+
 @io.on('connect')
 def connect():
-    global currentConnections
-    global bebop
-
-    print('App trying to connect...')
-
-    # Only allow one app to be connected at any given time
-    if currentConnections >= 1:
-        # print('\nToo many apps attempted to connect to drone, kicked', request.sid)
-        # print('Current connections ->', currentConnections, '\n')
-
-        raise ConnectionRefusedError('Unauthorized!')
-    else:
-        # Establish connection to drone
-        if bebop.connect_drone(liveStream = False):
-            currentConnections += 1
-            print('\nApp connected with ID', request.sid)
-            print('Current connections ->', currentConnections, '\n')
-        else:
-            print('Failed to connect to drone')
-            raise ConnectionRefusedError('Failure')
-            emit('error')
+    try:
+        systemContoller.connectDrone()
+        print('App connected with ID: ', request.sid, '\n')
+    except DroneConnectionError as error:
+        print( error.getMessage() )
+        raise ConnectionRefusedError('Failed')
+    except IncorrectNetwork as error:
+        print( error.getMessage() )
 
 # Disconnection event
 @io.on('disconnect')
 def disconnect():
-    global currentConnections
-    global bebop
-
-    # Stop the processes
-    stopProcesses()
-
-    # Disconnect drone
-    bebop.disconnect_drone()
-    
-    currentConnections -= 1
+    systemContoller.disconnectDrone()
     print('App disconnected with ID', request.sid)
-    print('Current connections ->', currentConnections)
-
-# darknet_interval = False
-# def maintain_darknet_stream(seconds):
-#     global darknet_interval
-#     def maintain():
-#         global darknet_command
-#         maintain_stream(seconds)
-
-#         if darknet_command and darknet_command.poll() != None:
-#             disarm()
-#             arm()
-
-#     darknet_interval = threading.Timer(seconds, maintain)
-#     darknet_interval.start()
-
-# def stop_darknet_maintenance():
-#     global darknet_interval
-#     if darknet_interval:
-#         darknet_interval.cancel()
-#         darknet_interval = False
 
 # Arming event
 @io.on('arm_drone')
 def arm():
-    global darknet_command
-    global bebop
-    global session_time
-
-    session_time = time.strftime('%d%h%Y')
-
-    print('Starting object recognition...', end='', flush=True)
-
-    # Move into the darknet directory
-    os.chdir('../object-recognition/src/darknet_/')
-
-    # darknet
-    darknet = shlex.split('./darknet detector demo cfg/animals.data cfg/animals-tiny.cfg backup/animals-tiny_last.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
-    # darknet = shlex.split('./darknet detector demo cfg/coco.data cfg/yolov3.cfg backup/yolov3.weights udp://127.0.0.1:5123 -thresh 0.7 -json_port 42069 -prefix ../../detections/' + session_time + '/img -out_filename ../../output.mkv')# -dont_show')
-
-    # will only fail if the directory already exists (i.e. drone armed, disarmed and armed again in same session)
     try:
-        os.mkdir('../../detections/' + session_time)
-    except:
-        pass
-
-    # if darknet is already running, kill it
-    if darknet_command:
-        darknet_command.kill()
-
-    darknet_command = subprocess.Popen(darknet, cwd=os.getcwd(), stderr=subprocess.PIPE, stdout=subprocess.DEVNULL)
-
-    # Move back into the server directory
-    os.chdir('../../../server/')
-
-    detection_armed = False
-    # Wait for detection to start, then alert the app
-    for line in iter(darknet_command.stderr.readline, b''):
-        if b'Done!' in line:
-            print('Done!')
-            print('Drone is armed! Beware poachers')
-            emit('drone_armed')
-
-            detection_armed = True
-            darknet_command.stderr.close()
-            break
-
-    if detection_armed:
-        # Start video streaming from drone to .264 file
-        bebop.start_video_stream()
+        systemContoller.armDrone()
         emit('drone_armed')
-
-        bebop.maintain_stream(12) # Maintain ffmpeg every X seconds
-
-        # maintain_darknet_stream(5)
-
-        # Launch the drone
-        # bebop.launch_drone()
-    else:
-        print('Something went wrong arming detection...')
+    except Exception:
+        emit('error')
 
 # Disarm event
 @io.on('disarm_drone')
 def disarm():
-    global darknet_command
-    global bebop
-
-    stopProcesses()
-    # stop_darknet_maintenance()
-
-    # Land the drone at its home location and stop the video stream
-    # bebop.go_home()
-    # bebop.land_drone()
-    
-    emit('drone_disarmed')
+    try:
+        systemContoller.disarmDrone()
+        emit('drone_disarmed')
+    except Exception:
+        pass
 
 # Return home event
 @io.on('return-home')
 def ETGoHome():
     global bebop
-    bebop.go_home()
+    # bebop.go_home()
 
 # Default GET, should never happen
 @app.route('/', methods=['GET'])
@@ -204,10 +107,10 @@ def stopProcesses():
         darknet_command = False
         print('Done!')
 
-    if bebop.is_drone_streaming():
+    # if bebop.is_drone_streaming():
         print('Turning off drone stream...', end='')
-        bebop.stop_maintenance()
-        bebop.stop_video_stream()
+        # bebop.stop_maintenance()
+        # bebop.stop_video_stream()
         print('Done!')
 
 # Update coords event
@@ -250,7 +153,7 @@ def coords():
 
 # Converts the image in detections/ to base64
 def convertImageToBase64(image_id):
-    global session_time
+    session_time = systemContoller.getSessionTime()
     img = '../object-recognition/detections/' + session_time + '/' + image_id
 
     with open(img, 'rb') as img_file:
@@ -259,13 +162,8 @@ def convertImageToBase64(image_id):
 # Endpoint for the app to request an image based on an image_id
 @app.route('/image', methods=['POST'])
 def return_image():
-    global session_time
-
-    if session_time:
-        blob = convertImageToBase64(request.get_json()['image'])
-        return (jsonify(blob), 200)
-    else:
-        return '', 500
+    blob = convertImageToBase64(request.get_json()['image'])
+    return (jsonify(blob), 200)
 
 # ============================================================================
 #                           Handling detections
@@ -277,9 +175,8 @@ def alertAppOfDetection(frame_id, detection):
 
     io.emit('detection', {'detection': detection, 'image': img})
 
+detectionController = DetectionController()
 # Endpoint for POST requests alerting the server of a detection
-@app.route('/detection', methods=['POST'])
-def detection():
     # Tests:
     # Single animal -> curl -X POST -d '{"frame_id":121, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
     # Herd -> curl -X POST -d '{"frame_id":181, "objects": [ {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}, {"class_id":1, "name":"elephant", "relative_coordinates":{"center_x":0.465886, "center_y":0.690794, "width":0.048322, "height":0.065592}, "confidence":0.704248}]}' -H 'Content-Type:application/json' http://127.0.0.1:42069/detection
@@ -297,91 +194,17 @@ def detection():
     #      }]
     #   }
     #
-
-    global lastDetectedFrame
-    global previousDetections
-    global newDetections
-
+@app.route('/detection', methods=['POST'])
+def detection():
     detection = request.json
+    try:
+        det = detectionController.newDetection(detection)
+        detectedAnimal = det['animal']
+        image = det['image']
+        io.emit('detection', {'detection': detectedAnimal, 'image': image})
+    except DetectionException as exp:
+        pass
 
-    # Server will only check first detection and then each 50th frame thereafter
-    if abs(detection['frame_id'] - lastDetectedFrame) > 50 or lastDetectedFrame == 0:
-
-        # If theres been over 100 frames without a detection, erase the list of old previousDetections as the camera has probably moved long past the last animal
-        if abs(detection['frame_id'] - lastDetectedFrame) > 100:
-            previousDetections = []
-
-        lastDetectedFrame = detection['frame_id']
-
-        dX = dY = threshX = threshY = 0
-        animalAlreadyDetected = False
-
-        # Count how many of each animal are present in the frame
-        animalCounters = {}
-        for detectedAnimal in detection['objects']:
-            if detectedAnimal['name'] in animalCounters:
-                animalCounters[detectedAnimal['name']]['count'] += 1
-            else:
-                # Initialise the animals details, saving its name as the index, a count for how many of them there are, and its coordinates
-                animalCounters[detectedAnimal['name']] = {}
-                animalCounters[detectedAnimal['name']]['count'] = 1
-                animalCounters[detectedAnimal['name']]['relative_coordinates'] = detectedAnimal['relative_coordinates']
-
-        for detectedAnimal in animalCounters:
-
-            # See if the old list of previousDetections contains the ones now detected
-            animalAlreadyDetected = False
-
-            # If there is more than 1 of this type of animal, then handle it as a herd. Else check if its the same animal as previously
-            if animalCounters[detectedAnimal]['count'] > 1:
-                for animal in previousDetections:
-                    # If there exists a previousDetections name equal to the newly detected animal and the herd flag is set, then that animal has already been detected
-                    if animal['name'] == detectedAnimal and animal['herd']:
-                        animalAlreadyDetected = True
-                        break
-
-                # New detection of a herd
-                if not animalAlreadyDetected:
-                    print('\n', '\033[36m', 'New detection!', '\033[37m') # Blue writing
-                    print('\tFrame ->', detection['frame_id'])
-                    print('\tMultiple ->', detectedAnimal, '\n')
-
-                    alertAppOfDetection(detection['frame_id'], 'multiple ' + detectedAnimal + ' detected')
-
-                # Create a new list of the currently detected animals, with herd flag set to true
-                newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': True})
-            else:
-                # Check if the list of detections animalAlreadyDetected an animal with the same name, and if its position is within the threshold
-                for animal in previousDetections:
-                    dX = abs(animal['relative_coordinates']['center_x'] - animalCounters[detectedAnimal]['relative_coordinates']['center_x'])
-                    dY = abs(animal['relative_coordinates']['center_y'] - animalCounters[detectedAnimal]['relative_coordinates']['center_y'])
-
-                    threshX = 4*animalCounters[detectedAnimal]['relative_coordinates']['width']
-                    threshY = 4*animalCounters[detectedAnimal]['relative_coordinates']['height']
-
-                    # If names are the same, and their X and Y coords are within a range of the thresholds, then its considered the same animal
-                    if animal['name'] == detectedAnimal and dX < threshX and dY < threshY:
-                        animalAlreadyDetected = True
-
-                        # Update the previousDetections center coordinates
-                        animal['relative_coordinates']['center_x'] = animalCounters[detectedAnimal]['relative_coordinates']['center_x']
-                        animal['relative_coordinates']['center_y'] = animalCounters[detectedAnimal]['relative_coordinates']['center_y']
-                        break
-
-                # New detection of a single animal
-                if not animalAlreadyDetected:
-                    print('\n', '\033[36m', 'New detection!', '\033[37m') # Blue writing
-                    print('\tFrame ->', detection['frame_id'])
-                    print('\tAnimal ->', detectedAnimal, '\n')
-
-                    alertAppOfDetection(detection['frame_id'], detectedAnimal)
-
-                # Create a new list of the currently detected animals, with the herd flag set to false
-                newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': False})
-
-        # Replace the old list with the new list, since the camera is always moving 'forward', you can discard any previousDetections that have fallen out of frame
-        previousDetections = newDetections
-        newDetections = []
     return '', 200
 
 # ============================================================================
@@ -403,7 +226,7 @@ def shutdown_process():
 
     # End session with drone
     stopProcesses()
-    bebop.disconnect_drone()
+    # bebop.disconnect_drone()
 
     if session_time:
         # Create an encrypted zip file of all the detections
@@ -465,7 +288,7 @@ def run(p = port, h = host):
     print('\033[37m') # Change color to white
 
     # Run the flask API
-    print('Server running on http://' + h + ':' + str(p))
+    print('Server running on http://' + h + ':' + str(p), '\n')
 
     try:
         startup_process()

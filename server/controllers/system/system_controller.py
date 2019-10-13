@@ -11,21 +11,28 @@ class SystemController():
     def connectDrone(self):
         if self.lessThanOneClientConnected():
             self.currentConnections += 1
-            try:
-                self.state.connectDrone()
-            except Exception:
-                raise DroneConnectionError('Failed to connect to physical drone!')
+            self.state.connectDrone()
         else:
-            # more than one user atempted to connect
-            raise DroneConnectionError('Only one client is allowed!')
+            raise DroneConnectionError('Only one client is allowed to connect!')
+
+    def armDrone(self):
+        try:
+            self.state.armDrone()
+        except Exception:
+            pass
+    def disarmDrone(self):
+        self.state.disarmDrone()
 
     def disconnectDrone(self):
        self.state.disconnectDrone()
+       self.currentConnections -= 1
 
     def lessThanOneClientConnected(self):
         if(self.currentConnections < 1):
             return True
         else:
             return False
+    def getSessionTime(self):
+        return self.state.getSessionTime()
 
 

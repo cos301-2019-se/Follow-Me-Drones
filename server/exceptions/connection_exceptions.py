@@ -11,6 +11,12 @@ class DroneConnectionError(ConnectionError):
         self.strerror = err
         self.args = {err}
     def getMessage(self):
-        super().defualtError()
+        # super().defualtError()
         return self.strerror
 
+class IncorrectNetwork(Exception):
+    def __init__(self, err):
+        self.strerror = err
+        self.args = {err}
+    def getMessage(self):
+        return self.strerror
