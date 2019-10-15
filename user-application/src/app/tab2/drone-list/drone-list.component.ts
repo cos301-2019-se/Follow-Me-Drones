@@ -53,8 +53,8 @@ export class DroneListComponent implements AfterViewInit {
   checkOneDroneStatus(drone) {
       drone.serverOnline( (online) => {
         if (online) {
-          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
           drone.setDroneState(DroneState.ONLINE);
+          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
         } else {
           drone.setDroneState(DroneState.OFFLINE);
         }
@@ -113,7 +113,7 @@ export class DroneListComponent implements AfterViewInit {
           const message =  `${drone.name} spotted ${animal}`;
           this.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
-          console.log('CHANGE STATE TO: ONLINE');
+          console.log('CHANGE STATE TO: ONLINE sarie');
           drone.setDroneState(DroneState.ONLINE);
 
         } else if ( socketEvent.event === 'connect') {

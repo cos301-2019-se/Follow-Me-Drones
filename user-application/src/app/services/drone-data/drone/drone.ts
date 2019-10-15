@@ -104,7 +104,6 @@ export class Drone {
         } else if ( socketEvent.event === 'connect_success') {
           console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
-
         } else if (socketEvent.event === 'drone_armed') {
           drone.setDroneState(DroneState.ARMED);
 
@@ -114,6 +113,10 @@ export class Drone {
         } else if (socketEvent.event === 'drone_disarmed') {
           console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
+        } else if ( socketEvent.event === 'connect_error') {
+          drone.setDroneState(DroneState.OFFLINE);
+          // alert(socketEvent.data);
+
         }
       },
       error: (error)  => {

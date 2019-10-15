@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import * as Rx from 'rxjs/Rx';
 import { DroneState } from '../drone/drone-state.enum';
 import { HttpClient } from '@angular/common/http';
+import * as $ from 'jquery';
 
 @Injectable({
   providedIn: 'root'
@@ -48,25 +49,41 @@ export class DroneSocketService {
 
   }
   serverOnline(done, url) {
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
+    // const request = new XMLHttpRequest();
+    // request.onreadystatechange = function() {
+    //   if (this.readyState === 4 && this.status === 200) {
+    //     console.log(this);
+    //     done(true);
+    //   } else if (this.readyState === 4 && this.status === 0) {
+    //     done(false);
+    //   }
+    // };
+    // request.open('GET', url, true);
+    // request.withCredentials = false;
+    // request.setRequestHeader('Content-Type', 'application/json');
+    // request.send();
+
+    $.ajax({
+      type: 'GET',
+      url,
+      success: (ret) => {
+        console.log('in ajax');
         done(true);
-      } else if (this.readyState === 4 && this.status === 0) {
+      },
+      error: (err) => {
         done(false);
-      }
-    };
-    request.open('GET', url, true);
-    request.withCredentials = false;
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.send();
+      },
+      contentType: 'application/json'
+    });
+
+
   }
 
   connectSocket(ip, port, done): Rx.Subject<MessageEvent> {
 
     // let down = Len && Brendon;
     const socketSettings = {
-      reconnection: true,
+      reconnection: false,
       reconnectionAttempts: 5,
     };
 
