@@ -20,6 +20,38 @@ import time
 import shlex
 import threading
 
+from controllers.system.no_drone import NoDrone
+from controllers.system.with_drone import WithDrone
+
+# l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
+# l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
+# l3 = '\t  _/_/_/        _/  _/_/  _/    _/      _/        _/_/          _/      _/_/_/    _/_/_/    _/_/_/_/  _/  _/  _/  _/        _/_/_/_/     \n'
+# l4 = '\t       _/      _/    _/  _/    _/      _/            _/        _/      _/    _/  _/    _/  _/    _/  _/    _/_/  _/        _/    _/      \n'
+# l5 = '\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n'
+# logo = l1 + l2 + l3 + l4 + l5
+
+l1 = "\t   dvvvvvo.   v vvvvvvvvvv v vvvvvvvo. `v.`vvvb         ,v' v vvvvvvvvvv v vvvvvvvo.    b.             v         .v.   vvvvvvv vvvvvvvv  ,ovvvvvvo.    v vvvvvvvo.\n"
+l2 = "\t v.`vvv.  Yv  v vvv        v vv     `vv `v.`vvvb       ,v'  v vvv        v vv     `vv   Yvvvvo.        v        :vvv.        v vv     ,v vv      `vb   v vv     `vv\n"
+l3 = "\t `v.`vvv.     v vvv        v vv     ,vv  `v.`vvvb     ,v'   v vvv        v vv     ,vv   .`Yvvvvvo.     v       .`vvvv.       v vv     vv vv       `vb  v vv     ,vv\n"
+l4 = "\t  `v.`vvv.    v vvvvvvvvvv v vv.   ,vv'   `v.`vvvb   ,v'    v vvvvvvvvvv v vv.   ,vv'   vo. `Yvvvvvo.  v      .v.`vvvv.      v vv     vv vv        vv  v vv.   ,vv'\n"
+l5 = "\t   `v.`vvv.   v vvv        v vvvvvvvP'     `v.`vvvb ,v'     v vvv        v vvvvvvvP'    v`Yvo. `Yvvvvoov     .v`v.`vvvv.     v vv     vv vv        vv  v vvvvvvvP'\n"
+l6 = "\t    `v.`vvv.  v vvv        v vv`vb          `v.`vvvbv'      v vvv        v vv`vb        v   `Yvo. `Yvvvv    .v' `v.`vvvv.    v vv     vv vv        vP  v vv`vb\n"
+l7 = "\tvb   `v.`vvv. v vvv        v vv `vb.         `v.`vvv'       v vvv        v vv `vb.      v      `Yvo. `Yv   .v'   `v.`vvvv.   v vv     `v vv       ,vP  v vv `vb.\n"
+l8 = "\t`vb.  ;v.`vvv v vvv        v vv   `vb.        `v.`v'        v vvv        v vv   `vb.    v         `Yvo.`  .vvvvvvvvv.`vvvv.  v vv     `v vv     ,vv'   v vv   `vb.\n"
+l9 = "\t `YvvvP ,vvP' v vvvvvvvvvv v vv     `vv.       `v.`         v vvvvvvvvvv v vv     `vv.  v            `Yo .v'       `v.`vvvv. v vv       `vvvvvvvP'     v vv     `vv.\n"
+logo = l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8 + l9
+
+print('\033[2J') # Clear screen
+print('\033[00H') # Move cursor to top left
+print('\033[36m') # Change color to blue
+print(logo)
+# print('\033[31m') # Change color to red
+print('\033[37m') # Change color to white
+
+# ============================================================================
+#                           Setup of server
+# ============================================================================
+
 # Port for the server
 port = 42069
 host = '0.0.0.0'
@@ -28,18 +60,19 @@ host = '0.0.0.0'
 app = Flask(__name__)
 CORS(app)
 
-# ============================================================================
-#                           Socket for the app
-# ============================================================================
 # Create the socket, with all origins allowed
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
-from controllers.system.no_drone import NoDrone
-# systemContoller = SystemController( NoDrone( Webcam(camera_id=0) ) )
-# systemContoller = SystemController( NoDrone( Video() ) )
+# systemContoller = SystemController( WithDrone() ) # Controller with the drone
+# systemContoller = SystemController( NoDrone( Webcam(camera_id=0) ) ) # Controller using webcam 0
+systemContoller = SystemController( NoDrone( Video( video='african-wildlife.mp4') ) ) # Controller using video
 
-from controllers.system.with_drone import WithDrone
-systemContoller = SystemController( WithDrone() )
+# Create a detection controller that can use the io object
+detectionController = DetectionController(io)
+
+# ============================================================================
+#                           Socket for the app
+# ============================================================================
 
 @io.on('connect')
 def connect():
@@ -136,14 +169,12 @@ def convertImageToBase64(image_id):
 @app.route('/image', methods=['POST'])
 def return_image():
     blob = convertImageToBase64(request.get_json()['image'])
+    
     return (jsonify(blob), 200)
 
 # ============================================================================
 #                           Handling detections
 # ============================================================================
-
-# Create a detection controller that can use the io object
-detectionController = DetectionController(io)
 
 # Endpoint for POST requests alerting the server of a detection
     # Tests:
@@ -166,19 +197,12 @@ detectionController = DetectionController(io)
 
 @app.route('/detection', methods=['POST'])
 def detection():
-    detection = request.json
-    try:
-        det = detectionController.newDetection(detection)
-        detectedAnimal = det['animal']
-        image = det['image']
-        io.emit('detection', {'detection': detectedAnimal, 'image': image})
-    except DetectionException as exp:
-        pass
+    detectionController.detectionFilter(request.json)
 
     return '', 200
 
 # ============================================================================
-#                  Print the logo and run socket/server
+#                           run socket/server
 # ============================================================================
 
 def zipdir(session_dir, password):
@@ -186,10 +210,16 @@ def zipdir(session_dir, password):
 
 def shutdown_process():
     global bebop
-    
-    session_time = systemContoller.getSessionTime()
+
+    try:
+        session_time = systemContoller.getSessionTime()
+    except:
+        session_time = False
 
     print('Beginning shutdown process... \n')
+
+    systemContoller.disarmDrone()
+    systemContoller.disconnectDrone()
 
     if session_time:
         # Create an encrypted zip file of all the detections
@@ -225,31 +255,6 @@ def shutdown_process():
     print('Done... Goodbye!')
 
 def run(p = port, h = host):
-    # l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
-    # l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
-    # l3 = '\t  _/_/_/        _/  _/_/  _/    _/      _/        _/_/          _/      _/_/_/    _/_/_/    _/_/_/_/  _/  _/  _/  _/        _/_/_/_/     \n'
-    # l4 = '\t       _/      _/    _/  _/    _/      _/            _/        _/      _/    _/  _/    _/  _/    _/  _/    _/_/  _/        _/    _/      \n'
-    # l5 = '\t_/_/_/          _/_/_/    _/_/        _/      _/_/_/          _/      _/_/_/    _/    _/  _/    _/  _/      _/    _/_/_/  _/    _/ \n'
-    # logo = l1 + l2 + l3 + l4 + l5
-
-    l1 = "\n\t   dvvvvvo.   v vvvvvvvvvv v vvvvvvvo. `v.`vvvb         ,v' v vvvvvvvvvv v vvvvvvvo.    b.             v         .v.   vvvvvvv vvvvvvvv  ,ovvvvvvo.    v vvvvvvvo.\n"
-    l2 = "\t v.`vvv.  Yv  v vvv        v vv     `vv `v.`vvvb       ,v'  v vvv        v vv     `vv   Yvvvvo.        v        :vvv.        v vv     ,v vv      `vb   v vv     `vv\n"
-    l3 = "\t `v.`vvv.     v vvv        v vv     ,vv  `v.`vvvb     ,v'   v vvv        v vv     ,vv   .`Yvvvvvo.     v       .`vvvv.       v vv     vv vv       `vb  v vv     ,vv\n"
-    l4 = "\t  `v.`vvv.    v vvvvvvvvvv v vv.   ,vv'   `v.`vvvb   ,v'    v vvvvvvvvvv v vv.   ,vv'   vo. `Yvvvvvo.  v      .v.`vvvv.      v vv     vv vv        vv  v vv.   ,vv'\n"
-    l5 = "\t   `v.`vvv.   v vvv        v vvvvvvvP'     `v.`vvvb ,v'     v vvv        v vvvvvvvP'    v`Yvo. `Yvvvvoov     .v`v.`vvvv.     v vv     vv vv        vv  v vvvvvvvP'\n"
-    l6 = "\t    `v.`vvv.  v vvv        v vv`vb          `v.`vvvbv'      v vvv        v vv`vb        v   `Yvo. `Yvvvv    .v' `v.`vvvv.    v vv     vv vv        vP  v vv`vb\n"
-    l7 = "\tvb   `v.`vvv. v vvv        v vv `vb.         `v.`vvv'       v vvv        v vv `vb.      v      `Yvo. `Yv   .v'   `v.`vvvv.   v vv     `v vv       ,vP  v vv `vb.\n"
-    l8 = "\t`vb.  ;v.`vvv v vvv        v vv   `vb.        `v.`v'        v vvv        v vv   `vb.    v         `Yvo.`  .vvvvvvvvv.`vvvv.  v vv     `v vv     ,vv'   v vv   `vb.\n"
-    l9 = "\t `YvvvP ,vvP' v vvvvvvvvvv v vv     `vv.       `v.`         v vvvvvvvvvv v vv     `vv.  v            `Yo .v'       `v.`vvvv. v vv       `vvvvvvvP'     v vv     `vv.\n"
-    logo = l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8 + l9
-
-    print('\033[2J') # Clear screen
-    print('\033[00H') # Move cursor to top left
-    print('\033[36m') # Change color to blue
-    print(logo)
-    # print('\033[31m') # Change color to red
-    print('\033[37m') # Change color to white
-
     # Run the flask API
     print('Server running on http://' + h + ':' + str(p), '\n')
 

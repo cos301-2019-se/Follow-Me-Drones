@@ -1498,7 +1498,7 @@ void load_weights_upto(network *net, char *filename, int cutoff)
         }
         if (feof(fp)) break;
     }
-    fprintf(stderr, "Done! Loaded %d layers from weights-file \n", i);
+    fprintf(stderr, "\nDone!\nLoaded %d layers from weights-file \n", i);
     fclose(fp);
 }
 

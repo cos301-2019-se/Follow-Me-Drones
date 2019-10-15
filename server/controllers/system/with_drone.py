@@ -7,16 +7,15 @@ import subprocess
 
 class WithDrone(SystemState):
     def __init__(self):
-        print('Starting with Drone')
+        print('Starting with drone')
         self.drone_controller = DroneController()
         self.setDetectionStrategy( RtpStream() )
 
     def connectDrone(self):
         print('The client is attempting to connect. The system will run with the drone!')
-        print('Connecting to d')
+        
         if self.correctNetwork():
             self.drone_controller.connect()
-
         else:
             raise IncorrectNetwork('Please connect to the ParrotBebop2 network')
             
@@ -24,11 +23,16 @@ class WithDrone(SystemState):
         self.drone_controller.disconnect()
 
     def armDrone(self):
-        print('Arming parrot!')
-        armed = self.strategy.startDetection()
+        print('\nArming with drone...')
+        try:
+            return self.objectDetectionStrategy.startDetection()
+        except:
+            print('Something went wrong arming the drone')
+            
+        return False
 
-        if armed:
-            self.drone_controller.arm()
+    def disarmDrone(self):
+        self.objectDetectionStrategy.stopDetection()
 
     def correctNetwork(self):
         try:

@@ -2,7 +2,6 @@
 from flask_socketio import ConnectionRefusedError
 from exceptions.connection_exceptions import DroneConnectionError
 
-
 class SystemController():
     def __init__(self, state):
         self.state = state
@@ -17,18 +16,27 @@ class SystemController():
             raise DroneConnectionError('Only one client is allowed to connect!')
 
     def armDrone(self):
+        print('Starting drone detection...')
         try:
-            self.state.armDrone()
-            self.isArmed = True
+            if self.state.armDrone():
+                self.isArmed = True
+                print('Done starting detection!')
+            else:
+                print('Failed starting detection!')
+
         except Exception:
-            pass
+            print('Failed!')
             
     def disarmDrone(self):
-        self.state.disarmDrone()
+        if self.isArmed:
+            print('Disarming drone...')
+            self.state.disarmDrone()
+            print('Done disarming!')
+
+            self.isArmed = False
 
     def disconnectDrone(self):
-        if self.isArmed:
-            self.disarmDrone()
+        self.disarmDrone()
 
         self.state.disconnectDrone()
         self.currentConnections -= 1
@@ -38,6 +46,7 @@ class SystemController():
             return True
         else:
             return False
+            
     def getSessionTime(self):
         return self.state.getSessionTime()
 

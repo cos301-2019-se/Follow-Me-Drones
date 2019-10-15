@@ -7,10 +7,6 @@ class DetectionController():
         self.newDetections = []
 
         self.io = socket
-        
-    def newDetection(self, data):
-        # return self.filter(self.detection)
-        return self.formatDetection(self.filter(data))
 
     def formatDetection(self, detection, isHerd):
         detection['image'] = 'img_' + str(detection['frame_id']).zfill(8) + '.jpg'
@@ -22,9 +18,12 @@ class DetectionController():
 
         return detection
 
-    def filter(self, detection):
+    def alertAppOfDetection(self, detection, isHerd):
+        self.io.emit('detection', self.formatDetection(detection, isHerd))
+
+    def detectionFilter(self, detection):
         # Server will only check first detection and then each 50th frame thereafter
-        if abs(detection['frame_id'] - self.lastDetectedFrame) > 50 or self.lastDetectedFrame == 0:
+        if (abs(detection['frame_id'] - self.lastDetectedFrame) > 50 or self.lastDetectedFrame == 0) and detection['frame_id'] != 1:
 
             # If theres been over 100 frames without a detection, erase the list of old previousDetections as the camera has probably moved long past the last animal
             if abs(detection['frame_id'] - self.lastDetectedFrame) > 100:
@@ -65,10 +64,7 @@ class DetectionController():
                         print('\tFrame ->', detection['frame_id'])
                         print('\tMultiple ->', detectedAnimal, '\n')
 
-                        detection['isHerd'] = True
-
-                        self.io.emit(formatDetection(detection, True))
-                        return detection
+                        self.alertAppOfDetection(detection, True)
 
                     # Create a new list of the currently detected animals, with herd flag set to true
                     self.newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': True})
@@ -96,7 +92,7 @@ class DetectionController():
                         print('\tFrame ->', detection['frame_id'])
                         print('\tAnimal ->', detectedAnimal, '\n')
 
-                        self.io.emit(formatDetection(detection, False))
+                        self.alertAppOfDetection(detection, False)
 
                     # Create a new list of the currently detected animals, with the herd flag set to false
                     self.newDetections.append({'name': detectedAnimal, 'relative_coordinates': animalCounters[detectedAnimal]['relative_coordinates'], 'herd': False})
