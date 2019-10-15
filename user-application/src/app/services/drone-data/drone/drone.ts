@@ -81,11 +81,11 @@ export class Drone {
     drone.messages.subscribe( {
       next: (socketEvent)  => {
         if (socketEvent.event === 'detection') {
-          const animal = socketEvent.data.detection;
+          const animal = socketEvent.data.animal;
           // drone.fetchImage( socketEvent.data.image );
           domObject.flightSessionController.detection(drone, socketEvent.data);
-          let message =  `${drone.name} spotted ${animal}`;
-          message = 'Now that is an Avengers level threat!';
+          const message =  `${drone.name} spotted ${animal}`;
+          // message = 'Now that is an Avengers level threat!';
           console.log(message);
           domObject.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
@@ -104,7 +104,6 @@ export class Drone {
         } else if ( socketEvent.event === 'connect_success') {
           console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
-
         } else if (socketEvent.event === 'drone_armed') {
           drone.setDroneState(DroneState.ARMED);
 
@@ -114,6 +113,10 @@ export class Drone {
         } else if (socketEvent.event === 'drone_disarmed') {
           console.log('CHANGE STATE TO: CONNECTED');
           drone.setDroneState(DroneState.CONNECTED);
+        } else if ( socketEvent.event === 'connect_error') {
+          drone.setDroneState(DroneState.OFFLINE);
+          // alert(socketEvent.data);
+
         }
       },
       error: (error)  => {

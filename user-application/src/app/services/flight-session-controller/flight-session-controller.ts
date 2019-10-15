@@ -21,7 +21,6 @@ export class FlightSessionController {
     this.pastSessions = new Map<string , FlightSession[]> ();
     this.storage.forEach( (value, key, index ) => {
       if ( key.endsWith('_sessions')) {
-        console.log(value);
         const droneId = key.replace('_sessions', '');
         const tempSessionsArr = [];
         value.forEach( (currentSession) => {
@@ -35,6 +34,13 @@ export class FlightSessionController {
     });
 
 
+  }
+  getSessionByUUID(uuid): FlightSession {
+    const allSessions = this.getAllSessions();
+    console.log('getting them all');
+    console.log(allSessions);
+    const session = allSessions.filter( sesh => sesh.sessionID === uuid);
+    return session[0];
   }
 
   getCurrentSession(uuid) {
@@ -76,7 +82,7 @@ export class FlightSessionController {
 
   }
 
-  startFlightSession(drone) {
+  startFlightSession(drone, sessionName) {
 
     if ( drone.getState() === DroneState.ARMED) {
       return false;
@@ -86,6 +92,7 @@ export class FlightSessionController {
     drone.setDroneState( DroneState.ARMING );
     const newFlightSession = new FlightSession();
     newFlightSession.droneName = drone.name;
+    newFlightSession.sessionName = sessionName;
     console.log('creating new session and setting name');
     this.activeSessions.set( drone.id, newFlightSession);
     return true;
@@ -96,7 +103,8 @@ export class FlightSessionController {
 
     const oldPastSessions = this.pastSessions.get(drone.id);
     if ( oldPastSessions !== undefined ) {
-      const updatedPastSessions = oldPastSessions.concat(this.activeSessions.get(drone.id));
+      const sesh = this.activeSessions.get(drone.id);
+      const updatedPastSessions = oldPastSessions.concat(sesh);
       this.pastSessions.set(drone.id, updatedPastSessions);
     } else {
       const firstSession = Array(this.activeSessions.get(drone.id));
@@ -139,6 +147,31 @@ export class FlightSessionController {
       });
     } , 1000 );
 
+  }
+  deleteSession(session) {
+    this.storage.forEach( (value, key, index ) => {
+      if ( key.endsWith('_sessions')) {
+        const droneId = key.replace('_sessions', '');
+        const tempSessionsArr = [];
+        value.forEach( (currentSession) => {
+          const tempSession = new FlightSession();
+          if ( currentSession.sessionID === session.sessionID) {
+            console.log('match');
+            console.log(currentSession);
+            // const arr  = this.pastSessions.get(droneId)
+            const arr  = this.pastSessions.get(droneId).filter( sesh => sesh.sessionID !== currentSession.sessionID);
+            this.pastSessions.delete(droneId);
+            this.pastSessions.set(droneId, arr);
+            this.storage.set(droneId + '_sessions', arr);
+            console.log(arr);
+          }
+          // tempSession.setSesssion(currentSession);
+          // tempSessionsArr.push(tempSession);
+        });
+        // this.pastSessions.set(droneId, tempSessionsArr);
+      }
+
+    });
   }
 
 }

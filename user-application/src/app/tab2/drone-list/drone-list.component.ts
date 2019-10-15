@@ -10,6 +10,7 @@ import { FlightSessionController } from '../../services/flight-session-controlle
 import { Router } from '@angular/router';
 import { IonItemSliding } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
+// import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Component({
   selector: 'app-drone-list',
@@ -23,16 +24,18 @@ export class DroneListComponent implements AfterViewInit {
   ////////////////////////////////////////////////////////////////////////////////
   // Init
   ////////////////////////////////////////////////////////////////////////////////
-  private drones: Drone[] = [];
+  public drones: Drone[] = [];
   messages: Subject<any>;
+  seshName: string;
   constructor(
               public toastController: ToastController,
               public actionSheetController: ActionSheetController,
               public modalController: ModalController,
               public droneDataService: DroneDataService,
               public flightSessionController: FlightSessionController,
-              public alertController : AlertController,
-              public router: Router
+              public alertController: AlertController,
+              public router: Router,
+              // public localNotifications : LocalNotifications
               ) {
 
     const currentClass = this;
@@ -52,8 +55,8 @@ export class DroneListComponent implements AfterViewInit {
   checkOneDroneStatus(drone) {
       drone.serverOnline( (online) => {
         if (online) {
-          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
           drone.setDroneState(DroneState.ONLINE);
+          console.log(`CHANGE STATE TO: ONLINE ${drone.name}`);
         } else {
           drone.setDroneState(DroneState.OFFLINE);
         }
@@ -66,7 +69,9 @@ export class DroneListComponent implements AfterViewInit {
   // Flight Sessions
   ////////////////////////////////////////////////////////////////////////////////
   startSession(drone) {
-    if (!this.flightSessionController.startFlightSession(drone)) {
+    // const seshName = prompt('Please enter a flight session name?');
+    const seshName = new Date().toDateString() + ' ' + new Date().toLocaleTimeString();
+    if (!this.flightSessionController.startFlightSession(drone, seshName)) {
       // TODO: Let user know accordingly
       alert('Problem!');
     }
@@ -107,11 +112,10 @@ export class DroneListComponent implements AfterViewInit {
           const animal = socketEvent.data.detection;
           // drone.fetchImage( socketEvent.data.image );
           this.flightSessionController.detection(drone, socketEvent.data);
-          let message =  `${drone.name} spotted ${animal}`;
-          message = 'Now that is an Avengers level threat!';
+          const message =  `${drone.name} spotted ${animal}`;
           this.presentToast(message);
         } else if (socketEvent.event === 'disconnect') {
-          console.log('CHANGE STATE TO: ONLINE');
+          console.log('CHANGE STATE TO: ONLINE sarie');
           drone.setDroneState(DroneState.ONLINE);
 
         } else if ( socketEvent.event === 'connect') {

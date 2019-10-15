@@ -12,7 +12,7 @@
 				<div class="ion-chip-wrapper">
 
 					<!--  Drone OFFLINE -->
-					<ion-chip color="danger" *ngIf="isOffline(drone)">
+					<ion-chip color="danger" (click)="checkOneDroneStatus(drone)" *ngIf="isOffline(drone)" >
 						<ion-label color="danger">Offline</ion-label>
 					</ion-chip>
 					<!-- ========================================== -->
@@ -20,7 +20,7 @@
 
 					<!-- Drone ONLINE -->
 
-					<ion-chip class="ion-chip" color="success" *ngIf="isOnline(drone)">
+					<ion-chip class="ion-chip" outline color="success" *ngIf="isOnline(drone)">
 						<ion-label color="success">Online</ion-label>
 					</ion-chip>
 
@@ -61,7 +61,7 @@
 					<!-- ========================================== -->
 
 					<!-- Drone ARMING -->
-					<ion-chip color="success" *ngIf="isArming(drone)">
+					<ion-chip color="success" outline *ngIf="isArming(drone)">
 						<ion-label color="success">Connected</ion-label>
 					</ion-chip>
 
@@ -71,7 +71,7 @@
 					<!-- ========================================== -->
 
 					<!-- Drone ARMED -->
-					<ion-chip color="success" (click)="disconnectDrone(drone)" *ngIf="isArmed(drone)">
+					<ion-chip color="success" outline (click)="disconnectDrone(drone)" *ngIf="isArmed(drone)">
 						<ion-label color="success">Connected</ion-label>
 					</ion-chip>
 
