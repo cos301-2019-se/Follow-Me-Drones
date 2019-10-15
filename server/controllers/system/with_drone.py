@@ -4,6 +4,7 @@ from ..drone.drone_controller import DroneController
 from ..object_detection.rtp_stream import RtpStream
 
 import subprocess
+import time
 
 class WithDrone(SystemState):
     def __init__(self):
@@ -24,15 +25,18 @@ class WithDrone(SystemState):
 
     def armDrone(self):
         print('\nArming with drone...')
-        try:
-            return self.objectDetectionStrategy.startDetection()
-        except:
-            print('Something went wrong arming the drone')
-            
-        return False
+        status = self.objectDetectionStrategy.startDetection()
+
+        print('status:', status)
+        if status:
+            self.drone_controller.arm()
+
+        return status
 
     def disarmDrone(self):
         self.objectDetectionStrategy.stopDetection()
+
+        self.drone_controller.disarm()
 
     def correctNetwork(self):
         try:

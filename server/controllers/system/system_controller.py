@@ -17,15 +17,12 @@ class SystemController():
 
     def armDrone(self):
         print('Starting drone detection...')
-        try:
-            if self.state.armDrone():
-                self.isArmed = True
-                print('Done starting detection!')
-            else:
-                print('Failed starting detection!')
 
-        except Exception:
-            print('Failed!')
+        if self.state.armDrone():
+            self.isArmed = True
+            print('Done starting detection!')
+        else:
+            print('Failed starting detection!')
             
     def disarmDrone(self):
         if self.isArmed:

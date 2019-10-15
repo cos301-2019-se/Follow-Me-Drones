@@ -64,8 +64,8 @@ CORS(app)
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
 
 # systemContoller = SystemController( WithDrone() ) # Controller with the drone
-# systemContoller = SystemController( NoDrone( Webcam(camera_id=0) ) ) # Controller using webcam 0
-systemContoller = SystemController( NoDrone( Video( video='african-wildlife.mp4') ) ) # Controller using video
+# systemContoller = SystemController( NoDrone( Webcam(camera_id=2) ) ) # Controller using webcam 0
+systemContoller = SystemController( NoDrone( Video( video='botswana-wildlife.mp4') ) ) # Controller using video
 
 # Create a detection controller that can use the io object
 detectionController = DetectionController(io)
@@ -73,6 +73,27 @@ detectionController = DetectionController(io)
 # ============================================================================
 #                           Socket for the app
 # ============================================================================
+
+# I like security
+# CERT_FILE = "certificates/cert.pem"
+# KEY_FILE = "certificates/key.pem"
+
+# def verify_and_create_ssl(certfile, keyfile):
+#     C_F = os.path.join(os.getcwd(), certfile)
+#     K_F = os.path.join(os.getcwd(), keyfile)
+
+#     if not os.path.exists(C_F) or not os.path.exists(K_F):
+#         print('Certificate don\'t exist, generating ssl certificate...', end='', flush=True)
+
+#         try:
+#             os.mkdir('certificates')
+#         except:
+#             pass
+
+#         cmd = shlex.split('openssl req -x509 -newkey rsa:4096 -nodes -out ' + certfile + ' -keyout ' + keyfile + ' -days 1825 -sha256 -subj "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"')
+        
+#         subprocess.call(cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+#         print('Done!')
 
 @io.on('connect')
 def connect():
@@ -94,20 +115,14 @@ def disconnect():
 # Arming event
 @io.on('arm_drone')
 def arm():
-    try:
-        systemContoller.armDrone()
-        emit('drone_armed')
-    except Exception:
-        emit('error')
+    systemContoller.armDrone()
+    emit('drone_armed')
 
 # Disarm event
 @io.on('disarm_drone')
 def disarm():
-    try:
-        systemContoller.disarmDrone()
-        emit('drone_disarmed')
-    except Exception:
-        pass
+    systemContoller.disarmDrone()
+    emit('drone_disarmed')
 
 # Default GET, should never happen
 @app.route('/', methods=['GET'])
@@ -208,6 +223,11 @@ def detection():
 def zipdir(session_dir, password):
     subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+def startup_process():
+    global CERT_FILE
+    global KEY_FILE
+    verify_and_create_ssl(CERT_FILE, KEY_FILE)
+
 def shutdown_process():
     global bebop
 
@@ -255,11 +275,16 @@ def shutdown_process():
     print('Done... Goodbye!')
 
 def run(p = port, h = host):
+    # global CERT_FILE
+    # global KEY_FILE
+
     # Run the flask API
-    print('Server running on http://' + h + ':' + str(p), '\n')
+    print('Server running on https://' + h + ':' + str(p), '\n')
+
+    startup_process()
 
     try:
-        io.run(app, port = p, host = h)
+        io.run(app, port = p, host = h)#, certfile=CERT_FILE, keyfile=KEY_FILE)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
         

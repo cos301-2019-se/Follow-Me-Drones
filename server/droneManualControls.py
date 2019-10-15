@@ -48,7 +48,7 @@ class BlackMagic:
         # 2 - warning
         # 1 - error
         # 0 - critical
-        self.bebop = olympe.Drone("192.168.42.1", loglevel=3, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
+        self.bebop = olympe.Drone("192.168.42.1", loglevel=0, drone_type=od.ARSDK_DEVICE_TYPE_BEBOP_2)
         self.stream_dir = os.path.join(os.getcwd(), 'stream/')
 
         if not os.path.exists(self.stream_dir):

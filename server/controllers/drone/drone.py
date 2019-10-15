@@ -4,33 +4,27 @@ import cv2
 
 import olympe
 import olympe_deps as od
-import math
-import time
 import shlex
 import threading
+import time
 
 import subprocess
 
 # enums
-from olympe.enums.ardrone3.Piloting import Circle_Direction, MoveTo_Orientation_mode
+from olympe.enums.ardrone3.Piloting import MoveTo_Orientation_mode
 from olympe.enums.ardrone3.GPSSettings import HomeType_Type
 from olympe.enums.ardrone3.PilotingState import FlyingStateChanged_State
 
 # messages
-from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, UserTakeOff, NavigateHome, Circle, moveTo
+from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing, PCMD, Circle, moveTo
 from olympe.messages.ardrone3.GPSSettings import ReturnHomeMinAltitude, HomeType
-from olympe.messages.ardrone3.Animations import Flip
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged, GpsLocationChanged, moveToChanged
-from olympe.messages.ardrone3.PilotingSettingsState import CirclingRadiusChanged
 from olympe.messages.ardrone3.PilotingSettings import MaxDistance, NoFlyOverMaxDistance
-from olympe.messages.ardrone3.GPSSettingsState import GPSFixStateChanged, HomeChanged
-
-from olympe.messages.battery import health
+from olympe.messages.ardrone3.GPSSettingsState import GPSFixStateChanged
 
 class Drone():
     def __init__(self):
-        print('init drone')
-          # make bebop object
+        # make bebop object
         # Debug levels
         # 4 - debug
         # 3 - info
@@ -48,7 +42,6 @@ class Drone():
 
         self.ffmpegInterval = False
         self.ffmpegCommand = False
-        self.ffmpeg = shlex.split('/bin/ffmpeg -re -i stream/h264_data.264 -c copy -f h264 udp://127.0.0.1:5123')
 
     def connect(self, liveStream):
         # Connect the the drone
@@ -102,18 +95,28 @@ class Drone():
         # Start video streaming
         self.bebop.start_video_streaming()
 
-    def startFfmpegRestream(self):
+    def startFfmpegRestream(self, socket):
+        self.restreamSocket = socket
+        
+        print('streaming socket:', self.restreamSocket)
+        ffmpeg = shlex.split('/bin/ffmpeg -re -i stream/h264_data.264 -c copy -f h264 ' + self.restreamSocket)
+
         # if ffmpeg is already running, kill it
         if self.ffmpegCommand:
             self.ffmpegCommand.kill()
 
         # start ffmpeg       
         self.ffmpegCommand = subprocess.Popen(
-            self.ffmpeg,
+            ffmpeg,
             cwd=os.getcwd(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
+
+    def stopFfmpegRestream(self):
+        if self.ffmpegCommand:
+            self.ffmpegCommand.kill()
+            self.ffmpegCommand = False
 
     def stopVideoStream(self):
         # Stop ffmpeg
@@ -133,6 +136,12 @@ class Drone():
             self.stopVideoStream()
 
             self.startVideoStream()
+
+            time.sleep(1)
+
+            self.stopFfmpegRestream()
+
+            self.startFfmpegRestream(self.restreamSocket)
 
         self.ffmpegInterval = threading.Timer(seconds, maintain)
         self.ffmpegInterval.start()

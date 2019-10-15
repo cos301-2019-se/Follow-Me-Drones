@@ -1,5 +1,7 @@
 from .drone import Drone
 
+import time
+
 class DroneController():
     def __init__(self):
         self.bebop = Drone()
@@ -17,7 +19,9 @@ class DroneController():
 
     def disconnect(self):
         if self.droneConnected:
-            if self.bebop.getFlyingState() != 'landed':
+            self.disarm()
+
+            if self.bebop.getFlyingState() != 'landed' and self.bebop.getFlyingState() != 'uninitialized':
                 self.bebop.goHome()
                 self.bebop.land()
 
@@ -31,6 +35,7 @@ class DroneController():
     #   - maintain the ffmpeg stream
     def arm(self):
         if not self.droneArmed:
+            print('arming drone')
             # Start video stream
             self.bebop.startVideoStream()
 
@@ -38,31 +43,34 @@ class DroneController():
             time.sleep(1)
 
             # Start ffmpeg restream
-            self.bebop.startFfmpegRestream()
+            self.bebop.startFfmpegRestream('udp://127.0.0.1:5123')
 
             # Maintain ffmpeg restream
             self.bebop.maintainFfmpegRestream(self.ffmpegRefreshTime)
 
             # Launch drone and go up by X meters
-            print('Taking off...', end='', flush=True)
-            self.bebop.launch(2.0) 
-            print('Done!')
+            # print('Taking off...', end='', flush=True)
+            # self.bebop.launch(2.0) 
+            # print('Done!')
 
             self.droneArmed = True
 
     def disarm(self):
         if self.droneArmed:
             # Drone go home
-            print('Drone returning home...', end='', flush=True)
-            self.bebop.goHome() 
-            print('Done!')
+            # print('Drone returning home...', end='', flush=True)
+            # self.bebop.goHome() 
+            # print('Done!')
 
             # Land drone
-            print('Landing drone...', end='', flush=True)
-            self.bebop.land() 
-            print('Done!')
+            # print('Landing drone...', end='', flush=True)
+            # self.bebop.land() 
+            # print('Done!')
 
             # Stop ffmpeg maintenance
+            self.bebop.stopFfmpegMaintenance()
+
+            # Stop restream
             self.bebop.stopFfmpegRestream()
 
             # Stop video stream

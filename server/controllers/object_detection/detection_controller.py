@@ -12,9 +12,9 @@ class DetectionController():
         detection['image'] = 'img_' + str(detection['frame_id']).zfill(8) + '.jpg'
 
         if isHerd:
-            detection['animal'] = 'multiple ' + detection['objects'][0]['name'] + 's detected'
+            detection['animal'] = 'multiple ' + detection['objects'][0]['name'] + '(s)'
         else:
-            detection['animal'] = detection['objects'][0]['name'] + ' detected'
+            detection['animal'] = 'a(n) ' + detection['objects'][0]['name']
 
         return detection
 
