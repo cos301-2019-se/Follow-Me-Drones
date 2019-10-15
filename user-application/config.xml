@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="io.ionic.starter" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>5G1B</name>
+    <name>Five Guys One Branch</name>
     <description>Five</description>
     <author email="5guys1branch@gmail.com" href="https://github.com/cos301-2019-se/Follow-Me-Drones">5 Guys 1 Branch</author>
     <content src="index.html" />
