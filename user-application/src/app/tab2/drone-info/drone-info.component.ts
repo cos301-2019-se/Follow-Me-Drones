@@ -10,7 +10,6 @@ import { UUID } from 'angular2-uuid';
 import {Validators, FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
 import { ToastController } from '@ionic/angular';
-import { Toast } from 'ionic-angular';
 
 @Component({
   selector: 'app-drone-info',
@@ -21,7 +20,6 @@ export class DroneInfoComponent implements OnInit {
   state: DroneInfoState;
   protected drone: Drone;
   public droneForm : FormGroup;
-  private toast : Toast;
 
   constructor(  
                 private router: Router,
@@ -101,7 +99,7 @@ export class DroneInfoComponent implements OnInit {
     const portRegex = '^()([1-9]|[1-5]?[0-9]{2,4}|6[1-4][0-9]{3}|65[1-4][0-9]{2}|655[1-2][0-9]|6553[1-5])$';
     
     if(droneName == '') { //Empty drone name
-      this.presentInvalidInfoToast("name");
+      this.presentInvalidInfoToast("drone name");
       return false;
     } if(!droneIP.match(ipRegex)) { //Invalid IP address
       this.presentInvalidInfoToast("IP address");
@@ -115,26 +113,19 @@ export class DroneInfoComponent implements OnInit {
   }
 
   async presentInvalidInfoToast(invalidInput : String) {
-    try { //To allow only a single toast to appear
-      this.toast.dismiss();
-    } catch (error) {}
-
-    this.toast = await this.toastController.create({
+    const toast = await this.toastController.create({
       message: `Please input a valid ${invalidInput}.`,
       position: 'bottom',
       showCloseButton: true,
-      closeButtonText: "Ok"
+      closeButtonText: "Ok",
+      duration: 2000
     });
-    await this.toast.present();
+    await toast.present();
   }
 
   cancel() {
     // TODO: Prompt user
     this.router.navigate(['/tabs/tab2/']);
-
-    try { //To clear toast before moving to next screen
-      this.toast.dismiss();
-    } catch (error) {}
   }
   getValue(el) {
     return  $(`#${el} input`)[0].value;

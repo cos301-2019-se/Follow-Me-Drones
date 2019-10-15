@@ -10,7 +10,6 @@ import { FlightSessionController } from '../../services/flight-session-controlle
 import { Router } from '@angular/router';
 import { IonItemSliding } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
-// import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Component({
   selector: 'app-drone-list',
