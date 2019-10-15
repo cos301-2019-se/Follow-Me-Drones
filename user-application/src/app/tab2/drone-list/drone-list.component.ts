@@ -10,6 +10,7 @@ import { FlightSessionController } from '../../services/flight-session-controlle
 import { Router } from '@angular/router';
 import { IonItemSliding } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
+// import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Component({
   selector: 'app-drone-list',
@@ -33,7 +34,8 @@ export class DroneListComponent implements AfterViewInit {
               public droneDataService: DroneDataService,
               public flightSessionController: FlightSessionController,
               public alertController: AlertController,
-              public router: Router
+              public router: Router,
+              // public localNotifications : LocalNotifications
               ) {
 
     const currentClass = this;

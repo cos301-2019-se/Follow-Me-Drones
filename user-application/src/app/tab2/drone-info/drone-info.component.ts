@@ -9,7 +9,8 @@ import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common'
 import { UUID } from 'angular2-uuid';
 import {Validators, FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
-import { ToastController, Toast } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
+import { Toast } from 'ionic-angular';
 
 @Component({
   selector: 'app-drone-info',
