@@ -21,6 +21,11 @@ export class AllSessionsComponent implements OnInit {
     this.router.navigate(['/tabs/tab3/detailed-session', session.getID()]);
   }
 
+  deleteSession(session) {
+    this.flightSessions.deleteSession(session);
+    this.allSessions = this.allSessions.filter( sesh => sesh.sessionID !== session.sessionID);
+  }
+
   ngOnInit() {}
 
 }
