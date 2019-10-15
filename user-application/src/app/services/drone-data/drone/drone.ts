@@ -81,7 +81,7 @@ export class Drone {
     drone.messages.subscribe( {
       next: (socketEvent)  => {
         if (socketEvent.event === 'detection') {
-          const animal = socketEvent.data.detection;
+          const animal = socketEvent.data.animal;
           // drone.fetchImage( socketEvent.data.image );
           domObject.flightSessionController.detection(drone, socketEvent.data);
           const message =  `${drone.name} spotted ${animal}`;

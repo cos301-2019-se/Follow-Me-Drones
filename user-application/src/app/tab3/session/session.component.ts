@@ -14,5 +14,8 @@ export class SessionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {}
+  test() {
+    alert('delet');
+  }
 
 }

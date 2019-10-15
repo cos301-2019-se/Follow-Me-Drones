@@ -12,7 +12,7 @@ import { FlightSessionController } from '../services/flight-session-controller/f
 })
 export class Tab3Page {
   segmentValue: SegmentStatus;
-  private drones: Drone[] = [];
+  public drones: Drone[] = [];
   private filteredDrones: Drone[] = [];
 
   private sessions: FlightSession[];

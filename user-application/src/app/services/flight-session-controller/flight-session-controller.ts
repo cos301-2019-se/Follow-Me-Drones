@@ -21,7 +21,6 @@ export class FlightSessionController {
     this.pastSessions = new Map<string , FlightSession[]> ();
     this.storage.forEach( (value, key, index ) => {
       if ( key.endsWith('_sessions')) {
-        console.log(value);
         const droneId = key.replace('_sessions', '');
         const tempSessionsArr = [];
         value.forEach( (currentSession) => {
@@ -148,6 +147,31 @@ export class FlightSessionController {
       });
     } , 1000 );
 
+  }
+  deleteSession(session) {
+    this.storage.forEach( (value, key, index ) => {
+      if ( key.endsWith('_sessions')) {
+        const droneId = key.replace('_sessions', '');
+        const tempSessionsArr = [];
+        value.forEach( (currentSession) => {
+          const tempSession = new FlightSession();
+          if ( currentSession.sessionID === session.sessionID) {
+            console.log('match');
+            console.log(currentSession);
+            // const arr  = this.pastSessions.get(droneId)
+            const arr  = this.pastSessions.get(droneId).filter( sesh => sesh.sessionID !== currentSession.sessionID);
+            this.pastSessions.delete(droneId);
+            this.pastSessions.set(droneId, arr);
+            this.storage.set(droneId + '_sessions', arr);
+            console.log(arr);
+          }
+          // tempSession.setSesssion(currentSession);
+          // tempSessionsArr.push(tempSession);
+        });
+        // this.pastSessions.set(droneId, tempSessionsArr);
+      }
+
+    });
   }
 
 }
