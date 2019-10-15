@@ -21,7 +21,7 @@ import shlex
 import threading
 
 from controllers.system.no_drone import NoDrone
-from controllers.system.with_drone import WithDrone
+# from controllers.system.with_drone import WithDrone
 
 # l1 = '\n\t    _/_/_/_/        _/_/_/  _/    _/  _/      _/    _/_/_/        _/      _/_/_/    _/_/_/      _/_/    _/      _/    _/_/_/  _/    _/   \n'
 # l2 = '\t   _/            _/        _/    _/    _/  _/    _/            _/_/      _/    _/  _/    _/  _/    _/  _/_/    _/  _/        _/    _/    \n'
@@ -73,27 +73,6 @@ detectionController = DetectionController(io)
 # ============================================================================
 #                           Socket for the app
 # ============================================================================
-
-# I like security
-# CERT_FILE = "certificates/cert.pem"
-# KEY_FILE = "certificates/key.pem"
-
-# def verify_and_create_ssl(certfile, keyfile):
-#     C_F = os.path.join(os.getcwd(), certfile)
-#     K_F = os.path.join(os.getcwd(), keyfile)
-
-#     if not os.path.exists(C_F) or not os.path.exists(K_F):
-#         print('Certificate don\'t exist, generating ssl certificate...', end='', flush=True)
-
-#         try:
-#             os.mkdir('certificates')
-#         except:
-#             pass
-
-#         cmd = shlex.split('openssl req -x509 -newkey rsa:4096 -nodes -out ' + certfile + ' -keyout ' + keyfile + ' -days 1825 -sha256 -subj "/C=ZA/ST=Gauteng/L=Pretoria/O=EPI-USE/OU=ERP/CN=5g1b.com"')
-        
-#         subprocess.call(cmd, cwd=os.getcwd(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-#         print('Done!')
 
 @io.on('connect')
 def connect():
@@ -223,10 +202,6 @@ def detection():
 def zipdir(session_dir, password):
     subprocess.call(['7z', 'a', '-mx=9', '-t7z', '-p' + password, '-y', session_dir + '-detections.zip', session_dir + '/*'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def startup_process():
-    global CERT_FILE
-    global KEY_FILE
-    verify_and_create_ssl(CERT_FILE, KEY_FILE)
 
 def shutdown_process():
     global bebop
@@ -275,16 +250,11 @@ def shutdown_process():
     print('Done... Goodbye!')
 
 def run(p = port, h = host):
-    # global CERT_FILE
-    # global KEY_FILE
-
     # Run the flask API
     print('Server running on https://' + h + ':' + str(p), '\n')
 
-    startup_process()
-
     try:
-        io.run(app, port = p, host = h)#, certfile=CERT_FILE, keyfile=KEY_FILE)
+        io.run(app, port = p, host = h)
     except KeyboardInterrupt:
         print('^C received, shutting down the server...')
         
