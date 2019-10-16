@@ -71,9 +71,9 @@ yolov3 = DarknetConfig(weights='yolov3.weights', cfg='yolov3.cfg', data='coco.da
 animals = DarknetConfig(weights='animals-tiny_last.weights', cfg='animals-tiny.cfg', data='animals.data')
 yolov3_http = DarknetConfig(weights='yolov3.weights', cfg='yolov3.cfg', data='coco.data', url='http://192.168.8.101:4747/mjpegfeed')
 
-# systemContoller = SystemController( WithDrone() ) # Controller with the drone
-# systemContoller = SystemController( NoDrone( Webcam(camera_id=2) ) ) # Controller using webcam 0
-systemContoller = SystemController( NoDrone( Video(config=yolov3_http) ) ) # Controller using video + pass in config param
+# systemContoller = SystemController( WithDrone(launch=False) ) # Controller with the drone
+systemContoller = SystemController( NoDrone( Webcam(config=yolov3) ) ) # Controller using webcam 0
+# systemContoller = SystemController( NoDrone( Video(config=animals) ) ) # Controller using video + pass in config param
 
 # Create a detection controller that can use the io object
 detectionController = DetectionController(io)
