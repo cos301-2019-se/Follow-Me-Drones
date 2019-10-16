@@ -7,9 +7,10 @@ import subprocess
 import time
 
 class WithDrone(SystemState):
-    def __init__(self):
+    def __init__(self, launch = False):
         print('Starting with drone')
-        self.drone_controller = DroneController()
+        self.should_launch = launch
+        self.drone_controller = DroneController(self.should_launch)
         self.setDetectionStrategy( RtpStream() )
 
     def connectDrone(self):
@@ -35,7 +36,6 @@ class WithDrone(SystemState):
 
     def disarmDrone(self):
         self.objectDetectionStrategy.stopDetection()
-
         self.drone_controller.disarm()
 
     def correctNetwork(self):

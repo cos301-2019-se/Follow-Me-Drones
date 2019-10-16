@@ -3,10 +3,11 @@ from .drone import Drone
 import time
 
 class DroneController():
-    def __init__(self):
+    def __init__(self, should_launch):
         self.bebop = Drone()
         self.droneConnected = False
         self.droneArmed = False
+        self.should_launch = should_launch
 
         self.ffmpegRefreshTime = 12
 
@@ -48,24 +49,26 @@ class DroneController():
             # Maintain ffmpeg restream
             self.bebop.maintainFfmpegRestream(self.ffmpegRefreshTime)
 
-            # Launch drone and go up by X meters
-            # print('Taking off...', end='', flush=True)
-            # self.bebop.launch(2.0) 
-            # print('Done!')
+            if self.should_launch:
+                # Launch drone and go up by X meters
+                print('Taking off...', end='', flush=True)
+                self.bebop.launch(1.0) 
+                print('Done!')
 
             self.droneArmed = True
 
     def disarm(self):
         if self.droneArmed:
-            # Drone go home
-            # print('Drone returning home...', end='', flush=True)
-            # self.bebop.goHome() 
-            # print('Done!')
+            if self.should_launch:
+                # Drone go home
+                print('Drone returning home...', end='', flush=True)
+                self.bebop.goHome() 
+                print('Done!')
 
-            # Land drone
-            # print('Landing drone...', end='', flush=True)
-            # self.bebop.land() 
-            # print('Done!')
+                # Land drone
+                print('Landing drone...', end='', flush=True)
+                self.bebop.land() 
+                print('Done!')
 
             # Stop ffmpeg maintenance
             self.bebop.stopFfmpegMaintenance()

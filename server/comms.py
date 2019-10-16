@@ -12,6 +12,8 @@ from exceptions.connection_exceptions import DroneConnectionError
 from exceptions.connection_exceptions import IncorrectNetwork
 from exceptions.detection_exceptions import DetectionException
 
+from  classes.darknet_config import DarknetConfig
+
 import subprocess
 import signal, os
 import glob
@@ -52,6 +54,8 @@ print('\033[37m') # Change color to white
 #                           Setup of server
 # ============================================================================
 
+
+
 # Port for the server
 port = 42069
 host = '0.0.0.0'
@@ -62,10 +66,14 @@ CORS(app)
 
 # Create the socket, with all origins allowed
 io = SocketIO(app, cors_allowed_origins="*", monitor_clients=True)
+# Darknet configs
+yolov3 = DarknetConfig(weights='yolov3.weights', cfg='yolov3.cfg', data='coco.data')
+animals = DarknetConfig(weights='animals-tiny_last.weights', cfg='animals-tiny.cfg', data='animals.data')
+yolov3_http = DarknetConfig(weights='yolov3.weights', cfg='yolov3.cfg', data='coco.data', url='http://192.168.8.101:4747/mjpegfeed')
 
-# systemContoller = SystemController( WithDrone() ) # Controller with the drone
-# systemContoller = SystemController( NoDrone( Webcam(camera_id=2) ) ) # Controller using webcam 0
-systemContoller = SystemController( NoDrone( Video( video='botswana-wildlife.mp4') ) ) # Controller using video
+# systemContoller = SystemController( WithDrone(launch=False) ) # Controller with the drone
+systemContoller = SystemController( NoDrone( Webcam(config=yolov3) ) ) # Controller using webcam 0
+# systemContoller = SystemController( NoDrone( Video(config=animals) ) ) # Controller using video + pass in config param
 
 # Create a detection controller that can use the io object
 detectionController = DetectionController(io)
