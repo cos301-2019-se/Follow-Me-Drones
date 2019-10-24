@@ -47,6 +47,7 @@ custom/
 *.mkv
 *.jpg
 *.png
+*.mov
 
 *.weights
 *.list
@@ -75,9 +76,10 @@ _deps
 object-recognition/src/yolo-mark/Makefile
 
 package-lock.json
-# Drone control stuff
 
-*.mav
+# Drone stuff
+parrot-groundsdk/
+stream/
 
 # virtualenv stuff
 venv/

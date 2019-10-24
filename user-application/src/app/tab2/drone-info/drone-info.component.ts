@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 import { UUID } from 'angular2-uuid';
 import {Validators, FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { DroneState } from '../../services/drone-data/drone/drone-state.enum';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-drone-info',
@@ -23,7 +25,8 @@ export class DroneInfoComponent implements OnInit {
                 private router: Router,
                 private route: ActivatedRoute,
                 private dronesData: DroneDataService,
-                private formBuilder : FormBuilder
+                private formBuilder : FormBuilder,
+                public toastController : ToastController
   ) {
 
     this.droneForm = this.formBuilder.group({
@@ -41,7 +44,6 @@ export class DroneInfoComponent implements OnInit {
 
     if ( route.snapshot.routeConfig.path !== 'new-drone' ) {
       this.drone = dronesData.getDrone(route.snapshot.paramMap.get('drone'));
-      console.log(this.drone);
       this.state = DroneInfoState.EDIT;
       this.droneForm.controls['droneName'].setValue(this.drone.name);
       this.droneForm.controls['dronePort'].setValue(this.drone.port);
@@ -54,27 +56,73 @@ export class DroneInfoComponent implements OnInit {
 
   submitDroneInfo(): void {
     if (this.state === DroneInfoState.ADD_NEW) {
-      console.log('Add new');
       const name = this.droneForm.value['droneName'];
-      const port = this.droneForm.value['dronePort'];
-      const droneIP = this.droneForm.value['droneIP'];
+      const port : string = this.droneForm.value['dronePort'];
+      const droneIP : string = this.droneForm.value['droneIP'];
       const comment = this.droneForm.value['droneComments'];
-      this.dronesData.addNewDrone(new Drone( UUID.UUID() , name, port, droneIP, './assets/drone-icons/drone-1.svg', comment  ));
+      const tempDrone = new  Drone( UUID.UUID() , name, port, droneIP, './assets/drone-icons/drone-1.svg', comment  );
+      
+      if(!this.validateInput(name, droneIP, port)) {
+        return;
+      }
+
+      tempDrone.serverOnline( (online) => {
+        if (online) {
+          tempDrone.setDroneState(DroneState.ONLINE);
+        } else {
+          tempDrone.setDroneState(DroneState.OFFLINE);
+        }
+      });
+
+      this.dronesData.addNewDrone(tempDrone);
 
       this.router.navigate(['/tabs/tab2/']);
-    } else if ( this.state === DroneInfoState.EDIT) {
+    } else if (this.state === DroneInfoState.EDIT) {
       // TODO: Check if drone is in active session. If it is the user can't edit the information
-      console.log('Edit!');
       const newName = this.droneForm.value['droneName'];
       const newPort = this.droneForm.value['dronePort'];
       const newIpAddress = this.droneForm.value['droneIP'];
       const newComment = this.droneForm.value['droneComments'];
+
+      if(!this.validateInput(newName, newIpAddress, newPort)) {
+        return;
+      }
+      
       this.drone.updateDrone(newName, newPort, newIpAddress, newComment );
       this.dronesData.updateDrone(this.drone);
       this.router.navigate(['/tabs/tab2/']);
     }
 
   }
+  validateInput(droneName : String, droneIP : String, port : String) : Boolean {
+    const ipRegex = '^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$';
+    const portRegex = '^()([1-9]|[1-5]?[0-9]{2,4}|6[1-4][0-9]{3}|65[1-4][0-9]{2}|655[1-2][0-9]|6553[1-5])$';
+    
+    if(droneName == '') { //Empty drone name
+      this.presentInvalidInfoToast("drone name");
+      return false;
+    } if(!droneIP.match(ipRegex)) { //Invalid IP address
+      this.presentInvalidInfoToast("IP address");
+      return false;
+    } else if(!port.match(portRegex)) { //Invalid port
+      this.presentInvalidInfoToast("port");
+      return false;
+    }
+
+    return true;
+  }
+
+  async presentInvalidInfoToast(invalidInput : String) {
+    const toast = await this.toastController.create({
+      message: `Please input a valid ${invalidInput}.`,
+      position: 'bottom',
+      showCloseButton: true,
+      closeButtonText: "Ok",
+      duration: 2000
+    });
+    await toast.present();
+  }
+
   cancel() {
     // TODO: Prompt user
     this.router.navigate(['/tabs/tab2/']);

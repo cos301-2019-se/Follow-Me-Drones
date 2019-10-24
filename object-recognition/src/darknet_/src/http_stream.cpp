@@ -14,8 +14,6 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
-#include <string>
-
 using std::cerr;
 using std::endl;
 
@@ -282,7 +280,7 @@ void send_json_custom(char const* send_buf, int port, int timeout)
         std::string content(send_buf);
         content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
         
-        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:" + std::__cxx11::to_string(port) + "/detection";
+        std::string to_send = "curl -X POST -H \"Content-Type: application/json\" -d '" + content + "' http://127.0.0.1:" + std::__cxx11::to_string(port) + "/detection &";
         std::cout << to_send << std::endl;
 
         system(to_send.c_str());
@@ -296,7 +294,7 @@ void send_json_custom(char const* send_buf, int port, int timeout)
 
 bool send_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, int port, int timeout)
 {
-    try 
+    try
     {
         char *send_buf = detection_to_json(dets, nboxes, classes, names, frame_id, NULL);
 

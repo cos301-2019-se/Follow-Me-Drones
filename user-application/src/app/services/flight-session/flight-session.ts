@@ -1,13 +1,17 @@
+import { UUID } from 'angular2-uuid';
+
 import { DroneState } from '../drone-data/drone/drone-state.enum';
 export class FlightSession {
   public detectionImages: string [] = [];
   public sessionName: string;
   public active: boolean;
   public droneName: string;
+  public sessionID: string;
   constructor() {
     console.log('Arming drone!');
     this.active = true;
     this.sessionName = 'mock_name';
+    this.sessionID = UUID.UUID();
     // this.droneName = 'Brendon Laptop';
   }
   setSesssion( obj ) {
@@ -15,6 +19,7 @@ export class FlightSession {
     this.detectionImages = obj.detectionImages;
     this.active = obj.active;
     this.droneName = obj.droneName;
+    this.sessionID = obj.sessionID;
   }
   setSessionName(sessionName) {
     this.sessionName = sessionName;
@@ -30,6 +35,9 @@ export class FlightSession {
   }
   getSessionName() {
     return this.sessionName;
+  }
+  getID() {
+    return this.sessionID;
   }
   isActive(): boolean {
     return this.active;

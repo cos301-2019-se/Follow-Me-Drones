@@ -30,5 +30,9 @@ export class PreviousSessionsComponent implements OnInit {
 
   }
   ngOnInit() {}
+  deleteSession(session) {
+    this.flightSessions.deleteSession(session);
+    this.previousSessions = this.previousSessions.filter( sesh => sesh.sessionID !== session.sessionID);
+  }
 
 }

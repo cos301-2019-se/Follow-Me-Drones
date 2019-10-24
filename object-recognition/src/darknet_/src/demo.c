@@ -37,6 +37,8 @@ static int demo_ext_output = 0;
 static long long int frame_id = 0;
 static int demo_json_port = -1;
 
+#define NFRAMES 3
+
 static float* predictions[NFRAMES];
 static int demo_index = 0;
 static image images[NFRAMES];
@@ -48,11 +50,11 @@ mat_cv* det_img;
 mat_cv* show_img;
 
 static volatile int flag_exit;
-static const int letter_box = 0;
+static int letter_box = 0;
 
 void *fetch_in_thread(void *ptr)
 {
-    int dont_close_stream = 0;    // set 1 if your IP-camera periodically turns off and turns on video-stream
+    int dont_close_stream = 1;    // set 1 if your IP-camera periodically turns off and turns on video-stream
     if(letter_box)
         in_s = get_image_from_stream_letterbox(cap, net.w, net.h, net.c, &in_img, dont_close_stream);
     else
@@ -102,8 +104,9 @@ double get_wall_time()
 }
 
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
-    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output)
+    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in)
 {
+    letter_box = letter_box_in;
     in_img = det_img = show_img = NULL;
     //skip = frame_skip;
     image **alphabet = load_alphabet();
@@ -174,8 +177,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
 
     int count = 0;
-    if(!dont_show)
-    {
+    if(!prefix && !dont_show){
         int full_screen = 0;
         create_window_cv("Demo", full_screen, 1352, 1013);
     }
@@ -186,7 +188,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     {
         int src_fps = 25;
         src_fps = get_stream_fps_cpp_cv(cap);
-        output_video_writer = create_video_writer(out_filename, 'D', 'I', 'V', 'X', src_fps, get_width_mat(det_img), get_height_mat(det_img), 1);
+        output_video_writer =
+            create_video_writer(out_filename, 'D', 'I', 'V', 'X', src_fps, get_width_mat(det_img), get_height_mat(det_img), 1);
 
         //'H', '2', '6', '4'
         //'D', 'I', 'V', 'X'
@@ -199,8 +202,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
     double before = get_wall_time();
 
-    while(1)
-    {
+    while(1){
         ++count;
         {
             if(pthread_create(&fetch_thread, 0, fetch_in_thread, 0)) error("Thread creation failed");
@@ -210,9 +212,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             int local_nboxes = nboxes;
             detection *local_dets = dets;
 
-            // if (nms) do_nms_obj(local_dets, local_nboxes, l.classes, nms);    // bad results
+            //if (nms) do_nms_obj(local_dets, local_nboxes, l.classes, nms);    // bad results
             if (nms) do_nms_sort(local_dets, local_nboxes, l.classes, nms);
-            
+
             printf("\033[2J");
             printf("\033[1;1H");
             printf("\nFPS:%.1f\n",fps);
@@ -220,8 +222,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
             bool objectDetected = false;
             ++frame_id;
-            if (demo_json_port > 0)
-            {
+            if (demo_json_port > 0) {
                 int timeout = 400000;
                 objectDetected = send_json(local_dets, local_nboxes, l.classes, demo_names, frame_id, demo_json_port, timeout);
             }
@@ -229,8 +230,18 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
             free_detections(local_dets, local_nboxes);
 
-            if(!prefix)
+            // printf("\nFPS:%.1f\n", fps);
+
+            if(prefix)
             {
+                if(objectDetected)
+                {
+                    char buff[256];
+                    sprintf(buff, "%s_%08d.jpg", prefix, count);
+                    if(show_img)
+                        save_cv_jpg(show_img, buff);
+                }
+
                 if (!dont_show)
                 {
                     show_image_mat(show_img, "Demo");
@@ -250,14 +261,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
             else
             {
-                if(objectDetected)
-                {
-                    char buff[256];
-                    sprintf(buff, "%s_%08d.jpg", prefix, count);
-                    if(show_img)
-                        save_cv_jpg(show_img, buff);
-                }
-
                 if (!dont_show)
                 {
                     show_image_mat(show_img, "Demo");
@@ -346,7 +349,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 }
 #else
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
-    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output)
+    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in)
 {
     fprintf(stderr, "Demo needs OpenCV for webcam images.\n");
 }
